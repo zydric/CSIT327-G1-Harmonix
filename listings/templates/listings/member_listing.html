@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="w-8 h-8 flex items-center justify-center mr-3">
+                        <img src="{% static 'images/harmonix_logo.png' %}" alt="Logo" class="w-full h-full">
+                    </div>
+                    <h1 class="text-[#4F2FC0] text-xl font-bold">Harmonix</h1>
+                </div>
+                <div class="flex space-x-8 text-sm font-medium text-gray-700">
+                    <a href="#" class="hover:text-[#4F2FC0]">LISTINGS</a>
+                    <a href="#" class="hover:text-[#4F2FC0]">PROFILE</a>
+                    <a href="#" class="hover:text-[#4F2FC0]">APPLICATIONS</a>
+                    <a href="#" class="hover:text-[#4F2FC0]">MY LISTINGS</a>
+                    <a href="#" class="hover:text-[#4F2FC0]">LOGOUT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+</div>
+{% endblock %}
