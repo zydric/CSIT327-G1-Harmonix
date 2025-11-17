@@ -16,11 +16,25 @@
                     <a href="#" class="hover:text-[#4F2FC0]">LISTINGS</a>
                     <a href="#" class="hover:text-[#4F2FC0]">PROFILE</a>
                     <a href="#" class="hover:text-[#4F2FC0]">APPLICATIONS</a>
-                    <a href="#" class="hover:text-[#4F2FC0]">MY LISTINGS</a>
+                    <a href="#" class="text-[#4F2FC0] border-b-2 border-[#4F2FC0] pb-4 -mb-px">MY LISTINGS</a>
                     <a href="#" class="hover:text-[#4F2FC0]">LOGOUT</a>
                 </div>
             </div>
         </div>
     </nav>
+
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Header + Create Button -->
+        <div class="flex items-center justify-between mb-10">
+            <div>
+                <h1 class="text-4xl font-bold mb-2 text-gray-900">My Listings</h1>
+                <p class="text-gray-500">Manage your band's job postings and applications</p>
+            </div>
+            <button onclick="document.getElementById('createModal').showModal()"
+                class="px-6 py-2 bg-[#4F2FC0] text-white rounded-lg font-medium hover:bg-purple-700 transition-colors">
+                + Create Listing
+            </button>
+        </div>
+    </div>
 </div>
 {% endblock %}
