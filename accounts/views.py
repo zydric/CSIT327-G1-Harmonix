@@ -18,7 +18,39 @@ from harmonix.constants import GENRE_CHOICES, INSTRUMENT_CHOICES
 from .models import User
 
 def band_profile_view(request):
-    return render(request, 'accounts/band_profile.html')
+    user = request.user
+    
+    if request.method == 'POST':
+        # Get form data
+        new_username = request.POST.get('username', '').strip()
+        new_location = request.POST.get('location', '').strip()
+        new_bio = request.POST.get('bio', '').strip()
+        new_genres = request.POST.get('genres', '').strip()
+
+        # Validate username if it changed
+        if new_username != user.username:
+            if User.objects.filter(username=new_username).exists():
+                messages.error(request, 'This username is already taken.')
+                return render(request, 'accounts/band_profile.html', {'user': user})
+
+        try:
+            # Update user fields
+            user.username = new_username
+            user.location = new_location
+            user.bio = new_bio
+            user.genres = new_genres
+            user.save()
+            
+            messages.success(request, 'Profile updated successfully!')
+            return redirect('accounts:band_profile')
+            
+        except Exception as e:
+            messages.error(request, f'An error occurred: {str(e)}')
+    
+    context = {
+        'user': user
+    }
+    return render(request, 'accounts/band_profile.html', context)
 
 def edit_band_profile_view(request):
     return render(request, 'accounts/edit_band_profile.html')
@@ -232,8 +264,39 @@ def logout_view(request):
 @login_required
 @csrf_protect
 def musician_profile_view(request):
+    user = request.user
+    
+    if request.method == 'POST':
+        # Get form data
+        new_username = request.POST.get('username', '').strip()
+        new_location = request.POST.get('location', '').strip()
+        new_bio = request.POST.get('bio', '').strip()
+        new_instruments = request.POST.get('instruments', '').strip()
+        new_genres = request.POST.get('genres', '').strip()
+
+        # Validate username if it changed
+        if new_username != user.username:
+            if User.objects.filter(username=new_username).exists():
+                messages.error(request, 'This username is already taken.')
+                return render(request, 'accounts/musician_profile.html', {'user': user})
+
+        try:
+            # Update user fields
+            user.username = new_username
+            user.location = new_location
+            user.bio = new_bio
+            user.instruments = new_instruments
+            user.genres = new_genres
+            user.save()
+            
+            messages.success(request, 'Profile updated successfully!')
+            return redirect('accounts:musician_profile')
+            
+        except Exception as e:
+            messages.error(request, f'An error occurred: {str(e)}')
+    
     context = {
-        'user': request.user
+        'user': user
     }
     return render(request, 'accounts/musician_profile.html', context)
 

@@ -1,0 +1,38 @@
+<!-- Reusable Button Component
+Usage: {% include 'components/button.html' with text='Click Me' href='#' variant='primary' %}
+Variants: primary, secondary, danger, outline
+-->
+{% if href %}
+<a href="{{ href }}" 
+   class="inline-block px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap
+   {% if variant == 'primary' or not variant %}
+       bg-[#4F2FC0] text-white hover:bg-[#3f24a0]
+   {% elif variant == 'secondary' %}
+       bg-gray-100 text-gray-700 hover:bg-gray-200
+   {% elif variant == 'danger' %}
+       bg-red-600 text-white hover:bg-red-700
+   {% elif variant == 'outline' %}
+       border-2 border-[#4F2FC0] text-[#4F2FC0] hover:bg-[#4F2FC0] hover:text-white
+   {% endif %}
+   {% if full_width %}w-full text-center{% endif %}
+   {{ extra_classes }}">
+    {{ text }}
+</a>
+{% else %}
+<button type="{{ type|default:'button' }}" 
+        class="px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap
+        {% if variant == 'primary' or not variant %}
+            bg-[#4F2FC0] text-white hover:bg-[#3f24a0]
+        {% elif variant == 'secondary' %}
+            bg-gray-100 text-gray-700 hover:bg-gray-200
+        {% elif variant == 'danger' %}
+            bg-red-600 text-white hover:bg-red-700
+        {% elif variant == 'outline' %}
+            border-2 border-[#4F2FC0] text-[#4F2FC0] hover:bg-[#4F2FC0] hover:text-white
+        {% endif %}
+        {% if full_width %}w-full{% endif %}
+        {{ extra_classes }}"
+        {% if onclick %}onclick="{{ onclick }}"{% endif %}>
+    {{ text }}
+</button>
+{% endif %}

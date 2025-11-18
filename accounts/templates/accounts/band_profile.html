@@ -1,42 +1,39 @@
-<!DOCTYPE html>
+{% extends "base.html" %}
 {% load custom_filters %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        :root {
-            --primary-color: #9B7EC4;
-            --light-bg: #F3EFF8;
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-    </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-</head>
 
-<body class="bg-white min-h-screen p-8">
-    <div id="app" class="max-w-7xl mx-auto">
-        <div id="viewMode">
-            
+{% block title %}My Profile - Harmonix{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <!-- Header -->
             <div class="mb-8 flex items-start justify-between">
                 <div>
                     <h1 class="text-4xl font-bold text-gray-900 mb-2">My Profile</h1>
                     <p class="text-gray-600">Manage your musical profile and preferences</p>
                 </div>
-                <a href="{% url 'accounts:edit_band_profile' %}" class="px-6 py-3 rounded-lg font-semibold text-white transition hover:opacity-90" style="background-color: var(--primary-color);">
-                    Edit Profile
-                </a>
+                <div id="headerButtons">
+                    <!-- View Mode Button -->
+                    <button id="editButton" onclick="enterEditMode()" class="px-6 py-3 rounded-lg font-semibold text-white transition hover:opacity-90" style="background-color: var(--primary-color);">
+                        Edit Profile
+                    </button>
+                    <!-- Edit Mode Buttons (Hidden by default) -->
+                    <div id="saveButtons" class="hidden space-x-3">
+                        <button onclick="exitEditMode()" class="px-6 py-3 rounded-lg font-semibold border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition">
+                            Cancel
+                        </button>
+                        <button type="submit" form="profile-form" class="px-6 py-3 rounded-lg font-semibold text-white transition hover:opacity-90" style="background-color: var(--primary-color);">
+                            Save Changes
+                        </button>
+                    </div>
+                </div>
             </div>
 
+            <!-- Main Content Form -->
+            <form id="profile-form" method="POST" class="contents">
+                {% csrf_token %}
+                
             <!-- Main Content - Two Column Layout -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
                 
                 <!-- Left Sidebar -->
                 <div class="lg:col-span-1">
@@ -73,20 +70,22 @@
                         <div>
                             <h3 class="font-bold text-gray-900 mb-3">Genres</h3>
                             <div class="flex flex-wrap gap-2">
-                                {% for genre in user.genres|split:',' %}
-                                <span class="px-3 py-1 bg-gray-100 text-gray-900 text-sm font-medium rounded-full">
-                                    {{ genre }}
-                                </span>
+                                {% with genres=user.genres|default:'' %}
+                                {% for genre in genres|split:',' %}
+                                    <span class="px-3 py-1 bg-gray-100 text-gray-900 text-sm font-medium rounded-full">
+                                        {{ genre }}
+                                    </span>
                                 {% empty %}
-                                <span class="text-gray-500 text-sm">{{ user.genres }}</span>
+                                    <span class="text-gray-500 text-sm">No genres selected</span>
                                 {% endfor %}
+                                {% endwith %}
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Right Content Area -->
-                <div class="lg:col-span-2">
+                <div class="lg:col-span-3">
                     <div class="bg-white border border-gray-200 rounded-2xl p-8">
                         <!-- Basic Information Section -->
                         <h2 class="text-2xl font-bold text-gray-900 mb-8">Basic Information</h2>
@@ -97,31 +96,154 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label class="block font-semibold text-gray-900 mb-2">Username</label>
-                                    <input type="text" value="{{ user.username }}" class="w-full px-4 py-2 bg-gray-100 text-gray-600 rounded-lg border border-gray-200 focus:outline-none" readonly>
+                                    <input type="text" name="username" value="{{ user.username }}" 
+                                           class="editable-field w-full px-4 py-2 bg-gray-100 text-gray-600 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#4F2FC0] focus:border-transparent" readonly>
                                 </div>
                                 <div>
                                     <label class="block font-semibold text-gray-900 mb-2">Email</label>
-                                    <input type="email" value="{{ user.email }}" class="w-full px-4 py-2 bg-gray-100 text-gray-600 rounded-lg border border-gray-200 focus:outline-none" readonly>
+                                    <input type="email" name="email" value="{{ user.email }}" 
+                                           class="w-full px-4 py-2 bg-gray-100 text-gray-600 rounded-lg border border-gray-200 focus:outline-none" readonly>
                                 </div>
                             </div>
 
                             <!-- Location -->
                             <div>
                                 <label class="block font-semibold text-gray-900 mb-2">Location</label>
-                                <input type="text" value="{{ user.location }}" class="w-full px-4 py-2 bg-gray-100 text-gray-600 rounded-lg border border-gray-200 focus:outline-none" readonly>
+                                <input type="text" name="location" value="{{ user.location }}" 
+                                       class="editable-field w-full px-4 py-2 bg-gray-100 text-gray-600 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#4F2FC0] focus:border-transparent" readonly>
                             </div>
 
                             <!-- Bio -->
                             <div>
                                 <label class="block font-semibold text-gray-900 mb-2">Bio</label>
-                                <textarea class="w-full px-4 py-3 bg-gray-100 text-gray-600 rounded-lg border border-gray-200 focus:outline-none h-32 resize-none" readonly>{{ user.bio }}</textarea>
+                                <textarea name="bio" 
+                                          class="editable-field w-full px-4 py-3 bg-gray-100 text-gray-600 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#4F2FC0] focus:border-transparent h-32 resize-none" readonly>{{ user.bio }}</textarea>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Genres Section (Hidden in view mode, shown in edit mode) -->
+                    <div id="genresSection" class="hidden bg-white border border-gray-200 rounded-2xl p-8 mt-8">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-2">Genres</h2>
+                        <p class="text-gray-600 mb-6">Select your band's genres</p>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4" id="genresGrid">
+                            <!-- Generated by JavaScript -->
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+            </form>
+</div>
+
+<script>
+    // Data
+    const initialGenres = ('{{ user.genres|default:""|escapejs }}').split(',').map(s => s.trim()).filter(Boolean);
+    const allGenres = ['Rock', 'Jazz', 'Blues', 'Folk', 'Country', 'Electronic', 'Indie', 'Pop', 'Classical', 'Hip-Hop'];
     
-</body>
-</html>
+    let selectedGenres = [...initialGenres];
+    let editMode = false;
+
+    // Enter edit mode
+    function enterEditMode() {
+        editMode = true;
+        
+        // Toggle buttons
+        document.getElementById('editButton').classList.add('hidden');
+        document.getElementById('saveButtons').classList.remove('hidden');
+        document.getElementById('saveButtons').classList.add('flex');
+        
+        // Make fields editable
+        document.querySelectorAll('.editable-field').forEach(field => {
+            field.readOnly = false;
+            field.classList.remove('bg-gray-100', 'text-gray-600');
+            field.classList.add('bg-white', 'text-gray-900');
+        });
+        
+        // Show genres section
+        document.getElementById('genresSection').classList.remove('hidden');
+        
+        // Initialize grid
+        renderGenresGrid();
+    }
+
+    // Exit edit mode (cancel)
+    function exitEditMode() {
+        editMode = false;
+        
+        // Toggle buttons
+        document.getElementById('editButton').classList.remove('hidden');
+        document.getElementById('saveButtons').classList.add('hidden');
+        document.getElementById('saveButtons').classList.remove('flex');
+        
+        // Make fields readonly again
+        document.querySelectorAll('.editable-field').forEach(field => {
+            field.readOnly = true;
+            field.classList.add('bg-gray-100', 'text-gray-600');
+            field.classList.remove('bg-white', 'text-gray-900');
+        });
+        
+        // Hide genres section
+        document.getElementById('genresSection').classList.add('hidden');
+        
+        // Reset selections to initial values
+        selectedGenres = [...initialGenres];
+        updateSidebar();
+    }
+
+    // Render genres grid
+    function renderGenresGrid() {
+        const grid = document.getElementById('genresGrid');
+        grid.innerHTML = '';
+        
+        allGenres.forEach(genre => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = `px-4 py-3 rounded-lg font-semibold transition border-2 ${
+                selectedGenres.includes(genre)
+                    ? 'text-white border-0'
+                    : 'text-gray-900 border-gray-200 bg-white hover:border-gray-300'
+            }`;
+            button.style.backgroundColor = selectedGenres.includes(genre) ? 'var(--primary-color)' : 'transparent';
+            button.textContent = genre;
+            button.onclick = () => toggleGenre(genre);
+            grid.appendChild(button);
+        });
+        
+        // Update hidden input
+        let input = document.querySelector('input[name="genres"]');
+        if (!input) {
+            input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'genres';
+            document.getElementById('profile-form').appendChild(input);
+        }
+        input.value = selectedGenres.join(', ');
+    }
+
+    // Toggle genre selection
+    function toggleGenre(genre) {
+        const index = selectedGenres.indexOf(genre);
+        if (index > -1) {
+            selectedGenres.splice(index, 1);
+        } else {
+            selectedGenres.push(genre);
+        }
+        renderGenresGrid();
+        updateSidebar();
+    }
+
+    // Update sidebar preview
+    function updateSidebar() {
+        const genresContainer = document.querySelector('.lg\\:col-span-1 > div > div:last-child .flex');
+        
+        if (genresContainer) {
+            genresContainer.innerHTML = selectedGenres.length > 0
+                ? selectedGenres.map(genre => 
+                    `<span class="px-3 py-1 bg-gray-100 text-gray-900 text-sm font-medium rounded-full">${genre}</span>`
+                  ).join('')
+                : '<span class="text-gray-500 text-sm">No genres selected</span>';
+        }
+    }
+</script>
+
+{% endblock %}
