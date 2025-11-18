@@ -168,9 +168,38 @@
 </div>
 
 <script>
-    // Data
-    const initialInstruments = ('{{ user.instruments|default:""|escapejs }}').split(',').map(s => s.trim()).filter(Boolean);
-    const initialGenres = ('{{ user.genres|default:""|escapejs }}').split(',').map(s => s.trim()).filter(Boolean);
+    // Data - mapping from database keys to display labels
+    const instrumentMap = {
+        'guitar': 'Guitar',
+        'bass': 'Bass',
+        'drums': 'Drums',
+        'piano': 'Piano',
+        'vocals': 'Vocals',
+        'keyboard': 'Keyboard',
+        'violin': 'Violin',
+        'saxophone': 'Saxophone',
+        'trumpet': 'Trumpet',
+        'percussion': 'Percussion'
+    };
+    
+    const genreMap = {
+        'rock': 'Rock',
+        'jazz': 'Jazz',
+        'indie': 'Indie',
+        'folk': 'Folk',
+        'electronic': 'Electronic',
+        'blues': 'Blues',
+        'country': 'Country',
+        'opm': 'OPM'
+    };
+    
+    // Convert database values (lowercase keys) to display labels (Title Case)
+    const initialInstrumentsRaw = ('{{ user.instruments|default:""|escapejs }}').split(',').map(s => s.trim()).filter(Boolean);
+    const initialGenresRaw = ('{{ user.genres|default:""|escapejs }}').split(',').map(s => s.trim()).filter(Boolean);
+    
+    const initialInstruments = initialInstrumentsRaw.map(key => instrumentMap[key.toLowerCase()] || key);
+    const initialGenres = initialGenresRaw.map(key => genreMap[key.toLowerCase()] || key);
+    
     const allInstruments = ['Guitar', 'Bass', 'Drums', 'Piano', 'Vocals', 'Keyboard', 'Violin', 'Saxophone', 'Trumpet', 'Percussion'];
     const allGenres = ['Rock', 'Jazz', 'Indie', 'Folk', 'Electronic', 'Blues', 'Country', 'OPM'];
     
@@ -179,10 +208,10 @@
     let editMode = false;
     
     // Debug: Log initial values to verify matching
-    console.log('Initial instruments from DB:', initialInstruments);
-    console.log('All instruments:', allInstruments);
-    console.log('Initial genres from DB:', initialGenres);
-    console.log('All genres:', allGenres);
+    console.log('Initial instruments from DB (raw):', initialInstrumentsRaw);
+    console.log('Initial instruments (mapped):', initialInstruments);
+    console.log('Initial genres from DB (raw):', initialGenresRaw);
+    console.log('Initial genres (mapped):', initialGenres);
 
     // Enter edit mode
     function enterEditMode() {
@@ -309,7 +338,7 @@
             selectedInstruments.push(instrument);
         }
         renderInstrumentsGrid();
-        updateSidebar();
+        updateSidebar(); // Instant update to sidebar tags
     }
 
     // Toggle genre selection
@@ -321,7 +350,7 @@
             selectedGenres.push(genre);
         }
         renderGenresGrid();
-        updateSidebar();
+        updateSidebar(); // Instant update to sidebar tags
     }
 
     // Update sidebar preview
@@ -346,9 +375,21 @@
         }
     }
 
+    // Helper function to convert display label back to database key
+    function getLabelKey(label, map) {
+        for (const [key, value] of Object.entries(map)) {
+            if (value === label) return key;
+        }
+        return label.toLowerCase();
+    }
+    
     // Ensure hidden inputs are updated before form submission
     document.getElementById('profile-form').addEventListener('submit', function(e) {
         if (editMode) {
+            // Convert display labels back to database keys (lowercase)
+            const instrumentKeys = selectedInstruments.map(label => getLabelKey(label, instrumentMap));
+            const genreKeys = selectedGenres.map(label => getLabelKey(label, genreMap));
+            
             // Update/create hidden inputs for instruments
             let instrumentsInput = document.querySelector('input[name="instruments"]');
             if (!instrumentsInput) {
@@ -357,7 +398,7 @@
                 instrumentsInput.name = 'instruments';
                 this.appendChild(instrumentsInput);
             }
-            instrumentsInput.value = selectedInstruments.join(', ');
+            instrumentsInput.value = instrumentKeys.join(', ');
             
             // Update/create hidden inputs for genres
             let genresInput = document.querySelector('input[name="genres"]');
@@ -367,7 +408,10 @@
                 genresInput.name = 'genres';
                 this.appendChild(genresInput);
             }
-            genresInput.value = selectedGenres.join(', ');
+            genresInput.value = genreKeys.join(', ');
+            
+            console.log('Submitting instruments:', instrumentKeys.join(', '));
+            console.log('Submitting genres:', genreKeys.join(', '));
         }
     });
 </script>
