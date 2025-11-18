@@ -1,28 +1,11 @@
-<!DOCTYPE html>
+{% extends "base.html" %}
 {% load custom_filters %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        :root {
-            --primary-color: #9B7EC4;
-            --light-bg: #F3EFF8;
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-    </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-</head>
 
-<body class="bg-white min-h-screen p-8">
-    <div id="app" class="max-w-7xl mx-auto">
-        <div id="viewMode">
+{% block title %}My Profile - Harmonix{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div id="viewMode">
             
             <!-- Header -->
             <div class="mb-8 flex items-start justify-between">
@@ -122,6 +105,5 @@
             </div>
         </div>
     </div>
-    
-</body>
-</html>
+</div>
+{% endblock %}
