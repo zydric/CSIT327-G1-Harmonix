@@ -1,53 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        :root {
-            --primary-color: #9B7EC4;
-            --light-bg: #F3EFF8;
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-    </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-</head>
 {% extends 'base.html' %}
 {% load static %}
 {% load custom_filters %}
-{% block content %}
-<body class="bg-white min-h-screen p-8">
-    <div id="app" class="max-w-7xl mx-auto">
-        <div id="viewMode">
-            <nav class="bg-white shadow-sm border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <!-- Logo -->
 
-                <!-- Navigation Links -->
-                <div class="flex space-x-8 text-sm font-medium text-gray-700">
-                    <a href="{% url 'listings:feed' %}" class="hover:text-[#4F2FC0] transition-colors">
-                        LISTINGS
-                    </a>
-                    <a href="{% url 'accounts:musician_profile' %}" class="text-[#4F2FC0] border-b-2 border-[#4F2FC0] pb-4 -mb-px">
-                        PROFILE
-                    </a>
-                    <a href="{% url 'applications:my_applications' %}" class="hover:text-[#4F2FC0] transition-colors">
-                        APPLICATIONS
-                    </a>
-                    <a href="{% url 'accounts:logout' %}" class="hover:text-[#4F2FC0] transition-colors">
-                        LOGOUT
-                    </a>
-                </div>
-            </div>
-        </div>
-    </nav>
+{% block title %}My Profile - Harmonix{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <!-- Header -->
             <div class="mb-8 flex items-start justify-between">
                 <div>
@@ -164,7 +122,5 @@
             </div>
         </div>
     </div>
-    
-</body>
+</div>
 {% endblock %}
-</html
