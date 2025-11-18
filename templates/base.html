@@ -4,11 +4,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Harmonix</title>
+    <title>{% block title %}Harmonix - Connect Musicians{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
     <link href="{% static 'css/tailwind.css' %}" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom Styles -->
+    <style>
+        :root {
+            --primary-color: #4F2FC0;
+            --primary-hover: #3f24a0;
+            --light-bg: #F3EFF8;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+    
+    {% block extra_css %}
+    {% endblock %}
 </head>
-<body>
-    {% block content %}
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    {% block navbar %}
+    {% include 'components/navbar.html' %}
+    {% endblock %}
+    
+    <!-- Main Content -->
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+    
+    <!-- Extra JavaScript -->
+    {% block extra_js %}
     {% endblock %}
 </body>
 </html>

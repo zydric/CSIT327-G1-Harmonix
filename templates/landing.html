@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block navbar %}{% endblock %}
+
 {% block content %}
 
 <div class="min-h-screen relative">
@@ -36,11 +38,11 @@
 
                 <!-- CTA Buttons -->
                 <div class="flex gap-4 text-center">
-                    <a href="{% url 'register' %}" 
+                    <a href="{% url 'accounts:register' %}" 
                        class="w-40 px-8 py-3 bg-white text-purple-700 rounded-full font-semibold hover:bg-gray-100 transition">
                         Register
                     </a>
-                    <a href="{% url 'login' %}" 
+                    <a href="{% url 'accounts:login' %}" 
                        class="w-40 px-8 py-3 bg-transparent border-2 border-white text-white rounded-full font-semibold hover:bg-white/10 transition">
                         Login
                     </a>

@@ -1,12 +1,27 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block navbar %}
+<nav class="bg-white shadow-sm border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+            <a href="/" class="flex items-center hover:opacity-80 transition-opacity">
+                <div class="w-8 h-8 flex items-center justify-center mr-3">
+                    <img src="{% static 'images/harmonix_logo.png' %}" alt="Harmonix Logo" class="w-full h-full">
+                </div>
+                <h1 class="text-[#4F2FC0] text-xl font-bold">Harmonix</h1>
+            </a>
+            <div class="flex space-x-8 text-sm font-medium text-gray-700">
+                <a href="{% url 'accounts:login' %}" class="hover:text-[#4F2FC0] transition-colors pb-4 -mb-px">Login</a>
+                <a href="{% url 'accounts:register' %}" class="text-[#4F2FC0] border-b-2 border-[#4F2FC0] pb-4 -mb-px">Register</a>
+            </div>
+        </div>
+    </div>
+</nav>
+{% endblock %}
 
 {% block content %}
-<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative">
-
-    <a href="/" class="absolute font-semibold bg-slate-100 top-10 right-8 text-[#4F2FC0] flex items-center justify-center text-lg p-2 w-10 h-10 rounded-full">
-        <span class="text-center">X</span>
-    </a>
-
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
         
         {% if messages %}
@@ -30,65 +45,157 @@
             </p>
         </div>
 
-        <form class="mt-8 space-y-6" method="POST" action="{% url 'register' %}">
+        <form class="mt-8 space-y-6" method="POST" action="{% url 'accounts:register' %}">
             {% csrf_token %}
             <div class="rounded-md space-y-3">
                 
                 <div>
                     <label for="role" class="block font-medium text-gray-700">Register as</label>
                     <select id="role" name="role" required
-                            class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                        <option value="" disabled selected>Choose user type</option>
-                        <option value="musician" {% if request.POST.role == 'musician' %}selected{% endif %}>Musician</option>
-                        <option value="band" {% if request.POST.role == 'band' %}selected{% endif %}>Band</option>
+                            class="appearance-none rounded-md relative block w-full px-3 py-2 border {% if field_errors.role %}border-red-500 bg-red-50{% else %}border-gray-300{% endif %} placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            onchange="toggleMusicianFields()">
+                        <option value="" disabled {% if not role %}selected{% endif %}>Choose user type</option>
+                        <option value="musician" {% if role == 'musician' %}selected{% endif %}>Musician</option>
+                        <option value="band" {% if role == 'band' %}selected{% endif %}>Band</option>
                     </select>
+                    {% if field_errors.role %}
+                    <p class="mt-1 text-sm text-red-600">{{ field_errors.role }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Instruments field (only for musicians) -->
+                <div id="instruments-field" class="hidden">
+                    <label for="instruments" class="block font-medium text-gray-700">Instruments <span class="text-red-500">*</span></label>
+                    <div class="mt-1 border {% if field_errors.instruments %}border-red-500 bg-red-50{% else %}border-gray-300{% endif %} rounded-md p-2 max-h-32 overflow-y-auto">
+                        {% for value, label in instrument_choices %}
+                        <label class="flex items-center space-x-2 text-sm">
+                            <input type="checkbox" name="instruments" value="{{ value }}" 
+                                   class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                   {% if value in selected_instruments %}checked{% endif %}>
+                            <span>{{ label }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Select all instruments you can play</p>
+                    {% if field_errors.instruments %}
+                    <p class="mt-1 text-sm text-red-600">{{ field_errors.instruments }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Genres field (only for musicians) -->
+                <div id="genres-field" class="hidden">
+                    <label for="genres" class="block font-medium text-gray-700">Musical Genres <span class="text-red-500">*</span></label>
+                    <div class="mt-1 border {% if field_errors.genres %}border-red-500 bg-red-50{% else %}border-gray-300{% endif %} rounded-md p-2 max-h-32 overflow-y-auto">
+                        {% for value, label in genre_choices %}
+                        <label class="flex items-center space-x-2 text-sm">
+                            <input type="checkbox" name="genres" value="{{ value }}" 
+                                   class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                   {% if value in selected_genres %}checked{% endif %}>
+                            <span>{{ label }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Select your preferred musical genres</p>
+                    {% if field_errors.genres %}
+                    <p class="mt-1 text-sm text-red-600">{{ field_errors.genres }}</p>
+                    {% endif %}
                 </div>
 
                 <div>
                     <label for="username" class="block font-medium text-gray-700">Username</label>
                     <input id="username" name="username" type="text" required 
-                        class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
+                        class="appearance-none rounded-md relative block w-full px-3 py-2 border {% if field_errors.username %}border-red-500 bg-red-50{% else %}border-gray-300{% endif %} placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
                         placeholder="Username"
-                        value="{{ request.POST.username }}">
+                        value="{{ username|default:'' }}">
+                    {% if field_errors.username %}
+                    <p class="mt-1 text-sm text-red-600">{{ field_errors.username }}</p>
+                    {% endif %}
                 </div>
 
                 <div>
                     <label for="email" class="block font-medium text-gray-700">Email</label>
                     <input id="email" name="email" type="email" required 
-                        class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
+                        class="appearance-none rounded-md relative block w-full px-3 py-2 border {% if field_errors.email %}border-red-500 bg-red-50{% else %}border-gray-300{% endif %} placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
                         placeholder="Email"
-                        value="{{ request.POST.email }}">
+                        value="{{ email|default:'' }}">
+                    {% if field_errors.email %}
+                    <p class="mt-1 text-sm text-red-600">{{ field_errors.email }}</p>
+                    {% endif %}
                 </div>
 
                 <div>
                     <label for="password1" class="block font-medium text-gray-700">Password</label>
                     <input id="password1" name="password1" type="password" required 
-                        class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
-                        placeholder="Password">
+                        class="appearance-none rounded-md relative block w-full px-3 py-2 border {% if field_errors.password1 %}border-red-500 bg-red-50{% else %}border-gray-300{% endif %} placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
+                        placeholder="Password"
+                        oninput="checkPasswordStrength()">
+                    {% if field_errors.password1 %}
+                    <p class="mt-1 text-sm text-red-600">{{ field_errors.password1 }}</p>
+                    {% endif %}
+                    
+                    <!-- Password Strength Indicator -->
+                    <div id="password-strength" class="mt-2 hidden">
+                        <div class="flex items-center space-x-2">
+                            <div class="flex-1">
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div id="strength-bar" class="h-2 rounded-full transition-all duration-300" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                            <span id="strength-text" class="text-sm font-medium"></span>
+                        </div>
+                        <div class="mt-1 scale- text-gray-600">
+                            <ul id="password-requirements" class="list-disc list-inside space-y-1">
+                                <li id="req-length" class="text-gray-500">At least 8 characters</li>
+                                <li id="req-lower" class="text-gray-500">One lowercase letter</li>
+                                <li id="req-upper" class="text-gray-500">One uppercase letter</li>
+                                <li id="req-number" class="text-gray-500">One number</li>
+                                <li id="req-special" class="text-gray-500">One special character</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
 
                 <div>
                     <label for="password2" class="block font-medium text-gray-700">Confirm Password</label>
                     <input id="password2" name="password2" type="password" required 
-                        class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
+                        class="appearance-none rounded-md relative block w-full px-3 py-2 border {% if field_errors.password2 %}border-red-500 bg-red-50{% else %}border-gray-300{% endif %} placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
                         placeholder="Confirm Password">
+                    {% if field_errors.password2 %}
+                    <p class="mt-1 text-sm text-red-600">{{ field_errors.password2 }}</p>
+                    {% endif %}
                 </div>
             </div>
 
             <div>
                 <button type="submit" 
-                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#4F2FC0] hover:bg-[#3f24a0] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#4F2FC0]">
                     Register
                 </button>
             </div>
 
             <div class="text-center">
                 <span class="text-gray-600">Already have an account?</span>
-                <a href="{% url 'login' %}" class="font-semibold text-[#4F2FC0] hover:text-[indigo-500]">
+                <a href="{% url 'accounts:login' %}" class="font-semibold text-[#4F2FC0] hover:text-[#3f24a0]">
                     Login
                 </a>
             </div>
         </form>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Load utilities first -->
+<script src="{% static 'accounts/js/form-validation.js' %}"></script>
+<script src="{% static 'accounts/js/password-strength.js' %}"></script>
+
+<!-- Load registration functionality -->
+<script src="{% static 'accounts/js/registration.js' %}"></script>
+
+<!-- Pass Django template context to JavaScript -->
+<script>
+    {% if field_errors %}
+        window.hasFieldErrors = true;
+    {% endif %}
+</script>
 {% endblock %}

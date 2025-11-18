@@ -4,7 +4,7 @@
   "description": "A web platform designed to connect musicians and bands with opportunities, enabling collaboration, networking, and community building.",
   "main": "tailwind.config.js",
   "scripts": {
-    "build:css": "npx tailwindcss -i ./assets/css/input.css -o ./static/css/tailwind.css --minify",
+    "build:css": "npx tailwindcss -i ./static/css/input.css -o ./static/css/tailwind.css --minify",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

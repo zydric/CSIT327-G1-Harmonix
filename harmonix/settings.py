@@ -94,6 +94,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'accounts',
+    'listings',
+    'applications',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
@@ -141,7 +143,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'harmonix.wsgi.application'
 
 LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = 'listings:feed'
 LOGOUT_REDIRECT_URL = 'login'
 
 # Database
@@ -151,7 +153,7 @@ LOGOUT_REDIRECT_URL = 'login'
 DATABASES = {
     'default': dj_database_url.config(
         default=os.getenv('DATABASE_URL', 'sqlite:///db.sqlite3'),
-        conn_max_age=600,
+        conn_max_age=0 if ENV == 'development' else 600,
         ssl_require=ENV == 'production',  # Only require SSL in production
     )
 }
@@ -211,5 +213,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Use WhiteNoise storage for serving static files in production
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-LOGIN_URL = 'login'
