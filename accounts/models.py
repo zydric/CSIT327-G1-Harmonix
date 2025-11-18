@@ -78,16 +78,22 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     @property
     def instruments_list(self):
-        """Returns list of instruments from comma-separated string"""
+        """Returns list of instruments from comma-separated string, converted to display format"""
+        from harmonix.constants import INSTRUMENT_DICT
         if self.instruments:
-            return [instrument.strip() for instrument in self.instruments.split(',') if instrument.strip()]
+            instruments = [instrument.strip() for instrument in self.instruments.split(',') if instrument.strip()]
+            # Convert lowercase keys to display labels (e.g., 'guitar' -> 'Guitar')
+            return [INSTRUMENT_DICT.get(inst.lower(), inst.capitalize()) for inst in instruments]
         return []
     
     @property
     def genres_list(self):
-        """Returns list of genres from comma-separated string"""
+        """Returns list of genres from comma-separated string, converted to display format"""
+        from harmonix.constants import GENRE_DICT
         if self.genres:
-            return [genre.strip() for genre in self.genres.split(',') if genre.strip()]
+            genres = [genre.strip() for genre in self.genres.split(',') if genre.strip()]
+            # Convert lowercase keys to display labels (e.g., 'rock' -> 'Rock')
+            return [GENRE_DICT.get(genre.lower(), genre.capitalize()) for genre in genres]
         return []
 
 

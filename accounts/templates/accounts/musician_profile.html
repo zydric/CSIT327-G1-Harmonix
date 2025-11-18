@@ -81,7 +81,7 @@
                         <!-- Instruments Section -->
                         <div class="mb-6">
                             <h3 class="font-bold text-gray-900 mb-3">Instruments</h3>
-                            <div class="flex flex-wrap gap-2">
+                            <div id="sidebar-instruments" class="flex flex-wrap gap-2">
                                 {% with instruments=user.instruments|default:'' %}
                                 {% for instrument in instruments|split:',' %}
                                     <span class="px-3 py-1 bg-gray-100 text-gray-900 text-sm font-medium rounded-full">
@@ -97,7 +97,7 @@
                         <!-- Genres Section -->
                         <div>
                             <h3 class="font-bold text-gray-900 mb-3">Genres</h3>
-                            <div class="flex flex-wrap gap-2">
+                            <div id="sidebar-genres" class="flex flex-wrap gap-2">
                                 {% with genres=user.genres|default:'' %}
                                 {% for genre in genres|split:',' %}
                                     <span class="px-3 py-1 bg-gray-100 text-gray-900 text-sm font-medium rounded-full">
@@ -355,8 +355,8 @@
 
     // Update sidebar preview
     function updateSidebar() {
-        const instrumentsContainer = document.querySelector('.lg\\:col-span-4 .mb-6:nth-of-type(3) .flex');
-        const genresContainer = document.querySelector('.lg\\:col-span-4 > div > div:last-child .flex');
+        const instrumentsContainer = document.getElementById('sidebar-instruments');
+        const genresContainer = document.getElementById('sidebar-genres');
         
         if (instrumentsContainer) {
             instrumentsContainer.innerHTML = selectedInstruments.length > 0

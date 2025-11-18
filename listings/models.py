@@ -57,13 +57,19 @@ class Listing(models.Model):
     
     @property
     def instruments_list(self):
-        """Returns list of instruments from comma-separated string"""
-        return [instrument.strip() for instrument in self.instruments_needed.split(',') if instrument.strip()]
+        """Returns list of instruments from comma-separated string, converted to display format"""
+        from harmonix.constants import INSTRUMENT_DICT
+        instruments = [instrument.strip() for instrument in self.instruments_needed.split(',') if instrument.strip()]
+        # Convert lowercase keys to display labels (e.g., 'guitar' -> 'Guitar')
+        return [INSTRUMENT_DICT.get(inst.lower(), inst.capitalize()) for inst in instruments]
     
     @property
     def genres_list(self):
-        """Returns list of genres from comma-separated string"""
-        return [genre.strip() for genre in self.genres.split(',') if genre.strip()]
+        """Returns list of genres from comma-separated string, converted to display format"""
+        from harmonix.constants import GENRE_DICT
+        genres = [genre.strip() for genre in self.genres.split(',') if genre.strip()]
+        # Convert lowercase keys to display labels (e.g., 'rock' -> 'Rock')
+        return [GENRE_DICT.get(genre.lower(), genre.capitalize()) for genre in genres]
     
     @property
     def application_count(self):
