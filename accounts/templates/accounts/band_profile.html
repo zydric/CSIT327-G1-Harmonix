@@ -142,10 +142,14 @@
 <script>
     // Data
     const initialGenres = ('{{ user.genres|default:""|escapejs }}').split(',').map(s => s.trim()).filter(Boolean);
-    const allGenres = ['Rock', 'Jazz', 'Blues', 'Folk', 'Country', 'Electronic', 'Indie', 'Pop', 'Classical', 'Hip-Hop'];
+    const allGenres = ['Rock', 'Jazz', 'Indie', 'Folk', 'Electronic', 'Blues', 'Country', 'OPM'];
     
     let selectedGenres = [...initialGenres];
     let editMode = false;
+    
+    // Debug: Log initial values to verify matching
+    console.log('Initial genres from DB:', initialGenres);
+    console.log('All genres:', allGenres);
 
     // Enter edit mode
     function enterEditMode() {
@@ -248,6 +252,21 @@
                 : '<span class="text-gray-500 text-sm">No genres selected</span>';
         }
     }
+
+    // Ensure hidden input is updated before form submission
+    document.getElementById('profile-form').addEventListener('submit', function(e) {
+        if (editMode) {
+            // Update/create hidden input for genres
+            let genresInput = document.querySelector('input[name="genres"]');
+            if (!genresInput) {
+                genresInput = document.createElement('input');
+                genresInput.type = 'hidden';
+                genresInput.name = 'genres';
+                this.appendChild(genresInput);
+            }
+            genresInput.value = selectedGenres.join(', ');
+        }
+    });
 </script>
 
 {% endblock %}

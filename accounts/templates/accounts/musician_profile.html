@@ -171,12 +171,18 @@
     // Data
     const initialInstruments = ('{{ user.instruments|default:""|escapejs }}').split(',').map(s => s.trim()).filter(Boolean);
     const initialGenres = ('{{ user.genres|default:""|escapejs }}').split(',').map(s => s.trim()).filter(Boolean);
-    const allInstruments = ['Guitar', 'Bass', 'Drums', 'Vocals', 'Keyboard', 'Piano', 'Saxophone', 'Violin', 'Trumpet', 'Flute'];
-    const allGenres = ['Rock', 'Jazz', 'Blues', 'Folk', 'Country', 'Electronic', 'Indie', 'Pop', 'Classical', 'Hip-Hop'];
+    const allInstruments = ['Guitar', 'Bass', 'Drums', 'Piano', 'Vocals', 'Keyboard', 'Violin', 'Saxophone', 'Trumpet', 'Percussion'];
+    const allGenres = ['Rock', 'Jazz', 'Indie', 'Folk', 'Electronic', 'Blues', 'Country', 'OPM'];
     
     let selectedInstruments = [...initialInstruments];
     let selectedGenres = [...initialGenres];
     let editMode = false;
+    
+    // Debug: Log initial values to verify matching
+    console.log('Initial instruments from DB:', initialInstruments);
+    console.log('All instruments:', allInstruments);
+    console.log('Initial genres from DB:', initialGenres);
+    console.log('All genres:', allGenres);
 
     // Enter edit mode
     function enterEditMode() {
@@ -339,6 +345,31 @@
                 : '<span class="text-gray-500 text-sm">No genres selected</span>';
         }
     }
+
+    // Ensure hidden inputs are updated before form submission
+    document.getElementById('profile-form').addEventListener('submit', function(e) {
+        if (editMode) {
+            // Update/create hidden inputs for instruments
+            let instrumentsInput = document.querySelector('input[name="instruments"]');
+            if (!instrumentsInput) {
+                instrumentsInput = document.createElement('input');
+                instrumentsInput.type = 'hidden';
+                instrumentsInput.name = 'instruments';
+                this.appendChild(instrumentsInput);
+            }
+            instrumentsInput.value = selectedInstruments.join(', ');
+            
+            // Update/create hidden inputs for genres
+            let genresInput = document.querySelector('input[name="genres"]');
+            if (!genresInput) {
+                genresInput = document.createElement('input');
+                genresInput.type = 'hidden';
+                genresInput.name = 'genres';
+                this.appendChild(genresInput);
+            }
+            genresInput.value = selectedGenres.join(', ');
+        }
+    });
 </script>
 
 {% endblock %}
