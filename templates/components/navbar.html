@@ -1,0 +1,63 @@
+{% load static %}
+<!-- Reusable Navigation Bar Component -->
+<nav class="bg-white shadow-sm border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+            <!-- Logo -->
+            <div class="flex items-center">
+                <div class="w-8 h-8 flex items-center justify-center mr-3">
+                    <img src="{% static 'images/harmonix_logo.png' %}" alt="Harmonix Logo" class="w-full h-full">
+                </div>
+                <h1 class="text-[#4F2FC0] text-xl font-bold">Harmonix</h1>
+            </div>
+
+            <!-- Navigation Links -->
+            <div class="flex space-x-8 text-sm font-medium text-gray-700">
+                <a href="{% url 'listings:feed' %}" 
+                   class="{% if request.resolver_match.url_name == 'feed' %}text-[#4F2FC0] border-b-2 border-[#4F2FC0]{% else %}hover:text-[#4F2FC0]{% endif %} transition-colors pb-4 -mb-px">
+                    Listings
+                </a>
+                
+                {% if user.is_authenticated %}
+                    {% if user.is_musician %}
+                        <a href="{% url 'accounts:musician_profile' %}" 
+                           class="{% if 'profile' in request.path %}text-[#4F2FC0] border-b-2 border-[#4F2FC0]{% else %}hover:text-[#4F2FC0]{% endif %} transition-colors pb-4 -mb-px">
+                            Profile
+                        </a>
+                    {% elif user.is_band_admin %}
+                        <a href="{% url 'accounts:band_profile' %}" 
+                           class="{% if 'profile' in request.path %}text-[#4F2FC0] border-b-2 border-[#4F2FC0]{% else %}hover:text-[#4F2FC0]{% endif %} transition-colors pb-4 -mb-px">
+                            Profile
+                        </a>
+                    {% endif %}
+                    
+                    <a href="{% url 'applications:my_applications' %}" 
+                       class="{% if 'applications' in request.path and 'my_applications' in request.path %}text-[#4F2FC0] border-b-2 border-[#4F2FC0]{% else %}hover:text-[#4F2FC0]{% endif %} transition-colors pb-4 -mb-px">
+                        Applications
+                    </a>
+                    
+                    {% if user.is_band_admin %}
+                        <a href="{% url 'listings:member_listing' %}" 
+                           class="{% if 'member_listing' in request.path %}text-[#4F2FC0] border-b-2 border-[#4F2FC0]{% else %}hover:text-[#4F2FC0]{% endif %} transition-colors pb-4 -mb-px">
+                            My Listings
+                        </a>
+                    {% endif %}
+                    
+                    <a href="{% url 'accounts:logout' %}" 
+                       class="hover:text-[#4F2FC0] transition-colors pb-4 -mb-px">
+                        Logout
+                    </a>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}" 
+                       class="hover:text-[#4F2FC0] transition-colors pb-4 -mb-px">
+                        Login
+                    </a>
+                    <a href="{% url 'accounts:register' %}" 
+                       class="hover:text-[#4F2FC0] transition-colors pb-4 -mb-px">
+                        Register
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>
