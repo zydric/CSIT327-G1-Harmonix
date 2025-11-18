@@ -1,29 +1,10 @@
 {% extends "base.html" %}
 {% load static %}
-{% block content %}
-<div class="min-h-screen bg-gray-50">
-    <!-- Navigation -->
-    <nav class="bg-white shadow-sm border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center">
-                    <div class="w-8 h-8 flex items-center justify-center mr-3">
-                        <img src="{% static 'images/harmonix_logo.png' %}" alt="Logo" class="w-full h-full">
-                    </div>
-                    <h1 class="text-[#4F2FC0] text-xl font-bold">Harmonix</h1>
-                </div>
-                <div class="flex space-x-8 text-sm font-medium text-gray-700">
-                    <a href="{% url 'listings:feed' %}" class="hover:text-[#4F2FC0]">LISTINGS</a>
-                    <a href="{% url 'accounts:musician_profile' %}" class="hover:text-[#4F2FC0]">PROFILE</a>
-                    <a href="{% url 'applications:my_applications' %}" class="hover:text-[#4F2FC0]">APPLICATIONS</a>
-                    <a href="{% url 'listings:member_listing' %}" class="text-[#4F2FC0] border-b-2 border-[#4F2FC0] pb-4 -mb-px">MY LISTINGS</a>
-                    <a href="{% url 'accounts:logout' %}" class="hover:text-[#4F2FC0]">LOGOUT</a>
-                </div>
-            </div>
-        </div>
-    </nav>
 
-    <div class="max-w-7xl mx-auto px-4 py-8">
+{% block title %}My Listings - Harmonix{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Header + Create Button -->
         <div class="flex items-center justify-between mb-10">
             <div>
