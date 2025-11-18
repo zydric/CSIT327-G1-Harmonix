@@ -232,6 +232,8 @@ def member_listing_view(request):
     context = {
         'user': request.user,
         'listings': listings,
+        'genre_choices': GENRE_CHOICES,
+        'instrument_choices': INSTRUMENT_CHOICES,
     }
     
     return render(request, 'listings/member_listing.html', context)
