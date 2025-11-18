@@ -43,11 +43,11 @@ class ListingForm(forms.ModelForm):
                 'placeholder': 'Describe the opportunity, requirements, and what you\'re looking for in detail...'
             }),
         }
-        help_texts = {
-            'title': 'Create an engaging title that clearly describes the opportunity',
-            'band_name': 'The name of your band or musical project',
-            'description': 'Provide detailed information about the opportunity, requirements, and expectations',
-        }
+        # help_texts = {
+        #     'title': 'Create an engaging title that clearly describes the opportunity',
+        #     'band_name': 'The name of your band or musical project',
+        #     'description': 'Provide detailed information about the opportunity, requirements, and expectations',
+        # }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -68,6 +68,9 @@ class ListingForm(forms.ModelForm):
                     for genre in self.instance.genres.split(',')
                     if genre.strip()
                 ]
+        else:
+            # For new listings, remove is_active field (will default to True in model)
+            self.fields.pop('is_active', None)
 
     def clean_title(self):
         title = self.cleaned_data.get('title')
