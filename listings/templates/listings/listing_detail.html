@@ -132,12 +132,12 @@
             </div>
         </div>
 
-        {% if is_owner and applications %}
+        {% if is_owner %}
         <!-- Applications Section (Only for Band Admin) -->
         <div class="mt-8 bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
             <div class="p-6 border-b border-gray-200">
                 <h2 class="text-lg font-semibold text-gray-900">
-                    Applications ({{ applications.count }})
+                    Applications {% if applications %}({{ applications.count }}){% else %}(0){% endif %}
                 </h2>
             </div>
             
