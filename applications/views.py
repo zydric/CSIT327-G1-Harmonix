@@ -69,6 +69,32 @@ def update_application_status(request, pk):
     return redirect('listings:detail', pk=application.listing.pk)
 
 
+@login_required
+def withdraw_application(request, pk):
+    """
+    Allow musicians to withdraw their pending applications
+    """
+    application = get_object_or_404(Application, pk=pk)
+    
+    # Check if user owns this application
+    if request.user != application.musician:
+        return HttpResponseForbidden("You can only withdraw your own applications.")
+    
+    # Only pending applications can be withdrawn
+    if application.status != 'pending':
+        messages.error(request, "Only pending applications can be withdrawn.")
+        return redirect('applications:my_applications')
+    
+    if request.method == 'POST':
+        listing_title = application.listing.title
+        application.delete()
+        messages.success(request, f"Your application to '{listing_title}' has been withdrawn.")
+        return redirect('applications:my_applications')
+    
+    # If not POST, redirect back
+    return redirect('applications:my_applications')
+
+
 @login_required 
 def my_applications(request):
     """
