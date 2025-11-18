@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.db.models import Q
 from django.http import HttpResponseForbidden
 from .models import Listing
-from .forms import ListingForm
+from .forms import ListingForm, ListingEditForm
 from applications.models import Application
 
 
@@ -179,14 +179,14 @@ def edit_listing(request, pk):
         return redirect('listings:detail', pk=listing.pk)
     
     if request.method == 'POST':
-        form = ListingForm(request.POST, instance=listing)
+        form = ListingEditForm(request.POST, instance=listing)
         if form.is_valid():
             listing = form.save()
             return redirect('listings:detail', pk=listing.pk)
         else:
             messages.error(request, "Please fix the errors below and try again.")
     else:
-        form = ListingForm(instance=listing)
+        form = ListingEditForm(instance=listing)
     
     context = {
         'form': form,

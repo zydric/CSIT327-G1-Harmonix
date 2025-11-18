@@ -27,7 +27,7 @@ class ListingForm(forms.ModelForm):
 
     class Meta:
         model = Listing
-        fields = ['title', 'band_name', 'description', 'instruments_needed', 'genres', 'is_active']
+        fields = ['title', 'band_name', 'description', 'instruments_needed', 'genres']
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent',
@@ -50,6 +50,8 @@ class ListingForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        # Check if this is an edit form (instance is being edited)
+        is_edit = kwargs.get('instance') and kwargs.get('instance').pk
         super().__init__(*args, **kwargs)
         
         # Set initial values for multi-select fields if editing
@@ -145,3 +147,18 @@ class ListingForm(forms.ModelForm):
             instance.save()
         
         return instance
+
+
+class ListingEditForm(ListingForm):
+    """
+    Form for editing band listings - includes is_active field
+    """
+    
+    class Meta(ListingForm.Meta):
+        fields = ['title', 'band_name', 'description', 'instruments_needed', 'genres', 'is_active']
+        widgets = {
+            **ListingForm.Meta.widgets,
+            'is_active': forms.CheckboxInput(attrs={
+                'class': 'h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded'
+            }),
+        }
