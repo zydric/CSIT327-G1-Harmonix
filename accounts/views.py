@@ -24,7 +24,6 @@ def band_profile_view(request):
         # Get form data
         new_username = request.POST.get('username', '').strip()
         new_location = request.POST.get('location', '').strip()
-        new_bio = request.POST.get('bio', '').strip()
         new_genres = request.POST.get('genres', '').strip()
 
         # Validate username if it changed
@@ -37,7 +36,6 @@ def band_profile_view(request):
             # Update user fields
             user.username = new_username
             user.location = new_location
-            user.bio = new_bio
             user.genres = new_genres
             user.save()
             
@@ -270,7 +268,6 @@ def musician_profile_view(request):
         # Get form data
         new_username = request.POST.get('username', '').strip()
         new_location = request.POST.get('location', '').strip()
-        new_bio = request.POST.get('bio', '').strip()
         new_instruments = request.POST.get('instruments', '').strip()
         new_genres = request.POST.get('genres', '').strip()
 
@@ -284,7 +281,6 @@ def musician_profile_view(request):
             # Update user fields
             user.username = new_username
             user.location = new_location
-            user.bio = new_bio
             user.instruments = new_instruments
             user.genres = new_genres
             user.save()
@@ -313,7 +309,6 @@ def edit_musician_profile_view(request):
         # Get form data
         new_username = request.POST.get('username', '').strip()
         new_location = request.POST.get('location', '').strip()
-        new_bio = request.POST.get('bio', '').strip()
         new_instruments = request.POST.get('instruments', '').strip()
         new_genres = request.POST.get('genres', '').strip()
 
@@ -327,7 +322,6 @@ def edit_musician_profile_view(request):
             # Update user fields
             user.username = new_username
             user.location = new_location
-            user.bio = new_bio
             user.instruments = new_instruments
             user.genres = new_genres
             user.save()
