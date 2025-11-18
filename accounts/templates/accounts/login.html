@@ -1,12 +1,16 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block navbar %}
 <nav class="bg-white shadow-sm border-b border-gray-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
-            <div class="flex items-center">
+            <a href="/" class="flex items-center hover:opacity-80 transition-opacity">
+                <div class="w-8 h-8 flex items-center justify-center mr-3">
+                    <img src="{% static 'images/harmonix_logo.png' %}" alt="Harmonix Logo" class="w-full h-full">
+                </div>
                 <h1 class="text-[#4F2FC0] text-xl font-bold">Harmonix</h1>
-            </div>
+            </a>
             <div class="flex space-x-8 text-sm font-medium text-gray-700">
                 <a href="{% url 'accounts:login' %}" class="text-[#4F2FC0] border-b-2 border-[#4F2FC0] pb-4 -mb-px">Login</a>
                 <a href="{% url 'accounts:register' %}" class="hover:text-[#4F2FC0] transition-colors pb-4 -mb-px">Register</a>
@@ -17,12 +21,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative">
-    
-    <a href="/" class="absolute font-semibold bg-slate-100 top-10 right-8 text-[#4F2FC0] flex items-center justify-center text-lg p-2 w-10 h-10 rounded-full">
-        <span class="text-center">X</span>
-    </a>
-
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
         
         {% if messages %}
