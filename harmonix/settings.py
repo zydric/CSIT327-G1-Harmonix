@@ -213,5 +213,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Use WhiteNoise storage for serving static files in production
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-LOGIN_URL = 'login'
