@@ -1,6 +1,22 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block navbar %}
+<nav class="bg-white shadow-sm border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+            <div class="flex items-center">
+                <h1 class="text-[#4F2FC0] text-xl font-bold">Harmonix</h1>
+            </div>
+            <div class="flex space-x-8 text-sm font-medium text-gray-700">
+                <a href="{% url 'accounts:login' %}" class="hover:text-[#4F2FC0] transition-colors pb-4 -mb-px">Login</a>
+                <a href="{% url 'accounts:register' %}" class="text-[#4F2FC0] border-b-2 border-[#4F2FC0] pb-4 -mb-px">Register</a>
+            </div>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
 {% block content %}
 <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative">
 

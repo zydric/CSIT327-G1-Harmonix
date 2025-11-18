@@ -140,7 +140,7 @@
                 <!-- Listings Feed -->
                 <div class="space-y-6">
                     {% for listing in listings %}
-                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer" 
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer overflow-hidden" 
                          onclick="window.location.href='{% url 'listings:detail' pk=listing.pk %}'">
                         <!-- Listing Header -->
                         <div class="flex justify-between items-start mb-4">
@@ -178,7 +178,7 @@
                         </div>
 
                         <!-- Description -->
-                        <p class="text-gray-700 mb-4 line-clamp-3">{{ listing.description|truncatewords:30 }}</p>
+                        <p class="text-gray-700 mb-4 line-clamp-3 break-words">{{ listing.description|truncatewords:30 }}</p>
 
                         <!-- Metadata -->
                         <div class="flex items-center space-x-6 text-sm text-gray-500">
