@@ -133,12 +133,18 @@
                 <!-- Form Actions -->
                 <div class="flex justify-end space-x-4 mt-8 pt-6 border-t border-gray-200">
                     <a href="{% url 'listings:feed' %}" 
+                       id="cancelBtn"
                        class="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
                         Cancel
                     </a>
                     <button type="submit" 
-                            class="px-6 py-2 bg-[#4F2FC0] text-white rounded-md hover:bg-[#3f24a0] transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
-                        Create Listing
+                            id="submitBtn"
+                            class="px-6 py-2 bg-[#4F2FC0] text-white rounded-md hover:bg-[#3f24a0] transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 flex items-center gap-2">
+                        <span id="submitText">Create Listing</span>
+                        <svg id="loadingSpinner" class="hidden animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
                     </button>
                 </div>
             </form>
@@ -195,6 +201,39 @@ document.addEventListener('DOMContentLoaded', function() {
             label.classList.add('bg-purple-50', 'border-purple-300');
             label.classList.remove('border-gray-200');
         }
+    });
+    
+    // Track form changes for cancel confirmation
+    let formChanged = false;
+    const form = document.getElementById('listingForm');
+    
+    // Listen for form changes
+    form.addEventListener('change', function() {
+        formChanged = true;
+    });
+    
+    form.addEventListener('input', function() {
+        formChanged = true;
+    });
+    
+    // Cancel button confirmation
+    document.getElementById('cancelBtn').addEventListener('click', function(e) {
+        if (formChanged) {
+            if (!confirm('You have unsaved changes. Are you sure you want to cancel?')) {
+                e.preventDefault();
+            }
+        }
+    });
+    
+    // Form submission loading state
+    form.addEventListener('submit', function() {
+        const submitBtn = document.getElementById('submitBtn');
+        const submitText = document.getElementById('submitText');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        
+        submitBtn.disabled = true;
+        submitText.textContent = 'Creating...';
+        loadingSpinner.classList.remove('hidden');
     });
 });
 </script>

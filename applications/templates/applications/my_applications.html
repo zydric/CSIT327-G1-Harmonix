@@ -36,13 +36,23 @@
                         </div>
                     </div>
                     
-                    <!-- Status Badge -->
-                    <span class="px-3 py-1 text-sm font-medium rounded-full 
-                        {% if application.status == 'pending' %}bg-yellow-100 text-yellow-800
-                        {% elif application.status == 'accepted' %}bg-green-100 text-green-800
-                        {% else %}bg-red-100 text-red-800{% endif %}">
-                        {{ application.get_status_display }}
-                    </span>
+                    <!-- Status Badge & Actions -->
+                    <div class="flex items-center space-x-3">
+                        <span class="px-3 py-1 text-sm font-medium rounded-full 
+                            {% if application.status == 'pending' %}bg-yellow-100 text-yellow-800
+                            {% elif application.status == 'accepted' %}bg-green-100 text-green-800
+                            {% else %}bg-red-100 text-red-800{% endif %}">
+                            {{ application.get_status_display }}
+                        </span>
+                        
+                        <!-- Withdraw Button (only for pending applications) -->
+                        {% if application.status == 'pending' %}
+                        <button onclick="confirmWithdraw({{ application.pk }}, '{{ application.listing.title|escapejs }}')" 
+                                class="text-sm text-red-600 hover:text-red-800 font-medium transition-colors">
+                            Withdraw
+                        </button>
+                        {% endif %}
+                    </div>
                 </div>
 
                 <!-- Application Message -->
@@ -99,4 +109,19 @@
         </div>
     </div>
 </div>
+
+<!-- Withdraw Confirmation Form -->
+<form id="withdrawForm" method="POST" style="display: none;">
+    {% csrf_token %}
+</form>
+
+<script>
+function confirmWithdraw(applicationId, listingTitle) {
+    if (confirm(`Are you sure you want to withdraw your application to "${listingTitle}"?\n\nThis action cannot be undone.`)) {
+        const form = document.getElementById('withdrawForm');
+        form.action = `/applications/withdraw/${applicationId}/`;
+        form.submit();
+    }
+}
+</script>
 {% endblock %}

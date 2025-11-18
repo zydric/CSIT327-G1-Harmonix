@@ -84,7 +84,7 @@
                             {% csrf_token %}
                             <input type="hidden" name="status" value="accepted">
                             <button type="submit" 
-                                    class="px-4 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors">
+                                    class="px-4 py-2 !bg-green-600 !text-white text-sm rounded-md hover:!bg-green-700 transition-colors font-medium">
                                 Accept
                             </button>
                         </form>
@@ -92,7 +92,7 @@
                             {% csrf_token %}
                             <input type="hidden" name="status" value="rejected">
                             <button type="submit" 
-                                    class="px-4 py-2 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 transition-colors">
+                                    class="px-4 py-2 !bg-red-600 !text-white text-sm rounded-md hover:!bg-red-700 transition-colors font-medium">
                                 Reject
                             </button>
                         </form>
