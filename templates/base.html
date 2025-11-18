@@ -35,6 +35,75 @@
     {% include 'components/navbar.html' %}
     {% endblock %}
     
+    <!-- Messages Toast Container -->
+    {% if messages %}
+    <div id="messagesContainer" class="fixed top-20 right-4 z-50 space-y-3" style="max-width: 400px;">
+        {% for message in messages %}
+        <div class="message-toast bg-white rounded-lg shadow-lg border-l-4 p-4 transform transition-all duration-300 ease-out
+            {% if message.tags == 'error' or message.tags == 'danger' %}border-red-500
+            {% elif message.tags == 'success' %}border-green-500
+            {% elif message.tags == 'warning' %}border-yellow-500
+            {% else %}border-blue-500{% endif %}"
+            role="alert">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    {% if message.tags == 'error' or message.tags == 'danger' %}
+                    <svg class="h-5 w-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    {% elif message.tags == 'success' %}
+                    <svg class="h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    {% elif message.tags == 'warning' %}
+                    <svg class="h-5 w-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                    {% else %}
+                    <svg class="h-5 w-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    {% endif %}
+                </div>
+                <div class="ml-3 flex-1">
+                    <p class="text-sm font-medium text-gray-900">{{ message }}</p>
+                </div>
+                <button onclick="this.closest('.message-toast').remove()" class="ml-3 flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <script>
+    // Auto-dismiss messages after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        const messages = document.querySelectorAll('.message-toast');
+        messages.forEach((message, index) => {
+            // Slide in animation
+            setTimeout(() => {
+                message.style.opacity = '0';
+                message.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    message.style.opacity = '1';
+                    message.style.transform = 'translateX(0)';
+                }, 50);
+            }, index * 100);
+            
+            // Auto dismiss after 5 seconds
+            setTimeout(() => {
+                message.style.opacity = '0';
+                message.style.transform = 'translateX(100%)';
+                setTimeout(() => message.remove(), 300);
+            }, 5000 + (index * 100));
+        });
+    });
+    </script>
+    {% endif %}
+    
     <!-- Main Content -->
     <main>
         {% block content %}
