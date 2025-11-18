@@ -1,40 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block title %}View Profile - Harmonix{% endblock %}
+
 {% block content %}
-<div class="min-h-screen bg-gray-50">
-    <!-- Navigation Bar -->
-    <nav class="bg-white shadow-sm border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <!-- Logo -->
-                <div class="flex items-center">
-                    <div class="w-8 h-8 flex items-center justify-center mr-3">
-                        <img src="{% static 'images/harmonix_logo.png' %}" alt="Harmonix Logo" class="w-full h-full">
-                    </div>
-                    <h1 class="text-[#4F2FC0] text-xl font-bold">Harmonix</h1>
-                </div>
-
-                <!-- Navigation Links -->
-                <div class="flex space-x-8 text-sm font-medium text-gray-700">
-                    <a href="{% url 'listings:feed' %}" class="hover:text-[#4F2FC0] transition-colors">
-                        LISTINGS
-                    </a>
-                    <a href="{% url 'accounts:musician_profile' %}" class="hover:text-[#4F2FC0] transition-colors">
-                        PROFILE
-                    </a>
-                    <a href="{% url 'applications:my_applications' %}" class="hover:text-[#4F2FC0] transition-colors">
-                        APPLICATIONS
-                    </a>
-                    <a href="{% url 'accounts:logout' %}" class="hover:text-[#4F2FC0] transition-colors">
-                        LOGOUT
-                    </a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Back Button -->
         <div class="mb-6">
             <a href="javascript:history.back()" class="inline-flex items-center text-gray-500 hover:text-[#4F2FC0] transition-colors">
