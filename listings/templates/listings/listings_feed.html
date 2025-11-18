@@ -90,7 +90,7 @@
 
                         <!-- Filter Buttons -->
                         <div class="space-y-2">
-                            <button type="submit" class="w-full px-4 py-2 bg-[#4F2FC0] text-white rounded-md text-sm font-medium hover:bg-purple-700 transition-colors">
+                            <button type="submit" class="w-full px-4 py-2 bg-[#4F2FC0] text-white rounded-md text-sm font-medium hover:bg-[#3f24a0] transition-colors">
                                 Apply Filters
                             </button>
                             <a href="{% url 'listings:feed' %}" class="block w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-md text-sm font-medium text-center hover:bg-gray-200 transition-colors">
@@ -127,7 +127,7 @@
                         {% if is_band_admin %}
                         <!-- Create Listing Button for Band Admins -->
                         <a href="{% url 'listings:create' %}" 
-                           class="px-6 py-2 bg-[#4F2FC0] text-white rounded-lg font-medium hover:bg-purple-700 transition-colors inline-flex items-center">
+                           class="px-6 py-2 bg-[#4F2FC0] text-white rounded-lg font-medium hover:bg-[#3f24a0] transition-colors inline-flex items-center">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                             </svg>
@@ -160,7 +160,7 @@
                             
                             {% if is_musician %}
                             <button onclick="event.stopPropagation(); window.location.href='{% url 'listings:detail' pk=listing.pk %}'" 
-                                    class="px-6 py-2 bg-[#4F2FC0] text-white rounded-lg font-medium hover:bg-purple-700 transition-colors">
+                                    class="px-6 py-2 bg-[#4F2FC0] text-white rounded-lg font-medium hover:bg-[#3f24a0] transition-colors">
                                 View Details
                             </button>
                             {% elif is_band_admin %}
@@ -170,7 +170,7 @@
                                     Edit
                                 </button>
                                 <button onclick="event.stopPropagation(); window.location.href='{% url 'listings:detail' pk=listing.pk %}'" 
-                                        class="px-4 py-2 bg-[#4F2FC0] text-white rounded-lg hover:bg-purple-700 transition-colors">
+                                        class="px-4 py-2 bg-[#4F2FC0] text-white rounded-lg hover:bg-[#3f24a0] transition-colors">
                                     Manage
                                 </button>
                             </div>
