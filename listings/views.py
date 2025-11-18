@@ -216,6 +216,23 @@ def delete_listing(request, pk):
     # If not POST, redirect back to listing detail
     return redirect('listings:detail', pk=listing.pk)
 
+@login_required
 def member_listing_view(request):
-    return render(request, 'listings/member_listing.html')
+    """
+    View for band admins to see their own listings and applications
+    """
+    # Check if user is a band admin
+    if not request.user.is_band_admin:
+        messages.error(request, "Only band admins can access this page.")
+        return redirect('listings:feed')
+    
+    # Get all listings for the current band admin
+    listings = Listing.objects.filter(band_admin=request.user).order_by('-created_at')
+    
+    context = {
+        'user': request.user,
+        'listings': listings,
+    }
+    
+    return render(request, 'listings/member_listing.html', context)
     
