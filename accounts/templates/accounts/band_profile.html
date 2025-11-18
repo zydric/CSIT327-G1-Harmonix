@@ -81,15 +81,13 @@
                         <div>
                             <h3 class="font-bold text-gray-900 mb-3">Genres</h3>
                             <div class="flex flex-wrap gap-2">
-                                {% with genres=user.genres|default:'' %}
-                                {% for genre in genres|split:',' %}
+                                {% for genre in user.genres_list %}
                                     <span class="px-3 py-1 bg-gray-100 text-gray-900 text-sm font-medium rounded-full">
                                         {{ genre }}
                                     </span>
                                 {% empty %}
                                     <span class="text-gray-500 text-sm">No genres selected</span>
                                 {% endfor %}
-                                {% endwith %}
                             </div>
                         </div>
                     </div>

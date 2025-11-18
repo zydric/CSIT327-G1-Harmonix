@@ -82,15 +82,13 @@
                         <div class="mb-6">
                             <h3 class="font-bold text-gray-900 mb-3">Instruments</h3>
                             <div id="sidebar-instruments" class="flex flex-wrap gap-2">
-                                {% with instruments=user.instruments|default:'' %}
-                                {% for instrument in instruments|split:',' %}
+                                {% for instrument in user.instruments_list %}
                                     <span class="px-3 py-1 bg-gray-100 text-gray-900 text-sm font-medium rounded-full">
                                         {{ instrument }}
                                     </span>
                                 {% empty %}
                                     <span class="text-gray-500 text-sm">No instruments selected</span>
                                 {% endfor %}
-                                {% endwith %}
                             </div>
                         </div>
 
@@ -98,15 +96,13 @@
                         <div>
                             <h3 class="font-bold text-gray-900 mb-3">Genres</h3>
                             <div id="sidebar-genres" class="flex flex-wrap gap-2">
-                                {% with genres=user.genres|default:'' %}
-                                {% for genre in genres|split:',' %}
+                                {% for genre in user.genres_list %}
                                     <span class="px-3 py-1 bg-gray-100 text-gray-900 text-sm font-medium rounded-full">
                                         {{ genre }}
                                     </span>
                                 {% empty %}
                                     <span class="text-gray-500 text-sm">No genres selected</span>
                                 {% endfor %}
-                                {% endwith %}
                             </div>
                         </div>
                     </div>
