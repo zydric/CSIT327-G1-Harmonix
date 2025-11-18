@@ -6,6 +6,7 @@ from django.http import HttpResponseForbidden
 from .models import Listing
 from .forms import ListingForm
 from applications.models import Application
+from harmonix.constants import GENRE_CHOICES, INSTRUMENT_CHOICES
 
 
 @login_required
