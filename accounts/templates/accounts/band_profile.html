@@ -140,16 +140,30 @@
 </div>
 
 <script>
-    // Data
-    const initialGenres = ('{{ user.genres|default:""|escapejs }}').split(',').map(s => s.trim()).filter(Boolean);
+    // Data - mapping from database keys to display labels
+    const genreMap = {
+        'rock': 'Rock',
+        'jazz': 'Jazz',
+        'indie': 'Indie',
+        'folk': 'Folk',
+        'electronic': 'Electronic',
+        'blues': 'Blues',
+        'country': 'Country',
+        'opm': 'OPM'
+    };
+    
+    // Convert database values (lowercase keys) to display labels (Title Case)
+    const initialGenresRaw = ('{{ user.genres|default:""|escapejs }}').split(',').map(s => s.trim()).filter(Boolean);
+    const initialGenres = initialGenresRaw.map(key => genreMap[key.toLowerCase()] || key);
+    
     const allGenres = ['Rock', 'Jazz', 'Indie', 'Folk', 'Electronic', 'Blues', 'Country', 'OPM'];
     
     let selectedGenres = [...initialGenres];
     let editMode = false;
     
     // Debug: Log initial values to verify matching
-    console.log('Initial genres from DB:', initialGenres);
-    console.log('All genres:', allGenres);
+    console.log('Initial genres from DB (raw):', initialGenresRaw);
+    console.log('Initial genres (mapped):', initialGenres);
 
     // Enter edit mode
     function enterEditMode() {
@@ -253,9 +267,20 @@
         }
     }
 
+    // Helper function to convert display label back to database key
+    function getLabelKey(label, map) {
+        for (const [key, value] of Object.entries(map)) {
+            if (value === label) return key;
+        }
+        return label.toLowerCase();
+    }
+    
     // Ensure hidden input is updated before form submission
     document.getElementById('profile-form').addEventListener('submit', function(e) {
         if (editMode) {
+            // Convert display labels back to database keys (lowercase)
+            const genreKeys = selectedGenres.map(label => getLabelKey(label, genreMap));
+            
             // Update/create hidden input for genres
             let genresInput = document.querySelector('input[name="genres"]');
             if (!genresInput) {
@@ -264,7 +289,9 @@
                 genresInput.name = 'genres';
                 this.appendChild(genresInput);
             }
-            genresInput.value = selectedGenres.join(', ');
+            genresInput.value = genreKeys.join(', ');
+            
+            console.log('Submitting genres:', genreKeys.join(', '));
         }
     });
 </script>
