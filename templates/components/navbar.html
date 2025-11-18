@@ -36,13 +36,6 @@
                         Applications
                     </a>
                     
-                    {% if user.is_band_admin %}
-                        <a href="{% url 'listings:member_listing' %}" 
-                           class="{% if 'member_listing' in request.path %}text-[#4F2FC0] border-b-2 border-[#4F2FC0]{% else %}hover:text-[#4F2FC0]{% endif %} transition-colors pb-4 -mb-px">
-                            My Listings
-                        </a>
-                    {% endif %}
-                    
                     <a href="{% url 'accounts:logout' %}" 
                        class="hover:text-[#4F2FC0] transition-colors pb-4 -mb-px">
                         Logout

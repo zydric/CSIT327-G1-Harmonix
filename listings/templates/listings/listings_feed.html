@@ -110,16 +110,16 @@
                         <div>
                             <h1 class="text-3xl font-bold text-gray-900 mb-2">
                                 {% if is_musician %}
-                                    Available Opportunities
+                                    Find Your Next Gig
                                 {% else %}
-                                    Your Listings
+                                    My Listings
                                 {% endif %}
                             </h1>
                             <p class="text-gray-600">
                                 {% if is_musician %}
                                     Showing {{ listings_count }} opportunities
                                 {% else %}
-                                    You have {{ listings_count }} active listings
+                                    You have {{ listings_count }} active listing{{ listings_count|pluralize }}
                                 {% endif %}
                             </p>
                         </div>
@@ -127,7 +127,7 @@
                         {% if is_band_admin %}
                         <!-- Create Listing Button for Band Admins -->
                         <a href="{% url 'listings:create' %}" 
-                           class="px-6 py-2 bg-[#4F2FC0] text-white rounded-lg font-medium hover:bg-[#3f24a0] transition-colors inline-flex items-center">
+                           class="px-6 py-2 bg-[#4F2FC0] text-white rounded-lg font-medium hover:bg-[#3f24a0] transition-colors flex items-center">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                             </svg>
@@ -140,12 +140,12 @@
                 <!-- Listings Feed -->
                 <div class="space-y-6">
                     {% for listing in listings %}
-                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer overflow-hidden" 
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer overflow-hidden min-w-0" 
                          onclick="window.location.href='{% url 'listings:detail' pk=listing.pk %}'">
                         <!-- Listing Header -->
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="flex-1">
-                                <h3 class="text-xl font-bold text-gray-900 mb-1 hover:text-[#4F2FC0] transition-colors">
+                        <div class="flex justify-between items-start mb-4 min-w-0">
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-xl font-bold text-gray-900 mb-1 hover:text-[#4F2FC0] transition-colors break-words">
                                     {{ listing.title }}
                                 </h3>
                                 <div class="flex items-center space-x-4 text-sm text-gray-600">
@@ -178,7 +178,7 @@
                         </div>
 
                         <!-- Description -->
-                        <p class="text-gray-700 mb-4 line-clamp-3 break-words">{{ listing.description|truncatewords:30 }}</p>
+                        <p class="text-gray-700 mb-4 break-words" style="word-break: break-word; overflow-wrap: anywhere;">{{ listing.description|truncatewords:30 }}</p>
 
                         <!-- Metadata -->
                         <div class="flex items-center space-x-6 text-sm text-gray-500">
@@ -214,6 +214,34 @@
                             </span>
                             {% endif %}
                         </div>
+
+                        <!-- Recent Applications (Only shown for band admin's own listings) -->
+                        {% if is_band_admin and listing.band_admin == user %}
+                        {% with applications=listing.applications.all|slice:":3" %}
+                        {% if applications %}
+                        <div class="mt-6 pt-6 border-t border-gray-200">
+                            <h4 class="font-semibold text-base mb-4 text-gray-800">Recent Applications</h4>
+                            <div class="space-y-3">
+                                {% for application in applications %}
+                                <div class="flex items-center justify-between px-3 py-3 bg-gray-50 rounded-lg border border-gray-200" onclick="event.stopPropagation();">
+                                    <div class="flex-1">
+                                        <p class="font-medium text-gray-900 text-sm">{{ application.musician.username }}</p>
+                                        <p class="text-xs text-gray-600 mt-1">{{ application.message|truncatewords:15 }}</p>
+                                        <p class="text-xs text-gray-500 mt-1">Applied {{ application.created_at|date:"M d, Y" }}</p>
+                                    </div>
+                                    <span class="px-3 py-1 text-xs font-medium rounded-full 
+                                        {% if application.status == 'accepted' %}bg-green-100 text-green-700
+                                        {% elif application.status == 'rejected' %}bg-red-100 text-red-700
+                                        {% else %}bg-gray-100 text-gray-700{% endif %}">
+                                        {{ application.status }}
+                                    </span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endwith %}
+                        {% endif %}
                     </div>
                     {% empty %}
                     <!-- Empty State -->
