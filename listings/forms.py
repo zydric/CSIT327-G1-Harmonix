@@ -12,7 +12,7 @@ class ListingForm(forms.ModelForm):
     instruments_needed = forms.MultipleChoiceField(
         choices=INSTRUMENT_CHOICES,
         widget=forms.CheckboxSelectMultiple(attrs={
-            'class': 'space-y-2'
+            'class': 'w-4 h-4 text-purple-600 bg-white border-gray-300 rounded focus:ring-purple-500 focus:ring-2'
         }),
         help_text="Select all instruments needed for this opportunity"
     )
@@ -20,7 +20,7 @@ class ListingForm(forms.ModelForm):
     genres = forms.MultipleChoiceField(
         choices=GENRE_CHOICES,
         widget=forms.CheckboxSelectMultiple(attrs={
-            'class': 'space-y-2'
+            'class': 'w-4 h-4 text-indigo-600 bg-white border-gray-300 rounded focus:ring-indigo-500 focus:ring-2'
         }),
         help_text="Select all genres that describe your band's style"
     )
@@ -30,15 +30,15 @@ class ListingForm(forms.ModelForm):
         fields = ['title', 'band_name', 'description', 'instruments_needed', 'genres', 'is_active']
         widgets = {
             'title': forms.TextInput(attrs={
-                'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent',
+                'class': 'w-full px-4 py-3 bg-white border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 font-medium transition-colors',
                 'placeholder': 'e.g., "Lead Guitarist Needed for Rock Band"'
             }),
             'band_name': forms.TextInput(attrs={
-                'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent',
+                'class': 'w-full px-4 py-3 bg-white border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 font-medium transition-colors',
                 'placeholder': 'Your band name'
             }),
             'description': forms.Textarea(attrs={
-                'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent',
+                'class': 'w-full px-4 py-3 bg-white border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 leading-relaxed transition-colors',
                 'rows': 6,
                 'placeholder': 'Describe the opportunity, requirements, and what you\'re looking for in detail...'
             }),
