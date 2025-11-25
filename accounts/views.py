@@ -46,7 +46,8 @@ def band_profile_view(request):
             messages.error(request, f'An error occurred: {str(e)}')
     
     context = {
-        'user': user
+        'user': user,
+        'genre_choices': GENRE_CHOICES,
     }
     return render(request, 'accounts/band_profile.html', context)
 
@@ -290,7 +291,9 @@ def musician_profile_view(request):
             messages.error(request, f'An error occurred: {str(e)}')
     
     context = {
-        'user': user
+        'user': user,
+        'genre_choices': GENRE_CHOICES,
+        'instrument_choices': INSTRUMENT_CHOICES,
     }
     return render(request, 'accounts/musician_profile.html', context)
 
