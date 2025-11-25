@@ -148,8 +148,17 @@
     const initialInstruments = ('{{ user.instruments|default:""|escapejs }}').split(',').map(s => s.trim()).filter(Boolean);
     const initialGenres = ('{{ user.genres|default:""|escapejs }}').split(',').map(s => s.trim()).filter(Boolean);
 
-        const allInstruments = ['Guitar', 'Bass', 'Drums', 'Vocals', 'Keyboard', 'Piano', 'Saxophone', 'Violin', 'Trumpet', 'Flute'];
-        const allGenres = ['Rock', 'Jazz', 'Blues', 'Folk', 'Country', 'Electronic', 'Indie', 'Pop', 'Classical', 'Hip-Hop'];
+        // Load from backend constants
+        const allInstruments = [
+            {% for value, label in instrument_choices %}
+                '{{ label }}'{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+        const allGenres = [
+            {% for value, label in genre_choices %}
+                '{{ label }}'{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
 
         let selectedInstruments = [...initialInstruments];
         let selectedGenres = [...initialGenres];
