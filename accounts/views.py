@@ -341,7 +341,7 @@ def password_reset_request(request):
         if form.is_valid():
             email = form.cleaned_data['email']
             
-            # Security: Always show success message regardless of whether email exists
+            # Security: Always redirect to success page regardless of whether email exists
             # This prevents user enumeration attacks
             try:
                 user = User.objects.get(email=email, is_active=True)
@@ -351,10 +351,7 @@ def password_reset_request(request):
                 # Don't reveal that the user doesn't exist
                 pass
             
-            messages.success(
-                request,
-                'If an account exists with that email, you will receive password reset instructions shortly.'
-            )
+            # Redirect to success page without using messages framework
             return redirect('accounts:password_reset_done')
     else:
         form = PasswordResetRequestForm()
@@ -388,7 +385,7 @@ def password_reset_confirm(request, uidb64, token):
             form = SetPasswordForm(user, request.POST)
             if form.is_valid():
                 form.save()
-                messages.success(request, 'Your password has been reset successfully! You can now log in.')
+                # Redirect to success page without using messages framework
                 return redirect('accounts:password_reset_complete')
         else:
             form = SetPasswordForm(user)
@@ -398,8 +395,7 @@ def password_reset_confirm(request, uidb64, token):
             'validlink': True,
         })
     else:
-        # Invalid or expired token
-        messages.error(request, 'This password reset link is invalid or has expired.')
+        # Invalid or expired token - render template with validlink=False
         return render(request, 'accounts/password_reset_confirm.html', {
             'validlink': False,
         })
