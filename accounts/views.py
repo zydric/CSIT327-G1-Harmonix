@@ -50,8 +50,6 @@ def band_profile_view(request):
     }
     return render(request, 'accounts/band_profile.html', context)
 
-def edit_band_profile_view(request):
-    return render(request, 'accounts/edit_band_profile.html')
 # ============================
 # Validation Helper Functions
 # ============================
@@ -295,51 +293,6 @@ def musician_profile_view(request):
         'user': user
     }
     return render(request, 'accounts/musician_profile.html', context)
-
-
-# ============================
-# Edit Profile View
-# ============================
-@login_required
-@csrf_protect
-def edit_musician_profile_view(request):
-    user = request.user
-    
-    if request.method == 'POST':
-        # Get form data
-        new_username = request.POST.get('username', '').strip()
-        new_location = request.POST.get('location', '').strip()
-        new_instruments = request.POST.get('instruments', '').strip()
-        new_genres = request.POST.get('genres', '').strip()
-
-        # Validate username if it changed
-        if new_username != user.username:
-            if User.objects.filter(username=new_username).exists():
-                messages.error(request, 'This username is already taken.')
-                return render(request, 'accounts/edit_musician_profile.html', {'user': user})
-
-        try:
-            # Update user fields
-            user.username = new_username
-            user.location = new_location
-            user.instruments = new_instruments
-            user.genres = new_genres
-            user.save()
-            
-            messages.success(request, 'Profile updated successfully!')
-            return redirect('accounts:musician_profile')
-            
-        except Exception as e:
-            messages.error(request, f'An error occurred while updating your profile: {str(e)}')
-            return render(request, 'accounts/edit_musician_profile.html', {'user': user})
-            
-    # Handle GET request
-    context = {
-        'user': user,
-        'instruments': [x.strip() for x in user.instruments.split(',')] if user.instruments else [],
-        'genres': [x.strip() for x in user.genres.split(',')] if user.genres else []
-    }
-    return render(request, 'accounts/edit_musician_profile.html', context)
 
 
 @login_required
