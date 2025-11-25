@@ -394,10 +394,9 @@
         if (instrumentsContainer) {
             instrumentsContainer.innerHTML = selectedInstruments.length > 0
                 ? selectedInstruments.map(inst => {
-                    const isCustom = !allInstruments.includes(inst);
                     return `<span class="px-3 py-1 bg-gray-100 text-gray-900 text-sm font-medium rounded-full inline-flex items-center gap-1">
                         ${inst}
-                        ${editMode && isCustom ? `<button type="button" onclick="removeInstrument('${inst.replace(/'/g, "\\'")}')" class="ml-1 hover:text-red-600">×</button>` : ''}
+                        ${editMode ? `<button type="button" onclick="removeInstrument('${inst.replace(/'/g, "\\'")}')" class="ml-1 hover:text-red-600 font-bold">×</button>` : ''}
                     </span>`;
                   }).join('')
                 : '<span class="text-gray-500 text-sm">No instruments selected</span>';
@@ -406,10 +405,9 @@
         if (genresContainer) {
             genresContainer.innerHTML = selectedGenres.length > 0
                 ? selectedGenres.map(genre => {
-                    const isCustom = !allGenres.includes(genre);
                     return `<span class="px-3 py-1 bg-gray-100 text-gray-900 text-sm font-medium rounded-full inline-flex items-center gap-1">
                         ${genre}
-                        ${editMode && isCustom ? `<button type="button" onclick="removeGenre('${genre.replace(/'/g, "\\'")}')" class="ml-1 hover:text-red-600">×</button>` : ''}
+                        ${editMode ? `<button type="button" onclick="removeGenre('${genre.replace(/'/g, "\\'")}')" class="ml-1 hover:text-red-600 font-bold">×</button>` : ''}
                     </span>`;
                   }).join('')
                 : '<span class="text-gray-500 text-sm">No genres selected</span>';
@@ -442,20 +440,20 @@
         }
     }
 
-    // Remove instrument (custom only)
+    // Remove instrument (works for both predefined and custom)
     function removeInstrument(instrument) {
         const index = selectedInstruments.indexOf(instrument);
-        if (index > -1 && !allInstruments.includes(instrument)) {
+        if (index > -1) {
             selectedInstruments.splice(index, 1);
             renderInstrumentsGrid();
             updateSidebar();
         }
     }
 
-    // Remove genre (custom only)
+    // Remove genre (works for both predefined and custom)
     function removeGenre(genre) {
         const index = selectedGenres.indexOf(genre);
-        if (index > -1 && !allGenres.includes(genre)) {
+        if (index > -1) {
             selectedGenres.splice(index, 1);
             renderGenresGrid();
             updateSidebar();
