@@ -125,12 +125,15 @@ def validate_registration_data(username, email, password1, password2, role, sele
     elif role not in ['musician', 'band']:
         field_errors['role'] = "Please select a valid role."
     
-    # Musician-specific validation
+    # Role-specific validation
     if role == 'musician':
         if not selected_instruments:
             field_errors['instruments'] = "Musicians must select at least one instrument."
         if not selected_genres:
             field_errors['genres'] = "Musicians must select at least one musical genre."
+    elif role == 'band':
+        if not selected_genres:
+            field_errors['genres'] = "Bands must select at least one musical genre."
     
     return field_errors
 
