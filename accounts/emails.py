@@ -2,7 +2,6 @@
 Email utilities for sending password reset emails.
 """
 
-from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.contrib.sites.shortcuts import get_current_site
@@ -12,24 +11,33 @@ from django.conf import settings
 from .tokens import password_reset_token
 import logging
 import threading
+import os
+
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail, Email, To, Content
 
 logger = logging.getLogger(__name__)
 
 
 def _send_email_async(subject, message, from_email, recipient_list, html_message):
     """
-    Send email in a separate thread to avoid blocking the request.
+    Send email in a separate thread using SendGrid API (not SMTP).
+    This avoids Render blocking port 587.
     """
     try:
-        send_mail(
+        # Use SendGrid API instead of SMTP
+        mail = Mail(
+            from_email=Email(from_email),
+            to_emails=To(recipient_list[0]),
             subject=subject,
-            message=message,
-            from_email=from_email,
-            recipient_list=recipient_list,
-            html_message=html_message,
-            fail_silently=False,  # Show errors for debugging
+            plain_text_content=Content("text/plain", message),
+            html_content=Content("text/html", html_message)
         )
-        logger.info(f"Password reset email sent successfully to {recipient_list[0]}")
+        
+        sg = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
+        response = sg.send(mail)
+        
+        logger.info(f"Password reset email sent successfully to {recipient_list[0]} (Status: {response.status_code})")
     except Exception as e:
         logger.error(f"Failed to send password reset email to {recipient_list[0]}: {str(e)}", exc_info=True)
 
