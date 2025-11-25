@@ -396,7 +396,7 @@
                 ? selectedInstruments.map(inst => {
                     return `<span class="px-3 py-1 bg-gray-100 text-gray-900 text-sm font-medium rounded-full inline-flex items-center gap-1">
                         ${inst}
-                        ${editMode ? `<button type="button" onclick="removeInstrument('${inst.replace(/'/g, "\\'")}')" class="ml-1 hover:text-red-600 font-bold">×</button>` : ''}
+                        ${editMode ? `<button type="button" onclick="removeInstrument('${inst.replace(/'/g, "\\'")}')" class="ml-1 text-red-600 hover:text-red-800 font-bold text-lg leading-none">×</button>` : ''}
                     </span>`;
                   }).join('')
                 : '<span class="text-gray-500 text-sm">No instruments selected</span>';
@@ -407,7 +407,7 @@
                 ? selectedGenres.map(genre => {
                     return `<span class="px-3 py-1 bg-gray-100 text-gray-900 text-sm font-medium rounded-full inline-flex items-center gap-1">
                         ${genre}
-                        ${editMode ? `<button type="button" onclick="removeGenre('${genre.replace(/'/g, "\\'")}')" class="ml-1 hover:text-red-600 font-bold">×</button>` : ''}
+                        ${editMode ? `<button type="button" onclick="removeGenre('${genre.replace(/'/g, "\\'")}')" class="ml-1 text-red-600 hover:text-red-800 font-bold text-lg leading-none">×</button>` : ''}
                     </span>`;
                   }).join('')
                 : '<span class="text-gray-500 text-sm">No genres selected</span>';
