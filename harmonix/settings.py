@@ -219,16 +219,10 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # ============================
 
 if ENV == 'production':
-    # Production: Use SendGrid SMTP
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_HOST = 'smtp.sendgrid.net'
-    EMAIL_PORT = 587
-    EMAIL_USE_TLS = True
-    EMAIL_HOST_USER = 'apikey'  # This is literally the string 'apikey'
-    EMAIL_HOST_PASSWORD = os.getenv('SENDGRID_API_KEY')
+    # Production: Use SendGrid API (not SMTP, since Render blocks port 587)
+    # Email will be sent directly via SendGrid's HTTP API in accounts/emails.py
     DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@harmonix.com')
     SERVER_EMAIL = DEFAULT_FROM_EMAIL
-    EMAIL_TIMEOUT = 10  # 10 seconds timeout for SMTP connection
 else:
     # Development: Print emails to console
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
