@@ -238,6 +238,13 @@
         // Data
         const initialGenres = ('{{ user.genres|default:""|escapejs }}').split(',').map(s => s.trim()).filter(Boolean);
 
+        // Load from backend constants
+        const allGenres = [
+            {% for value, label in genre_choices %}
+                '{{ label }}'{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+
         let selectedGenres = [...initialGenres];
 
         // Initialize edit mode on page load
@@ -300,8 +307,6 @@
             document.getElementById('editMode').classList.add('hidden');
         }
 
-        // Data
-        const initialGenres = ('{{ user.genres|default:""|escapejs }}').split(',').map(s => s.trim()).filter(Boolean);
     </script>
 </div>
 {% endblock %}
