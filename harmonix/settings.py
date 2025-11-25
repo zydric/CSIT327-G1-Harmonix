@@ -213,3 +213,25 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Use WhiteNoise storage for serving static files in production
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# ============================
+# Email Configuration
+# ============================
+
+if ENV == 'production':
+    # Production: Use SendGrid SMTP
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp.sendgrid.net'
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = 'apikey'  # This is literally the string 'apikey'
+    EMAIL_HOST_PASSWORD = os.getenv('SENDGRID_API_KEY')
+    DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@harmonix.com')
+    SERVER_EMAIL = DEFAULT_FROM_EMAIL
+else:
+    # Development: Print emails to console
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@localhost')
+
+# Email settings for password reset
+PASSWORD_RESET_TIMEOUT = 3600  # 1 hour (in seconds)
