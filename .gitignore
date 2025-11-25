@@ -26,6 +26,7 @@ static_root/
 # Environment variables
 .env
 *.env
+!.env.example
 
 # IDE settings
 .vscode/

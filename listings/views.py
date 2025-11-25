@@ -48,26 +48,10 @@ def listings_view(request):
         # Order by newest first
         listings = listings.order_by('-created_at')
         
-        # Get unique filter options for dropdowns
-        all_listings = Listing.objects.filter(is_active=True)
-        
-        # Get actual genres and instruments from listings
-        used_genres = set()
-        used_instruments = set()
-        
-        for listing in all_listings:
-            used_genres.update(listing.genres_list)
-            used_instruments.update(listing.instruments_list)
-        
-        # Create filter options with proper case matching
-        # Convert used items to lowercase for comparison
-        used_genres_lower = {g.lower() for g in used_genres}
-        used_instruments_lower = {i.lower() for i in used_instruments}
-        
-        # Filter to only show genres/instruments that are actually used
+        # Show all genres and instruments from constants in filters
         filter_options = {
-            'genres': [choice for choice in Listing.GENRE_CHOICES if choice[0] in used_genres_lower],
-            'instruments': [choice for choice in Listing.INSTRUMENT_CHOICES if choice[0] in used_instruments_lower],
+            'genres': GENRE_CHOICES,
+            'instruments': INSTRUMENT_CHOICES,
         }
         
     else:  # Band admin

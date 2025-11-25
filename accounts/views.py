@@ -46,12 +46,11 @@ def band_profile_view(request):
             messages.error(request, f'An error occurred: {str(e)}')
     
     context = {
-        'user': user
+        'user': user,
+        'genre_choices': GENRE_CHOICES,
     }
     return render(request, 'accounts/band_profile.html', context)
 
-def edit_band_profile_view(request):
-    return render(request, 'accounts/edit_band_profile.html')
 # ============================
 # Validation Helper Functions
 # ============================
@@ -126,12 +125,15 @@ def validate_registration_data(username, email, password1, password2, role, sele
     elif role not in ['musician', 'band']:
         field_errors['role'] = "Please select a valid role."
     
-    # Musician-specific validation
+    # Role-specific validation
     if role == 'musician':
         if not selected_instruments:
             field_errors['instruments'] = "Musicians must select at least one instrument."
         if not selected_genres:
             field_errors['genres'] = "Musicians must select at least one musical genre."
+    elif role == 'band':
+        if not selected_genres:
+            field_errors['genres'] = "Bands must select at least one musical genre."
     
     return field_errors
 
@@ -292,54 +294,11 @@ def musician_profile_view(request):
             messages.error(request, f'An error occurred: {str(e)}')
     
     context = {
-        'user': user
+        'user': user,
+        'genre_choices': GENRE_CHOICES,
+        'instrument_choices': INSTRUMENT_CHOICES,
     }
     return render(request, 'accounts/musician_profile.html', context)
-
-
-# ============================
-# Edit Profile View
-# ============================
-@login_required
-@csrf_protect
-def edit_musician_profile_view(request):
-    user = request.user
-    
-    if request.method == 'POST':
-        # Get form data
-        new_username = request.POST.get('username', '').strip()
-        new_location = request.POST.get('location', '').strip()
-        new_instruments = request.POST.get('instruments', '').strip()
-        new_genres = request.POST.get('genres', '').strip()
-
-        # Validate username if it changed
-        if new_username != user.username:
-            if User.objects.filter(username=new_username).exists():
-                messages.error(request, 'This username is already taken.')
-                return render(request, 'accounts/edit_musician_profile.html', {'user': user})
-
-        try:
-            # Update user fields
-            user.username = new_username
-            user.location = new_location
-            user.instruments = new_instruments
-            user.genres = new_genres
-            user.save()
-            
-            messages.success(request, 'Profile updated successfully!')
-            return redirect('accounts:musician_profile')
-            
-        except Exception as e:
-            messages.error(request, f'An error occurred while updating your profile: {str(e)}')
-            return render(request, 'accounts/edit_musician_profile.html', {'user': user})
-            
-    # Handle GET request
-    context = {
-        'user': user,
-        'instruments': [x.strip() for x in user.instruments.split(',')] if user.instruments else [],
-        'genres': [x.strip() for x in user.genres.split(',')] if user.genres else []
-    }
-    return render(request, 'accounts/edit_musician_profile.html', context)
 
 
 @login_required
@@ -358,3 +317,92 @@ def view_profile(request, username):
     }
     
     return render(request, 'accounts/view_profile.html', context)
+
+
+# ============================
+# Password Reset Views
+# ============================
+
+from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_str
+from .forms import PasswordResetRequestForm, SetPasswordForm
+from .emails import send_password_reset_email
+from .tokens import password_reset_token
+
+
+@csrf_protect
+def password_reset_request(request):
+    """
+    Handle password reset request.
+    User enters their email address to receive reset link.
+    """
+    if request.method == 'POST':
+        form = PasswordResetRequestForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            
+            # Security: Always redirect to success page regardless of whether email exists
+            # This prevents user enumeration attacks
+            try:
+                user = User.objects.get(email=email, is_active=True)
+                # Send password reset email
+                send_password_reset_email(request, user, email)
+            except User.DoesNotExist:
+                # Don't reveal that the user doesn't exist
+                pass
+            
+            # Redirect to success page without using messages framework
+            return redirect('accounts:password_reset_done')
+    else:
+        form = PasswordResetRequestForm()
+    
+    return render(request, 'accounts/password_reset_request.html', {'form': form})
+
+
+def password_reset_done(request):
+    """
+    Show confirmation that password reset email has been sent.
+    """
+    return render(request, 'accounts/password_reset_done.html')
+
+
+@csrf_protect
+def password_reset_confirm(request, uidb64, token):
+    """
+    Handle password reset confirmation with token validation.
+    User clicks link from email and sets new password.
+    """
+    try:
+        # Decode user ID
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    
+    # Validate token
+    if user is not None and password_reset_token.check_token(user, token):
+        if request.method == 'POST':
+            form = SetPasswordForm(user, request.POST)
+            if form.is_valid():
+                form.save()
+                # Redirect to success page without using messages framework
+                return redirect('accounts:password_reset_complete')
+        else:
+            form = SetPasswordForm(user)
+        
+        return render(request, 'accounts/password_reset_confirm.html', {
+            'form': form,
+            'validlink': True,
+        })
+    else:
+        # Invalid or expired token - render template with validlink=False
+        return render(request, 'accounts/password_reset_confirm.html', {
+            'validlink': False,
+        })
+
+
+def password_reset_complete(request):
+    """
+    Show confirmation that password has been reset successfully.
+    """
+    return render(request, 'accounts/password_reset_complete.html')
