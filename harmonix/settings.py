@@ -228,6 +228,7 @@ if ENV == 'production':
     EMAIL_HOST_PASSWORD = os.getenv('SENDGRID_API_KEY')
     DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@harmonix.com')
     SERVER_EMAIL = DEFAULT_FROM_EMAIL
+    EMAIL_TIMEOUT = 10  # 10 seconds timeout for SMTP connection
 else:
     # Development: Print emails to console
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -235,3 +236,40 @@ else:
 
 # Email settings for password reset
 PASSWORD_RESET_TIMEOUT = 3600  # 1 hour (in seconds)
+
+# ============================
+# Logging Configuration
+# ============================
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'accounts': {
+            'handlers': ['console'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'propagate': False,
+        },
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}

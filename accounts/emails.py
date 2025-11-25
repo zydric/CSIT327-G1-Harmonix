@@ -55,14 +55,19 @@ def send_password_reset_email(request, user, to_email):
         # Email subject
         subject = 'Reset Your Harmonix Password'
         
-        # Send email
+        # Validate email configuration before sending
+        if not settings.DEFAULT_FROM_EMAIL:
+            logger.error("DEFAULT_FROM_EMAIL not configured")
+            return False
+        
+        # Send email with proper error handling
         send_mail(
             subject=subject,
             message=plain_message,
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[to_email],
             html_message=html_message,
-            fail_silently=False,
+            fail_silently=True,  # Don't raise exceptions
         )
         
         logger.info(f"Password reset email sent successfully to {to_email}")
@@ -70,4 +75,5 @@ def send_password_reset_email(request, user, to_email):
         
     except Exception as e:
         logger.error(f"Failed to send password reset email to {to_email}: {str(e)}")
+        # Don't raise exception - fail gracefully
         return False
