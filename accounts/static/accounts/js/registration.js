@@ -15,28 +15,37 @@ document.addEventListener('DOMContentLoaded', function() {
     const password1Field = document.getElementById('password1');
     const password2Field = document.getElementById('password2');
     
-    // Function to toggle musician fields
+    // Function to toggle musician/band fields
     function toggleMusicianFields() {
         if (!roleSelect || !instrumentsField || !genresField) {
             console.error('Required elements not found for toggleMusicianFields');
             return;
         }
         
+        const genresHelperText = document.getElementById('genres-helper-text');
+        
         if (roleSelect.value === 'musician') {
+            // Show both instruments and genres for musicians
             instrumentsField.classList.remove('hidden');
             genresField.classList.remove('hidden');
+            if (genresHelperText) {
+                genresHelperText.textContent = 'Select your preferred musical genres';
+            }
+        } else if (roleSelect.value === 'band') {
+            // Show only genres for bands (no instruments)
+            instrumentsField.classList.add('hidden');
+            genresField.classList.remove('hidden');
+            if (genresHelperText) {
+                genresHelperText.textContent = 'Select your band\'s musical genres';
+            }
+            
+            // Clear instrument selections when switching to band
+            const instrumentCheckboxes = instrumentsField.querySelectorAll('input[type="checkbox"]');
+            instrumentCheckboxes.forEach(cb => cb.checked = false);
         } else {
+            // Hide both for no selection
             instrumentsField.classList.add('hidden');
             genresField.classList.add('hidden');
-            
-            // Clear selections when switching to band
-            if (roleSelect.value === 'band') {
-                const instrumentCheckboxes = instrumentsField.querySelectorAll('input[type="checkbox"]');
-                const genreCheckboxes = genresField.querySelectorAll('input[type="checkbox"]');
-                
-                instrumentCheckboxes.forEach(cb => cb.checked = false);
-                genreCheckboxes.forEach(cb => cb.checked = false);
-            }
         }
     }
     

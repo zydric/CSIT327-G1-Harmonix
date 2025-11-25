@@ -82,7 +82,7 @@
                     {% endif %}
                 </div>
 
-                <!-- Genres field (only for musicians) -->
+                <!-- Genres field (for both musicians and bands) -->
                 <div id="genres-field" class="hidden">
                     <label for="genres" class="block font-medium text-gray-700">Musical Genres <span class="text-red-500">*</span></label>
                     <div class="mt-1 border {% if field_errors.genres %}border-red-500 bg-red-50{% else %}border-gray-300{% endif %} rounded-md p-2 max-h-32 overflow-y-auto">
@@ -95,7 +95,7 @@
                         </label>
                         {% endfor %}
                     </div>
-                    <p class="text-xs text-gray-500 mt-1">Select your preferred musical genres</p>
+                    <p class="text-xs text-gray-500 mt-1" id="genres-helper-text">Select your preferred musical genres</p>
                     {% if field_errors.genres %}
                     <p class="mt-1 text-sm text-red-600">{{ field_errors.genres }}</p>
                     {% endif %}

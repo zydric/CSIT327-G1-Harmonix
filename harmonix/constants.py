@@ -2,14 +2,22 @@
 # These choices should be used consistently across all apps
 
 # Genre choices - standardized as per design requirements
+# Sorted by popularity/commonness
 GENRE_CHOICES = [
     ('rock', 'Rock'),
-    ('jazz', 'Jazz'),
+    ('pop', 'Pop'),
     ('indie', 'Indie'),
-    ('folk', 'Folk'),
+    ('hip-hop', 'Hip-Hop'),
     ('electronic', 'Electronic'),
+    ('jazz', 'Jazz'),
     ('blues', 'Blues'),
+    ('metal', 'Metal'),
+    ('punk', 'Punk'),
+    ('alternative', 'Alternative'),
+    ('folk', 'Folk'),
     ('country', 'Country'),
+    ('r&b', 'R&B'),
+    ('classical', 'Classical'),
     ('opm', 'OPM'),
 ]
 
