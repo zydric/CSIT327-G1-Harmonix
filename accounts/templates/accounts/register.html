@@ -72,7 +72,7 @@
                             <input type="checkbox" name="instruments" value="{{ value }}" 
                                    class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                                    {% if value in selected_instruments %}checked{% endif %}>
-                            <span>{{ label|escapejs }}</span>
+                            <span>{{ label }}</span>
                         </label>
                         {% endfor %}
                     </div>
@@ -91,7 +91,7 @@
                             <input type="checkbox" name="genres" value="{{ value }}" 
                                    class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                                    {% if value in selected_genres %}checked{% endif %}>
-                            <span>{{ label|escapejs }}</span>
+                            <span>{{ label }}</span>
                         </label>
                         {% endfor %}
                     </div>
