@@ -227,12 +227,12 @@
     // Load from backend constants
     const allInstruments = [
         {% for value, label in instrument_choices %}
-            '{{ label }}'{% if not forloop.last %},{% endif %}
+            '{{ label|escapejs }}'{% if not forloop.last %},{% endif %}
         {% endfor %}
     ];
     const allGenres = [
         {% for value, label in genre_choices %}
-            '{{ label }}'{% if not forloop.last %},{% endif %}
+            '{{ label|escapejs }}'{% if not forloop.last %},{% endif %}
         {% endfor %}
     ];
     
