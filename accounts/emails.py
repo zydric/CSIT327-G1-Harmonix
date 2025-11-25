@@ -27,11 +27,11 @@ def _send_email_async(subject, message, from_email, recipient_list, html_message
             from_email=from_email,
             recipient_list=recipient_list,
             html_message=html_message,
-            fail_silently=True,
+            fail_silently=False,  # Show errors for debugging
         )
         logger.info(f"Password reset email sent successfully to {recipient_list[0]}")
     except Exception as e:
-        logger.error(f"Failed to send password reset email to {recipient_list[0]}: {str(e)}")
+        logger.error(f"Failed to send password reset email to {recipient_list[0]}: {str(e)}", exc_info=True)
 
 
 def send_password_reset_email(request, user, to_email):
