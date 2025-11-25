@@ -11,8 +11,27 @@ from django.utils.encoding import force_bytes
 from django.conf import settings
 from .tokens import password_reset_token
 import logging
+import threading
 
 logger = logging.getLogger(__name__)
+
+
+def _send_email_async(subject, message, from_email, recipient_list, html_message):
+    """
+    Send email in a separate thread to avoid blocking the request.
+    """
+    try:
+        send_mail(
+            subject=subject,
+            message=message,
+            from_email=from_email,
+            recipient_list=recipient_list,
+            html_message=html_message,
+            fail_silently=True,
+        )
+        logger.info(f"Password reset email sent successfully to {recipient_list[0]}")
+    except Exception as e:
+        logger.error(f"Failed to send password reset email to {recipient_list[0]}: {str(e)}")
 
 
 def send_password_reset_email(request, user, to_email):
@@ -60,20 +79,19 @@ def send_password_reset_email(request, user, to_email):
             logger.error("DEFAULT_FROM_EMAIL not configured")
             return False
         
-        # Send email with proper error handling
-        send_mail(
-            subject=subject,
-            message=plain_message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[to_email],
-            html_message=html_message,
-            fail_silently=True,  # Don't raise exceptions
+        # Send email asynchronously to avoid blocking the request
+        # This prevents worker timeouts in production
+        email_thread = threading.Thread(
+            target=_send_email_async,
+            args=(subject, plain_message, settings.DEFAULT_FROM_EMAIL, [to_email], html_message),
+            daemon=True  # Thread will not prevent program from exiting
         )
+        email_thread.start()
         
-        logger.info(f"Password reset email sent successfully to {to_email}")
+        logger.info(f"Password reset email queued for {to_email}")
         return True
         
     except Exception as e:
-        logger.error(f"Failed to send password reset email to {to_email}: {str(e)}")
+        logger.error(f"Failed to queue password reset email for {to_email}: {str(e)}")
         # Don't raise exception - fail gracefully
         return False
