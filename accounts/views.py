@@ -31,6 +31,11 @@ def band_profile_view(request):
             if User.objects.filter(username=new_username).exists():
                 messages.error(request, 'This username is already taken.')
                 return render(request, 'accounts/band_profile.html', {'user': user})
+        
+        # Validate location format if provided
+        if new_location and not is_valid_location_format(new_location):
+            messages.error(request, 'Please enter location in the format: City, Country (e.g., Cebu, Philippines)')
+            return render(request, 'accounts/band_profile.html', {'user': user})
 
         try:
             # Update user fields
@@ -261,6 +266,28 @@ def logout_view(request):
 # ============================
 # Profile View
 # ============================
+def is_valid_location_format(location):
+    """
+    Validate location format: City, Country
+    """
+    if not location or location.strip() == '':
+        return True  # Empty is okay
+    
+    # Check for "City, Country" format
+    parts = location.split(',')
+    if len(parts) != 2:
+        return False
+    
+    city = parts[0].strip()
+    country = parts[1].strip()
+    
+    # Both parts should be non-empty and contain only valid characters
+    valid_name_pattern = re.compile(r'^[a-zA-Z\s\-.\'()]+$')
+    
+    return (city and country and 
+            valid_name_pattern.match(city) and 
+            valid_name_pattern.match(country))
+
 @login_required
 @csrf_protect
 def musician_profile_view(request):
@@ -278,6 +305,11 @@ def musician_profile_view(request):
             if User.objects.filter(username=new_username).exists():
                 messages.error(request, 'This username is already taken.')
                 return render(request, 'accounts/musician_profile.html', {'user': user})
+        
+        # Validate location format if provided
+        if new_location and not is_valid_location_format(new_location):
+            messages.error(request, 'Please enter location in the format: City, Country (e.g., Cebu, Philippines)')
+            return render(request, 'accounts/musician_profile.html', {'user': user})
 
         try:
             # Update user fields
