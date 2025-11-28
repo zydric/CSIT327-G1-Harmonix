@@ -29,7 +29,7 @@ def invites_page(request):
         'active_listings': active_listings,
     }
     
-    return render(request, 'invitations/invites.html', context)
+    return render(request, 'invitations/invite_musicians.html', context)
 
 
 @login_required
