@@ -34,7 +34,7 @@
                     <div class="bg-white rounded-lg shadow-md border border-gray-200 p-6 relative">
                         <!-- Invite button in top right -->
                         <button onclick="openInviteModal({{ musician.id }}, '{{ musician.username|escapejs }}')" 
-                                class="absolute top-4 right-4 bg-blue-600 text-gray-400 px-3 py-1 rounded-md text-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                class="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                             Invite
                         </button>
 
@@ -97,7 +97,7 @@
     </div>
 </div>
 
-<!-- Invite Modal -->
+<!-- Enhanced Invite Modal -->
 {% if active_listings %}
 <div id="inviteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 hidden">
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
@@ -113,9 +113,11 @@
 
         <!-- Modal Body -->
         <div class="mb-4">
-            <p class="text-gray-700 mb-4">Select which listing to invite <strong id="musicianName"></strong> to:</p>
+            <p class="text-gray-700 mb-4">Invite <strong id="musicianName"></strong> to join one of your listings:</p>
             
+            <!-- Listing Selection -->
             <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Select Listing:</label>
                 <select id="listingSelect" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="">Select a listing...</option>
                     {% for listing in active_listings %}
@@ -124,13 +126,22 @@
                 </select>
             </div>
 
+            <!-- Optional Message -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Message (Optional):</label>
+                <textarea id="inviteMessage" rows="3" placeholder="Add a personal message to your invitation..." 
+                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                <p class="text-xs text-gray-500 mt-1">This message will be visible to the musician</p>
+            </div>
+
+            <!-- Action Buttons -->
             <div class="flex justify-end space-x-3">
                 <button onclick="closeInviteModal()" 
                         class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500">
                     Cancel
                 </button>
                 <button onclick="sendInvitation()" 
-                        class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                     Send Invitation
                 </button>
             </div>
@@ -146,6 +157,7 @@ function openInviteModal(musicianId, musicianName) {
     currentMusicianId = musicianId;
     document.getElementById('musicianName').textContent = musicianName;
     document.getElementById('listingSelect').value = '';
+    document.getElementById('inviteMessage').value = '';
     document.getElementById('inviteModal').classList.remove('hidden');
 }
 
@@ -156,6 +168,7 @@ function closeInviteModal() {
 
 function sendInvitation() {
     const listingId = document.getElementById('listingSelect').value;
+    const message = document.getElementById('inviteMessage').value.trim();
     
     if (!listingId) {
         alert('Please select a listing first.');
@@ -172,10 +185,12 @@ function sendInvitation() {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
         },
         body: JSON.stringify({
             musician_id: currentMusicianId,
-            listing_id: listingId
+            listing_id: listingId,
+            message: message
         })
     })
     .then(response => response.json())

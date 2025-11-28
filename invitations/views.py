@@ -10,8 +10,8 @@ from .models import Invitation
 
 
 @login_required
-def invites_page(request):
-    """Display all musicians for band admins to invite"""
+def band_admin_invite_musicians(request):
+    """Display all musicians for band admins to invite (Band Admin View)"""
     
     # Only band admins can access this page
     if not request.user.is_band_admin:
@@ -29,7 +29,26 @@ def invites_page(request):
         'active_listings': active_listings,
     }
     
-    return render(request, 'invitations/invite_musicians.html', context)
+    return render(request, 'invitations/band_admin_invite.html', context)
+
+
+@login_required
+def musician_received_invitations(request):
+    """Display invitations received by musician (Musician View)"""
+    
+    # Only musicians can access this page
+    if not request.user.is_musician:
+        messages.error(request, "Access denied. Only musicians can view invitations.")
+        return redirect('listings:feed')
+    
+    # Get all invitations for this musician
+    invitations = Invitation.objects.filter(musician=request.user).select_related('band_admin', 'listing')
+    
+    context = {
+        'invitations': invitations,
+    }
+    
+    return render(request, 'invitations/musician_invitations.html', context)
 
 
 @login_required
@@ -48,6 +67,7 @@ def send_invitation(request):
         data = json.loads(request.body)
         musician_id = data.get('musician_id')
         listing_id = data.get('listing_id')
+        message = data.get('message', '').strip()
         
         # Validate musician
         musician = get_object_or_404(User, id=musician_id, role='musician')
@@ -71,13 +91,77 @@ def send_invitation(request):
         invitation = Invitation.objects.create(
             band_admin=request.user,
             musician=musician,
-            listing=listing
+            listing=listing,
+            message=message if message else None
         )
         
         return JsonResponse({
             'success': True,
             'message': f'Invitation sent to {musician.username} for "{listing.title}"!'
         })
+        
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+@csrf_exempt
+def respond_to_invitation(request):
+    """Handle musician's response to invitation (accept/decline)"""
+    
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST method required'}, status=400)
+    
+    # Only musicians can respond to invitations
+    if not request.user.is_musician:
+        return JsonResponse({'error': 'Access denied'}, status=403)
+    
+    try:
+        data = json.loads(request.body)
+        invitation_id = data.get('invitation_id')
+        response = data.get('response')  # 'accepted' or 'declined'
+        
+        if response not in ['accepted', 'declined']:
+            return JsonResponse({'error': 'Invalid response'}, status=400)
+        
+        # Get the invitation
+        invitation = get_object_or_404(Invitation, id=invitation_id, musician=request.user, status='pending')
+        
+        # Update the invitation status
+        invitation.status = response
+        invitation.save()
+        
+        action = 'accepted' if response == 'accepted' else 'declined'
+        
+        return JsonResponse({
+            'success': True,
+            'message': f'You have {action} the invitation for "{invitation.listing.title}"!'
+        })
+        
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+def get_listing_details(request, listing_id):
+    """Get detailed information about a listing for the modal"""
+    
+    try:
+        listing = get_object_or_404(Listing, id=listing_id, is_active=True)
+        
+        data = {
+            'id': listing.id,
+            'title': listing.title,
+            'band_name': listing.band_name,
+            'band_admin': listing.band_admin.username,
+            'description': listing.description,
+            'instruments_needed': listing.instruments_list,
+            'genres': listing.genres_list,
+            'location': listing.band_admin.location or 'Not specified',
+            'posted_date': listing.posted_date_display,
+        }
+        
+        return JsonResponse(data)
         
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
