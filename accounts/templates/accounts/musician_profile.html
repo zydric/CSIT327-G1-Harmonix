@@ -133,8 +133,10 @@
                             <!-- Location -->
                             <div>
                                 <label class="block font-semibold text-gray-900 mb-2">Location</label>
-                                <input type="text" name="location" value="{{ user.location }}" 
-                                       class="editable-field w-full px-4 py-2 bg-gray-100 text-gray-600 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#4F2FC0] focus:border-transparent" readonly>
+                                <div class="location-input-container">
+                                    <input type="text" name="location" id="locationInput" value="{{ user.location }}" 
+                                           class="editable-field w-full px-4 py-2 bg-gray-100 text-gray-600 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#4F2FC0] focus:border-transparent" readonly>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -191,7 +193,13 @@
     </div>
 </div>
 
+<!-- Include Location Autocomplete JS -->
+<script src="{% static 'accounts/js/location-autocomplete.js' %}"></script>
+
 <script>
+    // Location Autocomplete Instance
+    let locationAutocomplete;
+    
     // Data - mapping from database keys to display labels
     const instrumentMap = {
         'guitar': 'Guitar',
@@ -262,6 +270,15 @@
             field.classList.add('bg-white', 'text-gray-900');
         });
         
+        // Initialize location autocomplete
+        const locationInput = document.getElementById('locationInput');
+        if (locationInput && !locationAutocomplete) {
+            locationAutocomplete = new LocationAutocomplete(locationInput, {
+                placeholder: 'Enter city, country (e.g., Cebu, Philippines)',
+                validateFormat: true
+            });
+        }
+        
         // Show instruments and genres sections
         document.getElementById('instrumentsSection').classList.remove('hidden');
         document.getElementById('genresSection').classList.remove('hidden');
@@ -286,6 +303,19 @@
             field.classList.add('bg-gray-100', 'text-gray-600');
             field.classList.remove('bg-white', 'text-gray-900');
         });
+        
+        // Reset location field and remove autocomplete styling
+        const locationInput = document.getElementById('locationInput');
+        if (locationInput) {
+            locationInput.value = '{{ user.location|escapejs }}';
+            locationInput.classList.remove('location-valid', 'location-invalid');
+        }
+        
+        // Destroy location autocomplete instance
+        if (locationAutocomplete) {
+            locationAutocomplete.closeSuggestions();
+            locationAutocomplete = null;
+        }
         
         // Hide instruments and genres sections
         document.getElementById('instrumentsSection').classList.add('hidden');
