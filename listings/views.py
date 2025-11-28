@@ -19,10 +19,11 @@ def listings_view(request):
     """
     user = request.user
     
-    # Get filter parameters
+    # Get filter and sort parameters
     search_query = request.GET.get('search', '')
     genre_filter = request.GET.get('genre', '')
     instrument_filter = request.GET.get('instrument', '')
+    sort_by = request.GET.get('sort', 'newest')  # Default to newest
     
     if user.is_musician:
         # Musicians see all active listings
@@ -46,8 +47,11 @@ def listings_view(request):
             instrument_display = dict(Listing.INSTRUMENT_CHOICES).get(instrument_filter, instrument_filter)
             listings = listings.filter(instruments_needed__icontains=instrument_display)
 
-        # Order by newest first
-        listings = listings.order_by('-created_at')
+        # Apply sorting
+        if sort_by == 'alphabetical':
+            listings = listings.order_by('title')
+        else:  # Default to newest
+            listings = listings.order_by('-created_at')
         
         # Show all genres and instruments from constants in filters
         filter_options = {
@@ -57,7 +61,14 @@ def listings_view(request):
         
     else:  # Band admin
         # Band admins see only their own listings
-        listings = Listing.objects.filter(band_admin=user).order_by('-created_at')
+        listings = Listing.objects.filter(band_admin=user)
+        
+        # Apply sorting for band admins too
+        if sort_by == 'alphabetical':
+            listings = listings.order_by('title')
+        else:  # Default to newest
+            listings = listings.order_by('-created_at')
+            
         filter_options = {}  # Band admins don't need filters for their own listings
 
     # Apply pagination for both musicians and band admins
@@ -76,6 +87,7 @@ def listings_view(request):
             'search': search_query,
             'genre': genre_filter,
             'instrument': instrument_filter,
+            'sort': sort_by,
         },
         'page_obj': page_obj,  # Add page object for pagination controls
     }
