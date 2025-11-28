@@ -7,16 +7,142 @@ from django.contrib.auth.decorators import login_required
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 import re
+from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_str
+from .forms import PasswordResetRequestForm, SetPasswordForm
+from .emails import send_password_reset_email
+from .tokens import password_reset_token
 from harmonix.constants import GENRE_CHOICES, INSTRUMENT_CHOICES
-
-
-# REST FRAMEWORKS (Imports are not used in these views)
-# from rest_framework.decorators import api_view, permission_classes
-# from rest_framework.permissions import IsAuthenticated
-# from rest_framework.response import Response
 
 from .models import User
 
+# Registration View
+@csrf_protect
+def register(request):
+    if request.method == 'POST':
+        # --- Get form data ---
+        username = request.POST.get('username', '').strip()
+        email = request.POST.get('email', '').strip()
+        password1 = request.POST.get('password1', '')
+        password2 = request.POST.get('password2', '')
+        role = request.POST.get('role', '')
+        
+        # Get multi-select values
+        selected_instruments = request.POST.getlist('instruments')  # getlist for multiple values
+        selected_genres = request.POST.getlist('genres')  # getlist for multiple values
+
+        # --- Comprehensive Validation ---
+        field_errors = validate_registration_data(
+            username, email, password1, password2, role, 
+            selected_instruments, selected_genres
+        )
+        
+        if field_errors:
+            # Add field-specific errors to messages for display
+            for field, error in field_errors.items():
+                messages.error(request, error)
+            
+            return render(request, 'accounts/register.html', {
+                'genre_choices': GENRE_CHOICES,
+                'instrument_choices': INSTRUMENT_CHOICES,
+                'selected_instruments': selected_instruments,
+                'selected_genres': selected_genres,
+                'username': username,
+                'email': email,
+                'role': role,
+                'field_errors': field_errors,
+            })
+
+        # --- Create user ---
+        try:
+            # Convert lists to comma-separated strings
+            instruments_str = ', '.join(filter(None, selected_instruments)) if selected_instruments else ''
+            genres_str = ', '.join(filter(None, selected_genres)) if selected_genres else ''
+            
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password1,
+                role=role
+            )
+            
+            # Set instruments and genres if provided
+            if instruments_str:
+                user.instruments = instruments_str
+            if genres_str:
+                user.genres = genres_str
+            user.save()
+            
+            messages.success(request, 'Registration successful! Please login.')
+            return redirect('accounts:login')
+
+        except Exception as e:
+            messages.error(request, f'Registration failed: {str(e)}')
+            return render(request, 'accounts/register.html', {
+                'genre_choices': GENRE_CHOICES,
+                'instrument_choices': INSTRUMENT_CHOICES,
+                'selected_instruments': selected_instruments,
+                'selected_genres': selected_genres,
+                'username': username,
+                'email': email,
+                'role': role,
+                'field_errors': {},
+            })
+
+    # Handle GET request
+    return render(request, 'accounts/register.html', {
+        'genre_choices': GENRE_CHOICES,
+        'instrument_choices': INSTRUMENT_CHOICES,
+        'selected_instruments': [],
+        'selected_genres': [],
+        'field_errors': {},
+    })
+
+# Login View
+@csrf_protect
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        # Authenticate user
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            # Login successful
+            auth_login(request, user)
+            
+            # Redirect to 'next' page or default to 'listings:feed'
+            next_page = request.GET.get('next', 'listings:feed')
+            return redirect(next_page)
+        else:
+            # Login failed
+            messages.error(request, 'Invalid username or password!')
+
+    # Handle GET request
+    return render(request, 'accounts/login.html')
+
+# View Profile 
+@login_required
+def view_profile(request, username):
+    """
+    View another user's profile
+    """
+    from django.shortcuts import get_object_or_404
+    
+    profile_user = get_object_or_404(User, username=username)
+    
+    context = {
+        'profile_user': profile_user,
+        'user': request.user,
+        'is_own_profile': request.user == profile_user,
+    }
+    
+    return render(request, 'accounts/view_profile.html', context)
+
+# Edit Band Profile 
+@login_required
+@csrf_protect
 def band_profile_view(request):
     user = request.user
     
@@ -56,9 +182,63 @@ def band_profile_view(request):
     }
     return render(request, 'accounts/band_profile.html', context)
 
-# ============================
-# Validation Helper Functions
-# ============================
+# Edit Musician Profile 
+@login_required
+@csrf_protect
+def musician_profile_view(request):
+    user = request.user
+    
+    if request.method == 'POST':
+        # Get form data
+        new_username = request.POST.get('username', '').strip()
+        new_location = request.POST.get('location', '').strip()
+        new_instruments = request.POST.get('instruments', '').strip()
+        new_genres = request.POST.get('genres', '').strip()
+
+        # Validate username if it changed
+        if new_username != user.username:
+            if User.objects.filter(username=new_username).exists():
+                messages.error(request, 'This username is already taken.')
+                return render(request, 'accounts/musician_profile.html', {'user': user})
+        
+        # Validate location format if provided
+        if new_location and not is_valid_location_format(new_location):
+            messages.error(request, 'Please enter location in the format: City, Country (e.g., Cebu, Philippines)')
+            return render(request, 'accounts/musician_profile.html', {'user': user})
+
+        try:
+            # Update user fields
+            user.username = new_username
+            user.location = new_location
+            user.instruments = new_instruments
+            user.genres = new_genres
+            user.save()
+            
+            messages.success(request, 'Profile updated successfully!')
+            return redirect('accounts:musician_profile')
+            
+        except Exception as e:
+            messages.error(request, f'An error occurred: {str(e)}')
+    
+    context = {
+        'user': user,
+        'genre_choices': GENRE_CHOICES,
+        'instrument_choices': INSTRUMENT_CHOICES,
+    }
+    return render(request, 'accounts/musician_profile.html', context)
+
+# Logout 
+@never_cache  
+def logout_view(request):
+    logout(request)
+    return redirect('accounts:login')
+
+
+# ----------------------------
+# Helper Functions
+# ----------------------------
+
+# Registration Validation 
 def validate_registration_data(username, email, password1, password2, role, selected_instruments, selected_genres):
     """
     Comprehensive validation for registration data.
@@ -142,130 +322,7 @@ def validate_registration_data(username, email, password1, password2, role, sele
     
     return field_errors
 
-# ============================
-# Registration View
-# ============================
-@csrf_protect
-def register(request):
-    if request.method == 'POST':
-        # --- Get form data ---
-        username = request.POST.get('username', '').strip()
-        email = request.POST.get('email', '').strip()
-        password1 = request.POST.get('password1', '')
-        password2 = request.POST.get('password2', '')
-        role = request.POST.get('role', '')
-        
-        # Get multi-select values
-        selected_instruments = request.POST.getlist('instruments')  # getlist for multiple values
-        selected_genres = request.POST.getlist('genres')  # getlist for multiple values
-
-        # --- Comprehensive Validation ---
-        field_errors = validate_registration_data(
-            username, email, password1, password2, role, 
-            selected_instruments, selected_genres
-        )
-        
-        if field_errors:
-            # Add field-specific errors to messages for display
-            for field, error in field_errors.items():
-                messages.error(request, error)
-            
-            return render(request, 'accounts/register.html', {
-                'genre_choices': GENRE_CHOICES,
-                'instrument_choices': INSTRUMENT_CHOICES,
-                'selected_instruments': selected_instruments,
-                'selected_genres': selected_genres,
-                'username': username,
-                'email': email,
-                'role': role,
-                'field_errors': field_errors,
-            })
-
-        # --- Create user ---
-        try:
-            # Convert lists to comma-separated strings
-            instruments_str = ', '.join(filter(None, selected_instruments)) if selected_instruments else ''
-            genres_str = ', '.join(filter(None, selected_genres)) if selected_genres else ''
-            
-            user = User.objects.create_user(
-                username=username,
-                email=email,
-                password=password1,
-                role=role
-            )
-            
-            # Set instruments and genres if provided
-            if instruments_str:
-                user.instruments = instruments_str
-            if genres_str:
-                user.genres = genres_str
-            user.save()
-            
-            messages.success(request, 'Registration successful! Please login.')
-            return redirect('accounts:login')
-
-        except Exception as e:
-            messages.error(request, f'Registration failed: {str(e)}')
-            return render(request, 'accounts/register.html', {
-                'genre_choices': GENRE_CHOICES,
-                'instrument_choices': INSTRUMENT_CHOICES,
-                'selected_instruments': selected_instruments,
-                'selected_genres': selected_genres,
-                'username': username,
-                'email': email,
-                'role': role,
-                'field_errors': {},
-            })
-
-    # Handle GET request
-    return render(request, 'accounts/register.html', {
-        'genre_choices': GENRE_CHOICES,
-        'instrument_choices': INSTRUMENT_CHOICES,
-        'selected_instruments': [],
-        'selected_genres': [],
-        'field_errors': {},
-    })
-
-
-# ============================
-# Login View
-# ============================
-@csrf_protect
-def login_view(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-
-        # Authenticate user
-        user = authenticate(request, username=username, password=password)
-
-        if user is not None:
-            # Login successful
-            auth_login(request, user)
-            
-            # Redirect to 'next' page or default to 'listings:feed'
-            next_page = request.GET.get('next', 'listings:feed')
-            return redirect(next_page)
-        else:
-            # Login failed
-            messages.error(request, 'Invalid username or password!')
-
-    # Handle GET request
-    return render(request, 'accounts/login.html')
-
-
-# ============================
-# Logout View
-# ============================
-@never_cache  # Prevents caching of the logout page
-def logout_view(request):
-    logout(request)
-    return redirect('accounts:login')
-
-
-# ============================
-# Profile View
-# ============================
+# Location Validation
 def is_valid_location_format(location):
     """
     Validate location format: City, Country
@@ -288,80 +345,12 @@ def is_valid_location_format(location):
             valid_name_pattern.match(city) and 
             valid_name_pattern.match(country))
 
-@login_required
-@csrf_protect
-def musician_profile_view(request):
-    user = request.user
-    
-    if request.method == 'POST':
-        # Get form data
-        new_username = request.POST.get('username', '').strip()
-        new_location = request.POST.get('location', '').strip()
-        new_instruments = request.POST.get('instruments', '').strip()
-        new_genres = request.POST.get('genres', '').strip()
-
-        # Validate username if it changed
-        if new_username != user.username:
-            if User.objects.filter(username=new_username).exists():
-                messages.error(request, 'This username is already taken.')
-                return render(request, 'accounts/musician_profile.html', {'user': user})
-        
-        # Validate location format if provided
-        if new_location and not is_valid_location_format(new_location):
-            messages.error(request, 'Please enter location in the format: City, Country (e.g., Cebu, Philippines)')
-            return render(request, 'accounts/musician_profile.html', {'user': user})
-
-        try:
-            # Update user fields
-            user.username = new_username
-            user.location = new_location
-            user.instruments = new_instruments
-            user.genres = new_genres
-            user.save()
-            
-            messages.success(request, 'Profile updated successfully!')
-            return redirect('accounts:musician_profile')
-            
-        except Exception as e:
-            messages.error(request, f'An error occurred: {str(e)}')
-    
-    context = {
-        'user': user,
-        'genre_choices': GENRE_CHOICES,
-        'instrument_choices': INSTRUMENT_CHOICES,
-    }
-    return render(request, 'accounts/musician_profile.html', context)
 
 
-@login_required
-def view_profile(request, username):
-    """
-    View another user's profile
-    """
-    from django.shortcuts import get_object_or_404
-    
-    profile_user = get_object_or_404(User, username=username)
-    
-    context = {
-        'profile_user': profile_user,
-        'user': request.user,
-        'is_own_profile': request.user == profile_user,
-    }
-    
-    return render(request, 'accounts/view_profile.html', context)
 
 
-# ============================
+
 # Password Reset Views
-# ============================
-
-from django.utils.http import urlsafe_base64_decode
-from django.utils.encoding import force_str
-from .forms import PasswordResetRequestForm, SetPasswordForm
-from .emails import send_password_reset_email
-from .tokens import password_reset_token
-
-
 @csrf_protect
 def password_reset_request(request):
     """
