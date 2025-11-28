@@ -31,6 +31,13 @@
                         </a>
                     {% endif %}
                     
+                    {% if user.is_band_admin %}
+                        <a href="{% url 'invitations:invites' %}" 
+                           class="{% if 'invitations' in request.path %}text-[#4F2FC0] border-b-2 border-[#4F2FC0]{% else %}hover:text-[#4F2FC0]{% endif %} transition-colors pb-4 -mb-px">
+                            Invites
+                        </a>
+                    {% endif %}
+                    
                     <a href="{% url 'applications:my_applications' %}" 
                        class="{% if 'applications' in request.path %}text-[#4F2FC0] border-b-2 border-[#4F2FC0]{% else %}hover:text-[#4F2FC0]{% endif %} transition-colors pb-4 -mb-px">
                         Applications
