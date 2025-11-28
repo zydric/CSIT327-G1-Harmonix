@@ -345,11 +345,6 @@ def is_valid_location_format(location):
             valid_name_pattern.match(city) and 
             valid_name_pattern.match(country))
 
-
-
-
-
-
 # Password Reset Views
 @csrf_protect
 def password_reset_request(request):
