@@ -96,6 +96,7 @@ INSTALLED_APPS = [
     'accounts',
     'listings',
     'applications',
+    'invitations',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
