@@ -148,6 +148,21 @@
                     </div>
                 </div>
 
+                <!-- Sort Buttons -->
+                <div class="mb-6 flex items-center space-x-3">
+                    <span class="text-sm text-gray-600 font-medium">Sort by:</span>
+                    <div class="flex space-x-2">
+                        <a href="?{% if current_filters.search %}search={{ current_filters.search }}&{% endif %}{% if current_filters.genre %}genre={{ current_filters.genre }}&{% endif %}{% if current_filters.instrument %}instrument={{ current_filters.instrument }}&{% endif %}sort=alphabetical{% if page_obj.number > 1 %}&page={{ page_obj.number }}{% endif %}" 
+                           class="px-4 py-2 text-sm font-medium rounded-lg border transition-colors {% if current_filters.sort == 'alphabetical' %}bg-[#4F2FC0] text-white border-[#4F2FC0]{% else %}bg-white text-gray-700 border-gray-300 hover:bg-gray-50{% endif %}">
+                            A-Z
+                        </a>
+                        <a href="?{% if current_filters.search %}search={{ current_filters.search }}&{% endif %}{% if current_filters.genre %}genre={{ current_filters.genre }}&{% endif %}{% if current_filters.instrument %}instrument={{ current_filters.instrument }}&{% endif %}sort=newest{% if page_obj.number > 1 %}&page={{ page_obj.number }}{% endif %}" 
+                           class="px-4 py-2 text-sm font-medium rounded-lg border transition-colors {% if current_filters.sort == 'newest' or not current_filters.sort %}bg-[#4F2FC0] text-white border-[#4F2FC0]{% else %}bg-white text-gray-700 border-gray-300 hover:bg-gray-50{% endif %}">
+                            Newest
+                        </a>
+                    </div>
+                </div>
+
                 <!-- Listings Feed -->
                 <div class="space-y-6">
                     {% for listing in listings %}
@@ -281,7 +296,7 @@
                 <div class="flex justify-center mt-8">
                     <nav class="flex items-center space-x-2">
                         {% if page_obj.has_previous %}
-                            <a href="?{% if current_filters.search %}search={{ current_filters.search }}&{% endif %}{% if current_filters.genre %}genre={{ current_filters.genre }}&{% endif %}{% if current_filters.instrument %}instrument={{ current_filters.instrument }}&{% endif %}page={{ page_obj.previous_page_number }}" 
+                            <a href="?{% if current_filters.search %}search={{ current_filters.search }}&{% endif %}{% if current_filters.genre %}genre={{ current_filters.genre }}&{% endif %}{% if current_filters.instrument %}instrument={{ current_filters.instrument }}&{% endif %}{% if current_filters.sort %}sort={{ current_filters.sort }}&{% endif %}page={{ page_obj.previous_page_number }}" 
                                class="px-3 py-2 text-sm text-gray-500 hover:text-[#4F2FC0] hover:bg-gray-50 rounded-md transition-colors">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
@@ -301,7 +316,7 @@
                                     {{ num }}
                                 </span>
                             {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                                <a href="?{% if current_filters.search %}search={{ current_filters.search }}&{% endif %}{% if current_filters.genre %}genre={{ current_filters.genre }}&{% endif %}{% if current_filters.instrument %}instrument={{ current_filters.instrument }}&{% endif %}page={{ num }}" 
+                                <a href="?{% if current_filters.search %}search={{ current_filters.search }}&{% endif %}{% if current_filters.genre %}genre={{ current_filters.genre }}&{% endif %}{% if current_filters.instrument %}instrument={{ current_filters.instrument }}&{% endif %}{% if current_filters.sort %}sort={{ current_filters.sort }}&{% endif %}page={{ num }}" 
                                    class="px-4 py-2 text-sm text-gray-500 hover:text-[#4F2FC0] hover:bg-gray-50 rounded-md transition-colors">
                                     {{ num }}
                                 </a>
@@ -309,7 +324,7 @@
                         {% endfor %}
 
                         {% if page_obj.has_next %}
-                            <a href="?{% if current_filters.search %}search={{ current_filters.search }}&{% endif %}{% if current_filters.genre %}genre={{ current_filters.genre }}&{% endif %}{% if current_filters.instrument %}instrument={{ current_filters.instrument }}&{% endif %}page={{ page_obj.next_page_number }}" 
+                            <a href="?{% if current_filters.search %}search={{ current_filters.search }}&{% endif %}{% if current_filters.genre %}genre={{ current_filters.genre }}&{% endif %}{% if current_filters.instrument %}instrument={{ current_filters.instrument }}&{% endif %}{% if current_filters.sort %}sort={{ current_filters.sort }}&{% endif %}page={{ page_obj.next_page_number }}" 
                                class="px-3 py-2 text-sm text-gray-500 hover:text-[#4F2FC0] hover:bg-gray-50 rounded-md transition-colors">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
