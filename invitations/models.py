@@ -33,6 +33,9 @@ class Invitation(models.Model):
         related_name='invitations'
     )
     
+    # Optional message from band admin
+    message = models.TextField(blank=True, null=True, help_text="Optional message from band admin to musician")
+    
     # Status and timestamps
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
