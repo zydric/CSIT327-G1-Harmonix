@@ -4,12 +4,22 @@ from .models import Listing
 from harmonix.constants import GENRE_CHOICES, INSTRUMENT_CHOICES
 
 
+class CustomMultipleChoiceField(forms.MultipleChoiceField):
+    """
+    Custom MultipleChoiceField that allows values not in predefined choices
+    """
+    def validate(self, value):
+        # Override to allow custom values
+        if self.required and not value:
+            raise ValidationError(self.error_messages['required'], code='required')
+
+
 class ListingForm(forms.ModelForm):
     """
     Form for creating and editing band listings
     """
-    # Override fields to use multi-select widgets
-    instruments_needed = forms.MultipleChoiceField(
+    # Override fields to use custom multi-select widgets that allow custom values
+    instruments_needed = CustomMultipleChoiceField(
         choices=INSTRUMENT_CHOICES,
         widget=forms.CheckboxSelectMultiple(attrs={
             'class': 'w-4 h-4 text-purple-600 bg-white border-gray-300 rounded focus:ring-purple-500 focus:ring-2'
@@ -17,7 +27,7 @@ class ListingForm(forms.ModelForm):
         help_text="Select all instruments needed for this opportunity"
     )
     
-    genres = forms.MultipleChoiceField(
+    genres = CustomMultipleChoiceField(
         choices=GENRE_CHOICES,
         widget=forms.CheckboxSelectMultiple(attrs={
             'class': 'w-4 h-4 text-indigo-600 bg-white border-gray-300 rounded focus:ring-indigo-500 focus:ring-2'
@@ -127,21 +137,29 @@ class ListingForm(forms.ModelForm):
         
         # Convert multi-select field values to comma-separated strings
         if self.cleaned_data.get('instruments_needed'):
-            # Convert to display values (capitalized)
+            # Handle both predefined and custom values
             instrument_dict = dict(INSTRUMENT_CHOICES)
-            instruments = [
-                instrument_dict.get(inst, inst.capitalize()) 
-                for inst in self.cleaned_data['instruments_needed']
-            ]
+            instruments = []
+            for inst in self.cleaned_data['instruments_needed']:
+                # If it's a predefined choice, use the display value
+                if inst in instrument_dict:
+                    instruments.append(instrument_dict[inst])
+                else:
+                    # If it's a custom value, use it as-is (already formatted from frontend)
+                    instruments.append(inst)
             instance.instruments_needed = ', '.join(instruments)
         
         if self.cleaned_data.get('genres'):
-            # Convert to display values (capitalized)
+            # Handle both predefined and custom values
             genre_dict = dict(GENRE_CHOICES)
-            genres = [
-                genre_dict.get(genre, genre.capitalize()) 
-                for genre in self.cleaned_data['genres']
-            ]
+            genres = []
+            for genre in self.cleaned_data['genres']:
+                # If it's a predefined choice, use the display value
+                if genre in genre_dict:
+                    genres.append(genre_dict[genre])
+                else:
+                    # If it's a custom value, use it as-is (already formatted from frontend)
+                    genres.append(genre)
             instance.genres = ', '.join(genres)
         
         if commit:
