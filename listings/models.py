@@ -77,7 +77,13 @@ class Listing(models.Model):
         return self.applications.count()
     
     def is_applied_by(self, user):
-        """Check if a specific user has already applied to this listing"""
+        """Check if a specific user has already submitted (non-draft) application to this listing"""
         if not user.is_authenticated or user.role != 'musician':
             return False
-        return self.applications.filter(musician=user).exists()
+        return self.applications.filter(musician=user).exclude(status='draft').exists()
+    
+    def has_draft_by(self, user):
+        """Check if a specific user has a draft application to this listing"""
+        if not user.is_authenticated or user.role != 'musician':
+            return False
+        return self.applications.filter(musician=user, status='draft').exists()
