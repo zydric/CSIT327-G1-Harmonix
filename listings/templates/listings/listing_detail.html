@@ -211,8 +211,9 @@
         <div class="mt-3">
             <h3 class="text-xl font-bold text-gray-900 mb-4">Apply to {{ listing.title }}</h3>
             
-            <form method="post" action="{% url 'applications:apply' pk=listing.pk %}">
+            <form method="post" action="{% url 'applications:apply' pk=listing.pk %}" id="applicationForm">
                 {% csrf_token %}
+                <input type="hidden" name="action" value="submit" id="actionInput">
                 <div class="mb-4">
                     <label for="message" class="block text-base font-semibold text-gray-900 mb-3">
                         Cover Message (Optional)
@@ -226,6 +227,10 @@
                     <button type="button" onclick="hideApplicationModal()" 
                             class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
                         Cancel
+                    </button>
+                    <button type="button" onclick="saveAsDraft()" 
+                            class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
+                        Save as Draft
                     </button>
                     <button type="submit" 
                             class="px-4 py-2 bg-[#4F2FC0] text-white rounded-md hover:bg-[#3f24a0] transition-colors">
@@ -242,10 +247,30 @@
 // Application Modal Functions
 function showApplicationModal() {
     document.getElementById('applicationModal').classList.remove('hidden');
+    // Load draft if it exists
+    loadDraft();
 }
 
 function hideApplicationModal() {
     document.getElementById('applicationModal').classList.add('hidden');
+    // Clear the form when closing
+    document.getElementById('message').value = '';
+}
+
+function saveAsDraft() {
+    document.getElementById('actionInput').value = 'draft';
+    document.getElementById('applicationForm').submit();
+}
+
+function loadDraft() {
+    fetch(`/applications/draft/{{ listing.pk }}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.exists) {
+                document.getElementById('message').value = data.message;
+            }
+        })
+        .catch(error => console.error('Error loading draft:', error));
 }
 
 // Delete Confirmation
