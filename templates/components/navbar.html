@@ -41,7 +41,7 @@
                     {% if user.is_musician %}
                         <a href="{% url 'invitations:musician_invitations' %}" 
                            class="{% if 'invitations/received' in request.path %}text-[#4F2FC0] border-b-2 border-[#4F2FC0]{% else %}hover:text-[#4F2FC0]{% endif %} transition-colors pb-4 -mb-px">
-                            My Invitations
+                            Band Invitations
                         </a>
                     {% endif %}
                     
