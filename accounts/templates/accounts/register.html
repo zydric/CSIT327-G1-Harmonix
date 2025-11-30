@@ -74,9 +74,9 @@
                             {% for value, label in instrument_choices %}
                                 <label class="flex items-center p-3 border border-gray-200 rounded-md hover:bg-gray-50 cursor-pointer transition-colors">
                                     <input type="checkbox" name="instruments" value="{{ value }}"
-                                           class="w-4 h-4 text-purple-600 bg-white border-gray-300 rounded focus:ring-purple-500 focus:ring-2"
+                                           class="w-4 h-4 flex-shrink-0 text-purple-600 bg-white border-gray-300 rounded focus:ring-purple-500 focus:ring-2"
                                            {% if value in selected_instruments %}checked{% endif %}>
-                                    <span class="ml-2 text-sm text-gray-700">{{ label }}</span>
+                                    <span class="ml-2 text-xs text-gray-700 truncate">{{ label }}</span>
                                 </label>
                             {% endfor %}
                         </div>
@@ -111,9 +111,9 @@
                             {% for value, label in genre_choices %}
                                 <label class="flex items-center p-3 border border-gray-200 rounded-md hover:bg-gray-50 cursor-pointer transition-colors">
                                     <input type="checkbox" name="genres" value="{{ value }}"
-                                           class="w-4 h-4 text-indigo-600 bg-white border-gray-300 rounded focus:ring-indigo-500 focus:ring-2"
+                                           class="w-4 h-4 flex-shrink-0 text-indigo-600 bg-white border-gray-300 rounded focus:ring-indigo-500 focus:ring-2"
                                            {% if value in selected_genres %}checked{% endif %}>
-                                    <span class="ml-2 text-sm text-gray-700">{{ label }}</span>
+                                    <span class="ml-2 text-xs text-gray-700 truncate">{{ label }}</span>
                                 </label>
                             {% endfor %}
                         </div>
@@ -274,11 +274,11 @@ function addCustomInstrument() {
     checkbox.name = 'instruments';
     checkbox.value = value;
     checkbox.checked = true;
-    checkbox.className = 'w-4 h-4 text-purple-600 bg-white border-gray-300 rounded focus:ring-purple-500 focus:ring-2';
+    checkbox.className = 'w-4 h-4 flex-shrink-0 text-purple-600 bg-white border-gray-300 rounded focus:ring-purple-500 focus:ring-2';
     
     // Create label text
     const span = document.createElement('span');
-    span.className = 'ml-2 text-sm text-gray-700';
+    span.className = 'ml-2 text-xs text-gray-700 truncate';
     span.textContent = value;
     
     // Assemble the checkbox element
@@ -343,11 +343,11 @@ function addCustomGenre() {
     checkbox.name = 'genres';
     checkbox.value = value;
     checkbox.checked = true;
-    checkbox.className = 'w-4 h-4 text-indigo-600 bg-white border-gray-300 rounded focus:ring-indigo-500 focus:ring-2';
+    checkbox.className = 'w-4 h-4 flex-shrink-0 text-indigo-600 bg-white border-gray-300 rounded focus:ring-indigo-500 focus:ring-2';
     
     // Create label text
     const span = document.createElement('span');
-    span.className = 'ml-2 text-sm text-gray-700';
+    span.className = 'ml-2 text-xs text-gray-700 truncate';
     span.textContent = value;
     
     // Assemble the checkbox element
