@@ -50,14 +50,26 @@
                     <!-- Status Badge & Actions -->
                     <div class="flex items-center space-x-3">
                         <span class="px-3 py-1 text-sm font-medium rounded-full 
-                            {% if application.status == 'pending' %}bg-yellow-100 text-yellow-800
+                            {% if application.status == 'draft' %}bg-gray-100 text-gray-800
+                            {% elif application.status == 'pending' %}bg-yellow-100 text-yellow-800
                             {% elif application.status == 'accepted' %}bg-green-100 text-green-800
                             {% else %}bg-red-100 text-red-800{% endif %}">
                             {{ application.get_status_display }}
                         </span>
                         
+                        <!-- Draft Actions -->
+                        {% if application.status == 'draft' %}
+                        <button onclick="openDraftModal({{ application.pk }}, '{{ application.listing.title|escapejs }}', {{ application.listing.pk }}, `{{ application.message|escapejs }}`)" 
+                           class="text-sm text-[#4F2FC0] hover:text-purple-700 font-medium transition-colors">
+                            View Draft
+                        </button>
+                        <button onclick="confirmWithdraw({{ application.pk }}, '{{ application.listing.title|escapejs }}')" 
+                                class="text-sm text-red-600 hover:text-red-800 font-medium transition-colors">
+                            Delete Draft
+                        </button>
+                        
                         <!-- Withdraw Button (only for pending applications) -->
-                        {% if application.status == 'pending' %}
+                        {% elif application.status == 'pending' %}
                         <button onclick="confirmWithdraw({{ application.pk }}, '{{ application.listing.title|escapejs }}')" 
                                 class="text-sm text-red-600 hover:text-red-800 font-medium transition-colors">
                             Withdraw
@@ -81,7 +93,11 @@
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                         </svg>
-                        {{ application.application_date_display }}
+                        {% if application.status == 'draft' %}
+                            Draft created {{ application.created_at|date:"M d, Y" }}
+                        {% else %}
+                            {{ application.application_date_display }}
+                        {% endif %}
                     </div>
 
                     <!-- Instruments Needed -->
@@ -126,13 +142,118 @@
     {% csrf_token %}
 </form>
 
+<!-- Draft Application Modal -->
+<div id="draftModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border-2 border-gray-300 w-96 shadow-lg rounded-lg bg-white">
+        <div class="mt-3">
+            <h3 id="draftModalTitle" class="text-xl font-bold text-gray-900 mb-4">Edit Draft Application</h3>
+            
+            <form method="post" action="" id="draftForm">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="submit" id="draftActionInput">
+                <input type="hidden" name="application_id" value="" id="draftApplicationId">
+                <input type="hidden" name="redirect_to" value="my_applications">
+                <div class="mb-4">
+                    <label for="draftMessage" class="block text-base font-semibold text-gray-900 mb-3">
+                        Cover Message (Optional)
+                    </label>
+                    <textarea id="draftMessage" name="message" rows="4" 
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                              placeholder="Tell the band why you're interested and what you can bring to the project..."></textarea>
+                </div>
+                
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="hideDraftModal()" 
+                            class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
+                        Cancel
+                    </button>
+                    <button type="button" onclick="saveDraftFromModal()" 
+                            class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
+                        Save as Draft
+                    </button>
+                    <button type="submit" 
+                            class="px-4 py-2 bg-[#4F2FC0] text-white rounded-md hover:bg-[#3f24a0] transition-colors">
+                        Submit Application
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Draft Edit Modal -->
+<div id="draftModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border-2 border-gray-300 w-96 shadow-lg rounded-lg bg-white">
+        <div class="mt-3">
+            <h3 class="text-xl font-bold text-gray-900 mb-4" id="draftModalTitle">Edit Draft Application</h3>
+            
+            <form method="post" id="draftForm">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="submit" id="draftActionInput">
+                <div class="mb-4">
+                    <label for="draftMessage" class="block text-base font-semibold text-gray-900 mb-3">
+                        Cover Message (Optional)
+                    </label>
+                    <textarea id="draftMessage" name="message" rows="4" 
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                              placeholder="Tell the band why you're interested and what you can bring to the project..."></textarea>
+                </div>
+                
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="hideDraftModal()" 
+                            class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
+                        Cancel
+                    </button>
+                    <button type="button" onclick="saveDraftAsDraft()" 
+                            class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
+                        Save as Draft
+                    </button>
+                    <button type="submit" 
+                            class="px-4 py-2 bg-[#4F2FC0] text-white rounded-md hover:bg-[#3f24a0] transition-colors">
+                        Submit Application
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
 function confirmWithdraw(applicationId, listingTitle) {
-    if (confirm(`Are you sure you want to withdraw your application to "${listingTitle}"?\n\nThis action cannot be undone.`)) {
+    // Check if this is likely a draft based on the button text (simple approach)
+    const isDraft = event.target.textContent.includes('Delete');
+    const actionText = isDraft ? 'delete your draft for' : 'withdraw your application to';
+    const actionWord = isDraft ? 'deleted' : 'withdrawn';
+    
+    if (confirm(`Are you sure you want to ${actionText} "${listingTitle}"?\n\nThis action cannot be undone.`)) {
         const form = document.getElementById('withdrawForm');
         form.action = `/applications/withdraw/${applicationId}/`;
         form.submit();
     }
 }
+
+function openDraftModal(applicationId, listingTitle, listingId, currentMessage) {
+    document.getElementById('draftModalTitle').textContent = `Edit Draft - ${listingTitle}`;
+    document.getElementById('draftMessage').value = currentMessage;
+    document.getElementById('draftForm').action = `/applications/apply/${listingId}/`;
+    document.getElementById('draftModal').classList.remove('hidden');
+}
+
+function hideDraftModal() {
+    document.getElementById('draftModal').classList.add('hidden');
+    document.getElementById('draftMessage').value = '';
+}
+
+function saveDraftFromModal() {
+    document.getElementById('draftActionInput').value = 'draft';
+    document.getElementById('draftForm').submit();
+}
+
+// Close draft modal when clicking outside
+document.getElementById('draftModal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        hideDraftModal();
+    }
+});
 </script>
 {% endblock %}

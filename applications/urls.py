@@ -8,4 +8,5 @@ urlpatterns = [
     path('status/<int:pk>/', views.update_application_status, name='update_status'),
     path('withdraw/<int:pk>/', views.withdraw_application, name='withdraw'),
     path('my-applications/', views.my_applications, name='my_applications'),
+    path('draft/<int:listing_pk>/', views.get_draft_application, name='get_draft'),
 ]

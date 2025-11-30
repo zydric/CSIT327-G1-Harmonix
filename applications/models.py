@@ -30,6 +30,7 @@ class Application(models.Model):
     
     # Status tracking
     STATUS_CHOICES = [
+        ('draft', 'Draft'),
         ('pending', 'Pending Review'),
         ('accepted', 'Accepted'),
         ('rejected', 'Rejected'),
@@ -38,7 +39,7 @@ class Application(models.Model):
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
-        default='pending'
+        default='draft'
     )
     
     # Timestamps
@@ -46,7 +47,7 @@ class Application(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
-        # Prevent duplicate applications from same musician to same listing
+        # Keep original unique constraint, handle draft logic in views
         unique_together = ['musician', 'listing']
         ordering = ['-created_at']
         verbose_name = "Application"

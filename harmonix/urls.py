@@ -23,6 +23,7 @@ urlpatterns = [
     path('', views.landing_page, name='landing'),
     path('listings/', include('listings.urls')),  # Listings CRUD functionality
     path('applications/', include('applications.urls')),  # Application management
+    path('invitations/', include('invitations.urls')),  # Musician invitations
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),  # User authentication and profiles
 ]
