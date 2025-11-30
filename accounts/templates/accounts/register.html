@@ -65,40 +65,76 @@
 
                 <!-- Instruments field (only for musicians) -->
                 <div id="instruments-field" class="hidden">
-                    <label for="instruments" class="block font-medium text-gray-700">Instruments <span class="text-red-500">*</span></label>
-                    <div class="mt-1 border {% if field_errors.instruments %}border-red-500 bg-red-50{% else %}border-gray-300{% endif %} rounded-md p-2 max-h-32 overflow-y-auto">
-                        {% for value, label in instrument_choices %}
-                        <label class="flex items-center space-x-2 text-sm">
-                            <input type="checkbox" name="instruments" value="{{ value }}" 
-                                   class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                   {% if value in selected_instruments %}checked{% endif %}>
-                            <span>{{ label }}</span>
+                    <div class="bg-purple-50 p-6 rounded-lg border-2 border-purple-200">
+                        <label class="block text-base font-semibold text-gray-900 mb-2">
+                            Instruments <span class="text-red-500">*</span>
                         </label>
-                        {% endfor %}
+                        <p class="text-sm text-gray-600 mb-4">Select all instruments you can play</p>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                            {% for value, label in instrument_choices %}
+                                <label class="flex items-center p-3 border border-gray-200 rounded-md hover:bg-gray-50 cursor-pointer transition-colors">
+                                    <input type="checkbox" name="instruments" value="{{ value }}"
+                                           class="w-4 h-4 text-purple-600 bg-white border-gray-300 rounded focus:ring-purple-500 focus:ring-2"
+                                           {% if value in selected_instruments %}checked{% endif %}>
+                                    <span class="ml-2 text-sm text-gray-700">{{ label }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Custom Instrument Input -->
+                        <div class="mt-4">
+                            <label class="block text-sm font-semibold text-gray-900 mb-2">Add Custom Instrument</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="customInstrumentInput" placeholder="e.g., Ukulele, Harmonica"
+                                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                <button type="button" onclick="addCustomInstrument()"
+                                    class="px-4 py-2 bg-[#4F2FC0] text-white rounded-md hover:bg-[#3f24a0] transition-colors">
+                                    Add
+                                </button>
+                            </div>
+                        </div>
+                        
+                        {% if field_errors.instruments %}
+                            <p class="mt-2 text-sm text-red-600">{{ field_errors.instruments }}</p>
+                        {% endif %}
                     </div>
-                    <p class="text-xs text-gray-500 mt-1">Select all instruments you can play</p>
-                    {% if field_errors.instruments %}
-                    <p class="mt-1 text-sm text-red-600">{{ field_errors.instruments }}</p>
-                    {% endif %}
                 </div>
 
                 <!-- Genres field (for both musicians and bands) -->
                 <div id="genres-field" class="hidden">
-                    <label for="genres" class="block font-medium text-gray-700">Musical Genres <span class="text-red-500">*</span></label>
-                    <div class="mt-1 border {% if field_errors.genres %}border-red-500 bg-red-50{% else %}border-gray-300{% endif %} rounded-md p-2 max-h-32 overflow-y-auto">
-                        {% for value, label in genre_choices %}
-                        <label class="flex items-center space-x-2 text-sm">
-                            <input type="checkbox" name="genres" value="{{ value }}" 
-                                   class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                   {% if value in selected_genres %}checked{% endif %}>
-                            <span>{{ label }}</span>
+                    <div class="bg-indigo-50 p-6 rounded-lg border-2 border-indigo-200">
+                        <label class="block text-base font-semibold text-gray-900 mb-2">
+                            Musical Genres <span class="text-red-500">*</span>
                         </label>
-                        {% endfor %}
+                        <p class="text-sm text-gray-600 mb-4" id="genres-helper-text">Select your preferred musical genres</p>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            {% for value, label in genre_choices %}
+                                <label class="flex items-center p-3 border border-gray-200 rounded-md hover:bg-gray-50 cursor-pointer transition-colors">
+                                    <input type="checkbox" name="genres" value="{{ value }}"
+                                           class="w-4 h-4 text-indigo-600 bg-white border-gray-300 rounded focus:ring-indigo-500 focus:ring-2"
+                                           {% if value in selected_genres %}checked{% endif %}>
+                                    <span class="ml-2 text-sm text-gray-700">{{ label }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Custom Genre Input -->
+                        <div class="mt-4">
+                            <label class="block text-sm font-semibold text-gray-900 mb-2">Add Custom Genre</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="customGenreInput" placeholder="e.g., K-Pop, Vaporwave"
+                                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                <button type="button" onclick="addCustomGenre()"
+                                    class="px-4 py-2 bg-[#4F2FC0] text-white rounded-md hover:bg-[#3f24a0] transition-colors">
+                                    Add
+                                </button>
+                            </div>
+                        </div>
+                        
+                        {% if field_errors.genres %}
+                            <p class="mt-2 text-sm text-red-600">{{ field_errors.genres }}</p>
+                        {% endif %}
                     </div>
-                    <p class="text-xs text-gray-500 mt-1" id="genres-helper-text">Select your preferred musical genres</p>
-                    {% if field_errors.genres %}
-                    <p class="mt-1 text-sm text-red-600">{{ field_errors.genres }}</p>
-                    {% endif %}
                 </div>
 
                 <div>
@@ -197,5 +233,190 @@
     {% if field_errors %}
         window.hasFieldErrors = true;
     {% endif %}
+</script>
+
+<!-- Custom Instrument and Genre Input Functionality -->
+<script>
+/**
+ * Adds a custom instrument to the instruments selection grid
+ * Creates a new checkbox element and integrates it with the form
+ */
+function addCustomInstrument() {
+    const input = document.getElementById('customInstrumentInput');
+    const value = input.value.trim();
+    
+    if (!value) return;
+    
+    // Locate the instruments grid within the purple section
+    const instrumentsSection = input.closest('.bg-purple-50');
+    const instrumentsGrid = instrumentsSection?.querySelector('.grid');
+    
+    if (!instrumentsGrid) {
+        alert('Could not find instruments grid.');
+        return;
+    }
+    
+    // Prevent duplicate instruments
+    const existingLabels = Array.from(instrumentsGrid.querySelectorAll('span'))
+        .map(span => span.textContent.trim());
+    if (existingLabels.includes(value)) {
+        alert('This instrument already exists in the list.');
+        return;
+    }
+    
+    // Create new checkbox label container
+    const newLabel = document.createElement('label');
+    newLabel.className = 'flex items-center p-3 border border-gray-200 rounded-md hover:bg-gray-50 cursor-pointer transition-colors';
+    
+    // Create checkbox input
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.name = 'instruments';
+    checkbox.value = value;
+    checkbox.checked = true;
+    checkbox.className = 'w-4 h-4 text-purple-600 bg-white border-gray-300 rounded focus:ring-purple-500 focus:ring-2';
+    
+    // Create label text
+    const span = document.createElement('span');
+    span.className = 'ml-2 text-sm text-gray-700';
+    span.textContent = value;
+    
+    // Assemble the checkbox element
+    newLabel.appendChild(checkbox);
+    newLabel.appendChild(span);
+    instrumentsGrid.appendChild(newLabel);
+    
+    // Add interactive styling behavior
+    checkbox.addEventListener('change', function() {
+        const label = this.closest('label');
+        if (this.checked) {
+            label.classList.add('bg-purple-50', 'border-purple-300');
+            label.classList.remove('border-gray-200');
+        } else {
+            label.classList.remove('bg-purple-50', 'border-purple-300');
+            label.classList.add('border-gray-200');
+        }
+    });
+    
+    // Apply initial checked styling
+    newLabel.classList.add('bg-purple-50', 'border-purple-300');
+    newLabel.classList.remove('border-gray-200');
+    
+    // Reset input
+    input.value = '';
+}
+
+/**
+ * Adds a custom genre to the genres selection grid
+ * Creates a new checkbox element and integrates it with the form
+ */
+function addCustomGenre() {
+    const input = document.getElementById('customGenreInput');
+    const value = input.value.trim();
+    
+    if (!value) return;
+    
+    // Locate the genres grid within the indigo section
+    const genresSection = input.closest('.bg-indigo-50');
+    const genresGrid = genresSection?.querySelector('.grid');
+    
+    if (!genresGrid) {
+        alert('Could not find genres grid.');
+        return;
+    }
+    
+    // Prevent duplicate genres
+    const existingLabels = Array.from(genresGrid.querySelectorAll('span'))
+        .map(span => span.textContent.trim());
+    if (existingLabels.includes(value)) {
+        alert('This genre already exists in the list.');
+        return;
+    }
+    
+    // Create new checkbox label container
+    const newLabel = document.createElement('label');
+    newLabel.className = 'flex items-center p-3 border border-gray-200 rounded-md hover:bg-gray-50 cursor-pointer transition-colors';
+    
+    // Create checkbox input
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.name = 'genres';
+    checkbox.value = value;
+    checkbox.checked = true;
+    checkbox.className = 'w-4 h-4 text-indigo-600 bg-white border-gray-300 rounded focus:ring-indigo-500 focus:ring-2';
+    
+    // Create label text
+    const span = document.createElement('span');
+    span.className = 'ml-2 text-sm text-gray-700';
+    span.textContent = value;
+    
+    // Assemble the checkbox element
+    newLabel.appendChild(checkbox);
+    newLabel.appendChild(span);
+    genresGrid.appendChild(newLabel);
+    
+    // Add interactive styling behavior
+    checkbox.addEventListener('change', function() {
+        const label = this.closest('label');
+        if (this.checked) {
+            label.classList.add('bg-purple-50', 'border-purple-300');
+            label.classList.remove('border-gray-200');
+        } else {
+            label.classList.remove('bg-purple-50', 'border-purple-300');
+            label.classList.add('border-gray-200');
+        }
+    });
+    
+    // Apply initial checked styling
+    newLabel.classList.add('bg-purple-50', 'border-purple-300');
+    newLabel.classList.remove('border-gray-200');
+    
+    // Reset input
+    input.value = '';
+}
+
+// Enhanced checkbox interactions for registration form
+document.addEventListener('DOMContentLoaded', function() {
+    // Add Enter key handlers for custom inputs
+    const customInstrumentInput = document.getElementById('customInstrumentInput');
+    const customGenreInput = document.getElementById('customGenreInput');
+    
+    if (customInstrumentInput) {
+        customInstrumentInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addCustomInstrument();
+            }
+        });
+    }
+    
+    if (customGenreInput) {
+        customGenreInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addCustomGenre();
+            }
+        });
+    }
+    
+    // Enhanced visual feedback for checkbox interactions
+    const checkboxes = document.querySelectorAll('input[type="checkbox"][name="instruments"], input[type="checkbox"][name="genres"]');
+    checkboxes.forEach(checkbox => {
+        // Dynamic styling based on checked state
+        const updateCheckboxStyling = () => {
+            const label = checkbox.closest('label');
+            if (checkbox.checked) {
+                label.classList.add('bg-purple-50', 'border-purple-300');
+                label.classList.remove('border-gray-200');
+            } else {
+                label.classList.remove('bg-purple-50', 'border-purple-300');
+                label.classList.add('border-gray-200');
+            }
+        };
+        
+        checkbox.addEventListener('change', updateCheckboxStyling);
+        updateCheckboxStyling(); // Apply initial state
+    });
+});
 </script>
 {% endblock %}
