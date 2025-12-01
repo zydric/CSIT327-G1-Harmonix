@@ -12,7 +12,70 @@
 
     {% if invitations %}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            </div>
+            {% for invitation in invitations %}
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 flex flex-col h-full">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-3 mb-2">
+                                <h3 class="text-xl font-bold text-gray-900">
+                                    {{ invitation.listing.title }}
+                                </h3>
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                                    {% if invitation.status == 'pending' %}bg-yellow-100 text-yellow-800
+                                    {% elif invitation.status == 'accepted' %}bg-green-100 text-green-800
+                                    {% else %}bg-red-100 text-red-800{% endif %}">
+                                    {{ invitation.get_status_display }}
+                                </span>
+                            </div>
+
+                            <div class="flex flex-col space-y-1 text-sm text-gray-600 mb-4">
+                                <span class="font-medium text-[#4F2FC0]">{{ invitation.listing.band_name }}</span>
+                                <span>From: {{ invitation.band_admin.username }}</span>
+                                {% if invitation.band_admin.location %}
+                                    <span>{{ invitation.band_admin.location }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if invitation.message %}
+                        <div class="mb-4 flex-grow">
+                            <h4 class="text-sm font-medium text-gray-700 mb-2">Message:</h4>
+                            <p class="text-gray-700 bg-gray-50 p-3 rounded-md text-sm italic">"{{ invitation.message }}"</p>
+                        </div>
+                    {% else %}
+                        <div class="flex-grow"></div>
+                    {% endif %}
+
+                    {% if invitation.status == 'pending' %}
+                        <div class="flex space-x-3 mb-4">
+                            <button onclick="respondToInvitation({{ invitation.id }}, 'accepted')"
+                                    class="flex-1 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500">
+                                Accept
+                            </button>
+                            <button onclick="respondToInvitation({{ invitation.id }}, 'declined')"
+                                    class="flex-1 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500">
+                                Decline
+                            </button>
+                        </div>
+                    {% endif %}
+
+                    <div class="flex items-center justify-between text-sm text-gray-500 border-t border-gray-200 pt-4 mt-auto">
+                        <div class="flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            {{ invitation.created_at|date:"M d" }}
+                        </div>
+
+                        <button onclick="openInvitationModal({{ invitation.id }}, {{ invitation.listing.id }})"
+                                class="text-[#4F2FC0] hover:text-purple-700 font-medium transition-colors">
+                            View Listing →
+                        </button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     {% else %}
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
             <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
