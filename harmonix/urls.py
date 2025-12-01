@@ -17,6 +17,7 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
 from . import views
 from accounts import views as account_views
 
@@ -30,3 +31,18 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),  # User authentication and profiles
 ]
+
+# Test routes for error pages (only in DEBUG mode)
+if settings.DEBUG:
+    urlpatterns += [
+        path('test/400/', views.handler400, name='test_400'),
+        path('test/403/', views.handler403, name='test_403'),
+        path('test/404/', views.handler404, name='test_404'),
+        path('test/500/', views.handler500, name='test_500'),
+    ]
+
+# Custom error handlers
+handler400 = 'harmonix.views.handler400'
+handler403 = 'harmonix.views.handler403'
+handler404 = 'harmonix.views.handler404'
+handler500 = 'harmonix.views.handler500'
