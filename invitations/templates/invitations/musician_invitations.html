@@ -17,9 +17,7 @@
                     <div class="flex justify-between items-start mb-4">
                         <div class="flex-1">
                             <div class="flex items-center space-x-3 mb-2">
-                                <h3 class="text-xl font-bold text-gray-900">
-                                    {{ invitation.listing.title }}
-                                </h3>
+                                <h3 class="text-xl font-bold text-gray-900">{{ invitation.listing.title }}</h3>
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
                                     {% if invitation.status == 'pending' %}bg-yellow-100 text-yellow-800
                                     {% elif invitation.status == 'accepted' %}bg-green-100 text-green-800
@@ -27,13 +25,10 @@
                                     {{ invitation.get_status_display }}
                                 </span>
                             </div>
-
                             <div class="flex flex-col space-y-1 text-sm text-gray-600 mb-4">
                                 <span class="font-medium text-[#4F2FC0]">{{ invitation.listing.band_name }}</span>
                                 <span>From: {{ invitation.band_admin.username }}</span>
-                                {% if invitation.band_admin.location %}
-                                    <span>{{ invitation.band_admin.location }}</span>
-                                {% endif %}
+                                {% if invitation.band_admin.location %}<span>{{ invitation.band_admin.location }}</span>{% endif %}
                             </div>
                         </div>
                     </div>
@@ -49,41 +44,53 @@
 
                     {% if invitation.status == 'pending' %}
                         <div class="flex space-x-3 mb-4">
-                            <button onclick="respondToInvitation({{ invitation.id }}, 'accepted')"
-                                    class="flex-1 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500">
-                                Accept
-                            </button>
-                            <button onclick="respondToInvitation({{ invitation.id }}, 'declined')"
-                                    class="flex-1 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500">
-                                Decline
-                            </button>
+                            <button onclick="respondToInvitation({{ invitation.id }}, 'accepted')" class="flex-1 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500">Accept</button>
+                            <button onclick="respondToInvitation({{ invitation.id }}, 'declined')" class="flex-1 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500">Decline</button>
                         </div>
                     {% endif %}
 
                     <div class="flex items-center justify-between text-sm text-gray-500 border-t border-gray-200 pt-4 mt-auto">
                         <div class="flex items-center">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                            </svg>
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                             {{ invitation.created_at|date:"M d" }}
                         </div>
-
-                        <button onclick="openInvitationModal({{ invitation.id }}, {{ invitation.listing.id }})"
-                                class="text-[#4F2FC0] hover:text-purple-700 font-medium transition-colors">
-                            View Listing →
-                        </button>
+                        <button onclick="openInvitationModal({{ invitation.id }}, {{ invitation.listing.id }})" class="text-[#4F2FC0] hover:text-purple-700 font-medium transition-colors">View Listing →</button>
                     </div>
                 </div>
             {% endfor %}
         </div>
     {% else %}
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-            <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2M4 13h2m13-8v2a1 1 0 01-1 1H7a1 1 0 01-1-1V5a1 1 0 011-1h10a1 1 0 011 1z"></path>
-            </svg>
+            <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2M4 13h2m13-8v2a1 1 0 01-1 1H7a1 1 0 01-1-1V5a1 1 0 011-1h10a1 1 0 011 1z"></path></svg>
             <h3 class="text-lg font-medium text-gray-900 mb-2">No Invitations</h3>
             <p class="text-gray-500">You haven't received any band invitations yet.</p>
         </div>
     {% endif %}
+</div>
+
+<div id="listingModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 hidden">
+    <div class="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-2xl font-bold text-gray-900">Listing Details</h3>
+            <button onclick="closeListingModal()" class="text-gray-400 hover:text-gray-600">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+
+        <div id="listingDetails">
+            <div class="text-center py-4">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                <p class="text-gray-500 mt-2">Loading...</p>
+            </div>
+        </div>
+
+        <div class="border-t border-gray-200 pt-4 mt-6">
+            <div class="flex justify-end space-x-3">
+                <button onclick="closeListingModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500">Close</button>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
