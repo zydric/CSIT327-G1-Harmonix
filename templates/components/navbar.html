@@ -6,7 +6,7 @@
             {% if user.is_authenticated and user.is_musician %}
                 {% url 'musician_dashboard' as dashboard_url %}
             {% elif user.is_authenticated and user.is_band_admin %}
-                {% url 'listings:feed' as dashboard_url %}
+                {% url 'band_admin_dashboard' as dashboard_url %}
             {% else %}
                 {% url 'landing' as dashboard_url %}
             {% endif %}
@@ -24,6 +24,13 @@
                 {% if user.is_authenticated and user.is_musician %}
                     <a href="{{ dashboard_url }}"
                        class="{% if 'dashboard/musician' in request.path %}text-[#4F2FC0] border-b-2 border-[#4F2FC0]{% else %}hover:text-[#4F2FC0]{% endif %} transition-colors pb-4 -mb-px">
+                        Dashboard
+                    </a>
+                {% endif %}
+
+                {% if user.is_authenticated and user.is_band_admin %}
+                    <a href="{{ dashboard_url }}"
+                       class="{% if 'dashboard/band-admin' in request.path %}text-[#4F2FC0] border-b-2 border-[#4F2FC0]{% else %}hover:text-[#4F2FC0]{% endif %} transition-colors pb-4 -mb-px">
                         Dashboard
                     </a>
                 {% endif %}
