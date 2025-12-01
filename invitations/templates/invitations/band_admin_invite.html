@@ -1,147 +1,274 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Invite Musicians - Harmonix{% endblock %}
+{% block title %}Browse Musicians - Harmonix{% endblock %}
 
 {% block content %}
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-7xl mx-auto">
         <!-- Header -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Invite Musicians</h1>
-            <p class="text-gray-600 mt-2">Browse and invite talented musicians to join your band listings.</p>
+            <h1 class="text-4xl font-bold text-gray-900">Browse Musicians</h1>
+            <p class="text-gray-600 mt-2">Showing {{ musicians|length }} musicians</p>
+        </div>
+
+        <div class="mb-6 flex items-center space-x-3">
+            <span class="text-sm text-gray-600 font-medium">Sort by:</span>
+            <div class="flex space-x-2">
+                <a href="?{% if current_filters.search %}search={{ current_filters.search }}&{% endif %}{% if current_filters.genre %}genre={{ current_filters.genre }}&{% endif %}{% if current_filters.instrument %}instrument={{ current_filters.instrument }}&{% endif %}sort=alphabetical{% if page_obj.number > 1 %}&page={{ page_obj.number }}{% endif %}"
+                    class="px-4 py-2 text-sm font-medium rounded-lg border transition-colors {% if current_filters.sort == 'alphabetical' %}bg-[#4F2FC0] text-white border-[#4F2FC0]{% else %}bg-white text-gray-700 border-gray-300 hover:bg-gray-50{% endif %}">
+                    A-Z
+                </a>
+                <a href="?{% if current_filters.search %}search={{ current_filters.search }}&{% endif %}{% if current_filters.genre %}genre={{ current_filters.genre }}&{% endif %}{% if current_filters.instrument %}instrument={{ current_filters.instrument }}&{% endif %}sort=newest{% if page_obj.number > 1 %}&page={{ page_obj.number }}{% endif %}"
+                    class="px-4 py-2 text-sm font-medium rounded-lg border transition-colors {% if current_filters.sort == 'newest' or not current_filters.sort %}bg-[#4F2FC0] text-white border-[#4F2FC0]{% else %}bg-white text-gray-700 border-gray-300 hover:bg-gray-50{% endif %}">
+                    Newest
+                </a>
+            </div>
         </div>
 
         <!-- Check if user has active listings -->
         {% if not active_listings %}
-            <div class="bg-yellow-50 border border-yellow-200 rounded-md p-4">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <div class="ml-3">
-                        <h3 class="text-sm font-medium text-yellow-800">No Active Listings</h3>
-                        <p class="mt-1 text-sm text-yellow-700">You need to have active listings before you can invite musicians. <a href="{% url 'listings:feed' %}" class="underline">Create a listing first</a>.</p>
-                    </div>
+        <div class="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-yellow-800">No Active Listings</h3>
+                    <p class="mt-1 text-sm text-yellow-700">You need to have active listings before you can invite
+                        musicians. <a href="{% url 'listings:feed' %}" class="underline">Create a listing first</a>.</p>
                 </div>
             </div>
+        </div>
         {% else %}
-            <!-- Musicians Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {% for musician in musicians %}
-                    <div class="bg-white rounded-lg shadow-md border border-gray-200 p-6 relative">
-                        <!-- Invite button in top right -->
-                        <button onclick="openInviteModal({{ musician.id }}, '{{ musician.username|escapejs }}')" 
-                                class="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            Invite
-                        </button>
-
-                        <!-- Musician Info -->
-                        <div class="pr-16"> <!-- Add padding to avoid overlap with button -->
-                            <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ musician.username }}</h3>
-                            
-                            {% if musician.location %}
-                                <div class="flex items-center text-gray-600 mb-2">
-                                    <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                    </svg>
-                                    <span class="text-sm">{{ musician.location }}</span>
-                                </div>
-                            {% endif %}
-
-                            {% if musician.instruments_list %}
-                                <div class="mb-3">
-                                    <h4 class="text-sm font-medium text-gray-700 mb-1">Instruments:</h4>
-                                    <div class="flex flex-wrap gap-1">
-                                        {% for instrument in musician.instruments_list %}
-                                            <span class="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
-                                                {{ instrument }}
-                                            </span>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                            {% else %}
-                                <div class="mb-3">
-                                    <p class="text-sm text-gray-500 italic">No instruments specified</p>
-                                </div>
-                            {% endif %}
-
-                            {% if musician.genres_list %}
-                                <div class="mb-3">
-                                    <h4 class="text-sm font-medium text-gray-700 mb-1">Genres:</h4>
-                                    <div class="flex flex-wrap gap-1">
-                                        {% for genre in musician.genres_list %}
-                                            <span class="inline-block bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
-                                                {{ genre }}
-                                            </span>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                            {% else %}
-                                <div class="mb-3">
-                                    <p class="text-sm text-gray-500 italic">No genres specified</p>
-                                </div>
-                            {% endif %}
+        <!-- Musicians Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for musician in musicians %}
+            <div
+                class="bg-white rounded-lg shadow-md border border-gray-200 p-6 flex flex-col h-full hover:shadow-lg transition-shadow"
+                data-musician-id="{{ musician.id }}"
+                data-musician-name="{{ musician.username }}"
+                data-musician-handle="{{ musician.handle|default:musician.username }}"
+                data-musician-location="{{ musician.location|default:'' }}"
+                data-musician-bio="{{ musician.bio|default:''|escapejs }}"
+                data-musician-instruments="{{ musician.instruments_list|join:',' }}"
+                data-musician-genres="{{ musician.genres_list|join:',' }}"
+                data-musician-avatar="{{ musician.profile_picture|default:'' }}"
+                data-musician-instagram="{{ musician.instagram|default:'' }}"
+                data-musician-youtube="{{ musician.youtube|default:'' }}">
+                
+                <!-- Profile Header -->
+                <div class="flex items-start gap-4 mb-4">
+                    <!-- Avatar -->
+                    <div class="flex-shrink-0">
+                        {% if musician.profile_picture %}
+                        <img src="{{ musician.profile_picture }}" alt="{{ musician.username }}"
+                            class="w-12 h-12 rounded-full object-cover">
+                        {% else %}
+                        <div class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center">
+                            <span class="text-gray-600 font-semibold">{{ musician.username|first|upper }}</span>
                         </div>
+                        {% endif %}
                     </div>
-                {% empty %}
-                    <div class="col-span-full text-center py-12">
-                        <p class="text-gray-500 text-lg">No musicians found.</p>
+                    <!-- Name & Handle -->
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-lg font-semibold text-gray-900">{{ musician.username }}</h3>
+                        <p class="text-sm text-gray-600">@{{ musician.handle|default:musician.username }}</p>
                     </div>
-                {% endfor %}
+                </div>
+
+                <!-- Location -->
+                {% if musician.location %}
+                <div class="flex items-center text-gray-600 mb-4">
+                    <svg class="h-4 w-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                        </path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <span class="text-sm">{{ musician.location }}</span>
+                </div>
+                {% endif %}
+
+                <!-- Instruments -->
+                {% if musician.instruments_list %}
+                <div class="mb-3">
+                    <div class="flex flex-wrap gap-1">
+                        {% for instrument in musician.instruments_list %}
+                        <span class="inline-block bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-xs font-medium">
+                            {{ instrument }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Genres -->
+                {% if musician.genres_list %}
+                <div class="mb-4">
+                    <div class="flex flex-wrap gap-1">
+                        {% for genre in musician.genres_list %}
+                        <span class="inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-medium">
+                            {{ genre }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Bio/Description -->
+                {% if musician.bio %}
+                <p class="text-sm text-gray-600 mb-4 line-clamp-2 flex-grow">
+                    {{ musician.bio }}
+                </p>
+                {% else %}
+                <p class="text-sm text-gray-500 italic mb-4 flex-grow">
+                    No bio provided
+                </p>
+                {% endif %}
+
+                <!-- Social Media Icons -->
+                {% if musician.instagram or musician.youtube %}
+                <div class="flex items-center gap-3 mb-4 border-t pt-4">
+                    {% if musician.instagram %}
+                    <a href="https://instagram.com/{{ musician.instagram }}" target="_blank" rel="noopener noreferrer"
+                        class="text-gray-500 hover:text-gray-700">
+                        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073z" />
+                            <circle cx="12" cy="12" r="3.305" />
+                            <circle cx="18.513" cy="5.487" r=".773" />
+                        </svg>
+                    </a>
+                    {% endif %}
+                    {% if musician.youtube %}
+                    <a href="https://youtube.com/{{ musician.youtube }}" target="_blank" rel="noopener noreferrer"
+                        class="text-gray-500 hover:text-gray-700">
+                        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                        </svg>
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- View Profile & Invite Button -->
+                <button onclick="openInviteModal({{ musician.id }}, '{{ musician.username|escapejs }}')"
+                    class="w-full bg-[#4F2FC0] text-white px-4 py-2 rounded-md font-medium hover:bg-[#3d1fa0] focus:outline-none focus:ring-2 focus:ring-[#4F2FC0] mt-auto">
+                    View Profile & Invite
+                </button>
             </div>
+            {% empty %}
+            <div class="col-span-full text-center py-12">
+                <p class="text-gray-500 text-lg">No musicians found.</p>
+            </div>
+            {% endfor %}
+        </div>
         {% endif %}
     </div>
 </div>
 
-<!-- Enhanced Invite Modal -->
+<!-- Two-column modal layout with musician profile on left, invitation form on right -->
 {% if active_listings %}
-<div id="inviteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 hidden">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-        <!-- Modal Header -->
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-medium text-gray-900">Invite Musician</h3>
-            <button onclick="closeInviteModal()" class="text-gray-400 hover:text-gray-600">
-                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
+<div id="inviteModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 overflow-y-auto h-full w-full z-50 hidden flex items-center justify-center">
+    <!-- Redesigned modal with two-column layout -->
+    <div class="relative bg-white rounded-lg shadow-xl w-full max-w-4xl mx-4 flex">
+        <!-- Close Button -->
+        <button onclick="closeInviteModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+
+        <!-- Left Column: Musician Profile -->
+        <div class="w-1/2 bg-gray-50 p-8 border-r border-gray-200 overflow-y-auto max-h-[90vh]">
+            <div class="space-y-6">
+                <!-- Avatar & Name -->
+                <div>
+                    <div class="flex items-center gap-4 mb-4">
+                        <img id="musicianAvatar" src="/placeholder.svg?height=80&width=80" alt="" class="w-20 h-20 rounded-full object-cover">
+                        <div>
+                            <h3 id="musicianNameLarge" class="text-xl font-semibold text-gray-900"></h3>
+                            <p id="musicianHandle" class="text-sm text-gray-600"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location -->
+                <div id="locationSection" class="hidden">
+                    <div class="flex items-center text-gray-700">
+                        <svg class="h-4 w-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <span id="musicianLocation" class="text-sm"></span>
+                    </div>
+                </div>
+
+                <!-- Bio -->
+                <div id="bioSection" class="hidden">
+                    <h4 class="font-semibold text-gray-900 mb-2">Bio</h4>
+                    <p id="musicianBio" class="text-sm text-gray-700"></p>
+                </div>
+
+                <!-- Instruments -->
+                <div id="instrumentsSection" class="hidden">
+                    <h4 class="font-semibold text-gray-900 mb-2">Instruments</h4>
+                    <div id="instrumentsList" class="flex flex-wrap gap-2"></div>
+                </div>
+
+                <!-- Genres -->
+                <div id="genresSection" class="hidden">
+                    <h4 class="font-semibold text-gray-900 mb-2">Genres</h4>
+                    <div id="genresList" class="flex flex-wrap gap-2"></div>
+                </div>
+
+                <!-- Social Media -->
+                <div id="socialSection" class="hidden">
+                    <h4 class="font-semibold text-gray-900 mb-2">Social Media</h4>
+                    <div id="socialLinks" class="flex gap-3 flex-wrap"></div>
+                </div>
+            </div>
         </div>
 
-        <!-- Modal Body -->
-        <div class="mb-4">
-            <p class="text-gray-700 mb-4">Invite <strong id="musicianName"></strong> to join one of your listings:</p>
+        <!-- Right Column: Invitation Form -->
+        <div class="w-1/2 p-8 flex flex-col">
+            <h3 class="text-2xl font-semibold text-gray-900 mb-6">Send Invitation</h3>
             
             <!-- Listing Selection -->
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Select Listing:</label>
-                <select id="listingSelect" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">Select a listing...</option>
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-900 mb-2">Select Your Band Listing:</label>
+                <select id="listingSelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F2FC0]">
+                    <option value="">Choose a listing...</option>
                     {% for listing in active_listings %}
-                        <option value="{{ listing.id }}">{{ listing.title }} - {{ listing.band_name }}</option>
+                    <option value="{{ listing.id }}">{{ listing.title }} - {{ listing.band_name }}</option>
                     {% endfor %}
                 </select>
             </div>
 
-            <!-- Optional Message -->
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Message (Optional):</label>
-                <textarea id="inviteMessage" rows="3" placeholder="Add a personal message to your invitation..." 
-                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-                <p class="text-xs text-gray-500 mt-1">This message will be visible to the musician</p>
+            <!-- Message -->
+            <div class="mb-6 flex-grow">
+                <label class="block text-sm font-medium text-gray-900 mb-2">Message</label>
+                <textarea id="inviteMessage" rows="6" placeholder="Write a personal message to the musician..." 
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F2FC0] resize-none"></textarea>
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex justify-end space-x-3">
-                <button onclick="closeInviteModal()" 
-                        class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500">
+            <div class="flex gap-3">
+                <button onclick="closeInviteModal()" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium">
                     Cancel
                 </button>
-                <button onclick="sendInvitation()" 
-                        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <!-- Send button now uses #4F2FC0 brand color with icon -->
+                <button onclick="sendInvitation()" class="flex-1 px-6 py-2 bg-[#4F2FC0] text-white rounded-lg hover:bg-[#3d1fa0] font-medium flex items-center justify-center gap-2">
+                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5.951-1.429 5.951 1.429a1 1 0 001.169-1.409l-7-14z"></path>
+                    </svg>
                     Send Invitation
                 </button>
             </div>
@@ -151,69 +278,160 @@
 {% endif %}
 
 <script>
-let currentMusicianId = null;
+    let currentMusicianId = null;
+    let currentMusicianData = null;
 
-function openInviteModal(musicianId, musicianName) {
-    currentMusicianId = musicianId;
-    document.getElementById('musicianName').textContent = musicianName;
-    document.getElementById('listingSelect').value = '';
-    document.getElementById('inviteMessage').value = '';
-    document.getElementById('inviteModal').classList.remove('hidden');
-}
-
-function closeInviteModal() {
-    currentMusicianId = null;
-    document.getElementById('inviteModal').classList.add('hidden');
-}
-
-function sendInvitation() {
-    const listingId = document.getElementById('listingSelect').value;
-    const message = document.getElementById('inviteMessage').value.trim();
-    
-    if (!listingId) {
-        alert('Please select a listing first.');
-        return;
-    }
-
-    if (!currentMusicianId) {
-        alert('Error: No musician selected.');
-        return;
-    }
-
-    // Send AJAX request
-    fetch('{% url "invitations:send_invitation" %}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': '{{ csrf_token }}'
-        },
-        body: JSON.stringify({
-            musician_id: currentMusicianId,
-            listing_id: listingId,
-            message: message
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert(data.message);
-            closeInviteModal();
-        } else {
-            alert(data.error || 'An error occurred while sending the invitation.');
+    function openInviteModal(musicianId, musicianName) {
+        currentMusicianId = musicianId;
+        
+        // Find musician data from the DOM (stored in data attributes on musician cards)
+        const musicianCard = document.querySelector(`[data-musician-id="${musicianId}"]`);
+        
+        if (musicianCard) {
+            currentMusicianData = {
+                id: musicianId,
+                username: musicianCard.dataset.musicianName || musicianName,
+                handle: musicianCard.dataset.musicianHandle || '@' + musicianName,
+                location: musicianCard.dataset.musicianLocation || '',
+                bio: musicianCard.dataset.musicianBio || '',
+                instruments: (musicianCard.dataset.musicianInstruments || '').split(',').filter(i => i),
+                genres: (musicianCard.dataset.musicianGenres || '').split(',').filter(g => g),
+                avatar: musicianCard.dataset.musicianAvatar || '',
+                instagram: musicianCard.dataset.musicianInstagram || '',
+                youtube: musicianCard.dataset.musicianYoutube || ''
+            };
+            
+            populateModalProfile();
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while sending the invitation.');
-    });
-}
-
-// Close modal when clicking outside
-document.getElementById('inviteModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeInviteModal();
+        
+        document.getElementById('listingSelect').value = '';
+        document.getElementById('inviteMessage').value = '';
+        document.getElementById('inviteModal').classList.remove('hidden');
     }
-});
-</script>
 
+    function populateModalProfile() {
+        if (!currentMusicianData) return;
+
+        // Avatar & Name
+        const avatarEl = document.getElementById('musicianAvatar');
+        if (currentMusicianData.avatar) {
+            avatarEl.src = currentMusicianData.avatar;
+            avatarEl.style.display = 'block';
+        } else {
+            avatarEl.style.display = 'none';
+        }
+
+        document.getElementById('musicianNameLarge').textContent = currentMusicianData.username;
+        document.getElementById('musicianHandle').textContent = currentMusicianData.handle;
+
+        // Location
+        if (currentMusicianData.location) {
+            document.getElementById('locationSection').classList.remove('hidden');
+            document.getElementById('musicianLocation').textContent = currentMusicianData.location;
+        } else {
+            document.getElementById('locationSection').classList.add('hidden');
+        }
+
+        // Bio
+        if (currentMusicianData.bio) {
+            document.getElementById('bioSection').classList.remove('hidden');
+            document.getElementById('musicianBio').textContent = currentMusicianData.bio;
+        } else {
+            document.getElementById('bioSection').classList.add('hidden');
+        }
+
+        // Instruments
+        if (currentMusicianData.instruments.length > 0) {
+            document.getElementById('instrumentsSection').classList.remove('hidden');
+            const instrumentsList = document.getElementById('instrumentsList');
+            instrumentsList.innerHTML = currentMusicianData.instruments
+                .map(inst => `<span class="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-xs font-medium">${inst}</span>`)
+                .join('');
+        } else {
+            document.getElementById('instrumentsSection').classList.add('hidden');
+        }
+
+        // Genres
+        if (currentMusicianData.genres.length > 0) {
+            document.getElementById('genresSection').classList.remove('hidden');
+            const genresList = document.getElementById('genresList');
+            genresList.innerHTML = currentMusicianData.genres
+                .map(genre => `<span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-medium">${genre}</span>`)
+                .join('');
+        } else {
+            document.getElementById('genresSection').classList.add('hidden');
+        }
+
+        // Social Media
+        if (currentMusicianData.instagram || currentMusicianData.youtube) {
+            document.getElementById('socialSection').classList.remove('hidden');
+            const socialLinks = document.getElementById('socialLinks');
+            let html = '';
+            if (currentMusicianData.instagram) {
+                html += `<a href="https://instagram.com/${currentMusicianData.instagram}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200"><svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069z"/></svg> Instagram</a>`;
+            }
+            if (currentMusicianData.youtube) {
+                html += `<a href="https://youtube.com/${currentMusicianData.youtube}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200"><svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/></svg> YouTube</a>`;
+            }
+            socialLinks.innerHTML = html;
+        } else {
+            document.getElementById('socialSection').classList.add('hidden');
+        }
+    }
+
+    function closeInviteModal() {
+        currentMusicianId = null;
+        currentMusicianData = null;
+        document.getElementById('inviteModal').classList.add('hidden');
+    }
+
+    function sendInvitation() {
+        const listingId = document.getElementById('listingSelect').value;
+        const message = document.getElementById('inviteMessage').value.trim();
+
+        if (!listingId) {
+            alert('Please select a listing first.');
+            return;
+        }
+
+        if (!currentMusicianId) {
+            alert('Error: No musician selected.');
+            return;
+        }
+
+        // Send AJAX request
+        fetch('{% url "invitations:send_invitation" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                musician_id: currentMusicianId,
+                listing_id: listingId,
+                message: message
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    closeInviteModal();
+                } else {
+                    alert(data.error || 'An error occurred while sending the invitation.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while sending the invitation.');
+            });
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('inviteModal').addEventListener('click', function (e) {
+        if (e.target === this) {
+            closeInviteModal();
+        }
+    });
+</script>
 {% endblock %}
