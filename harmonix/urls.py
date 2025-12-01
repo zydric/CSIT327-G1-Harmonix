@@ -18,9 +18,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from . import views
+from accounts import views as account_views
 
 urlpatterns = [
     path('', views.landing_page, name='landing'),
+    path('dashboard/musician/', account_views.musician_dashboard, name='musician_dashboard'),
     path('listings/', include('listings.urls')),  # Listings CRUD functionality
     path('applications/', include('applications.urls')),  # Application management
     path('invitations/', include('invitations.urls')),  # Musician invitations

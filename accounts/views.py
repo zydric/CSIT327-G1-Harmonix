@@ -15,6 +15,8 @@ from .tokens import password_reset_token
 from harmonix.constants import GENRE_CHOICES, INSTRUMENT_CHOICES
 
 from .models import User
+from applications.models import Application
+from invitations.models import Invitation
 
 # Registration View
 @csrf_protect
@@ -112,8 +114,15 @@ def login_view(request):
             # Login successful
             auth_login(request, user)
             
-            # Redirect to 'next' page or default to 'listings:feed'
-            next_page = request.GET.get('next', 'listings:feed')
+            # Redirect to 'next' page or role-specific dashboard
+            next_page = request.GET.get('next') or request.POST.get('next')
+            if not next_page:
+                if user.is_musician:
+                    next_page = 'musician_dashboard'
+                elif user.is_band_admin:
+                    next_page = 'listings:feed'
+                else:
+                    next_page = 'listings:feed'
             return redirect(next_page)
         else:
             # Login failed
@@ -121,6 +130,52 @@ def login_view(request):
 
     # Handle GET request
     return render(request, 'accounts/login.html')
+
+
+@login_required
+def musician_dashboard(request):
+    """Dashboard landing page for musicians."""
+    user = request.user
+
+    if not user.is_musician:
+        messages.error(request, 'Musician dashboard is only available to musician accounts.')
+        return redirect('listings:feed')
+
+    applications_qs = Application.objects.filter(musician=user)
+    invitations_qs = Invitation.objects.filter(musician=user)
+
+    stats = {
+        'applications_total': applications_qs.exclude(status='draft').count(),
+        'applications_pending': applications_qs.filter(status='pending').count(),
+        'invitations_total': invitations_qs.count(),
+        'invitations_pending': invitations_qs.filter(status='pending').count(),
+        'drafts_total': applications_qs.filter(status='draft').count(),
+    }
+
+    recent_applications = applications_qs.exclude(status='draft').select_related('listing').order_by('-updated_at')[:3]
+    recent_invitations = invitations_qs.select_related('listing', 'band_admin').order_by('-updated_at')[:3]
+
+    status_styles = {
+        'pending': 'bg-yellow-100 text-yellow-800 border border-yellow-200',
+        'accepted': 'bg-green-100 text-green-800 border border-green-200',
+        'rejected': 'bg-red-100 text-red-800 border border-red-200',
+        'draft': 'bg-gray-100 text-gray-800 border border-gray-200',
+        'declined': 'bg-red-100 text-red-800 border border-red-200',
+    }
+
+    default_status_style = 'bg-gray-100 text-gray-800 border border-gray-200'
+    for application in recent_applications:
+        application.status_class = status_styles.get(application.status, default_status_style)
+    for invitation in recent_invitations:
+        invitation.status_class = status_styles.get(invitation.status, default_status_style)
+
+    context = {
+        'stats': stats,
+        'recent_applications': recent_applications,
+        'recent_invitations': recent_invitations,
+    }
+
+    return render(request, 'dashboard/musician_dashboard.html', context)
 
 # View Profile 
 @login_required

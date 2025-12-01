@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}Musician Dashboard | Harmonix{% endblock %}
+
+{% block content %}
+<section class="bg-gradient-to-b from-purple-50 via-white to-white py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+        <!-- Welcome / Hero -->
+        <div class="bg-white rounded-2xl shadow-sm border border-purple-100 p-8">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                <div>
+                    <p class="text-sm uppercase tracking-wide text-purple-500 font-semibold">Musician Dashboard</p>
+                    <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mt-2">
+                        Welcome back, {{ request.user.username }}!
+                    </h1>
+                    <p class="text-lg text-gray-600 mt-3">
+                        Here's what's happening with your musical journey.
+                    </p>
+                </div>
+                <div class="bg-purple-600 text-white rounded-2xl px-6 py-4 shadow-lg w-full lg:w-auto">
+                    <p class="text-sm uppercase tracking-wide text-purple-200 font-semibold">At a glance</p>
+                    <p class="text-3xl font-bold mt-2">{{ stats.applications_total }} applications</p>
+                    <p class="text-sm text-purple-100 mt-1">{{ stats.applications_pending }} waiting for review</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
+                <p class="text-sm text-gray-500">Applications</p>
+                <p class="text-3xl font-bold text-gray-900 mt-2">{{ stats.applications_total }}</p>
+                <p class="text-sm text-yellow-600 mt-1">{{ stats.applications_pending }} pending</p>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
+                <p class="text-sm text-gray-500">Invitations</p>
+                <p class="text-3xl font-bold text-gray-900 mt-2">{{ stats.invitations_total }}</p>
+                <p class="text-sm text-yellow-600 mt-1">{{ stats.invitations_pending }} pending response</p>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
+                <p class="text-sm text-gray-500">Drafts</p>
+                <p class="text-3xl font-bold text-gray-900 mt-2">{{ stats.drafts_total }}</p>
+                <p class="text-sm text-gray-500 mt-1">Saved applications</p>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
+                <p class="text-sm text-gray-500">Opportunities</p>
+                <p class="text-3xl font-bold text-gray-900 mt-2">{{ stats.applications_pending|add:stats.invitations_pending }}</p>
+                <p class="text-sm text-gray-500 mt-1">Need your attention</p>
+            </div>
+        </div>
+
+        <!-- Quick actions -->
+        <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-900">Quick actions</h2>
+                    <p class="text-gray-600">Jump back into your search with a single click.</p>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                    <a href="{% url 'listings:feed' %}"
+                       class="inline-flex items-center justify-center rounded-xl bg-purple-600 px-5 py-3 text-white font-semibold shadow hover:bg-purple-700 transition">
+                        Browse Opportunities
+                    </a>
+                    <a href="{% url 'applications:my_applications' %}"
+                       class="inline-flex items-center justify-center rounded-xl border border-gray-200 px-5 py-3 text-gray-900 font-semibold hover:border-purple-300 transition">
+                        View Applications
+                    </a>
+                    <a href="{% url 'invitations:musician_invitations' %}"
+                       class="inline-flex items-center justify-center rounded-xl border border-gray-200 px-5 py-3 text-gray-900 font-semibold hover:border-purple-300 transition">
+                        View Invitations
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent activity -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-gray-900">Recent Applications</h2>
+                    <a href="{% url 'applications:my_applications' %}" class="text-sm text-purple-600 font-medium hover:text-purple-700">See all</a>
+                </div>
+                {% if recent_applications %}
+                    <ul class="space-y-4">
+                        {% for application in recent_applications %}
+                            <li class="border border-gray-100 rounded-xl p-4 flex flex-col gap-2">
+                                <div class="flex items-center justify-between">
+                                    <p class="font-semibold text-gray-900">{{ application.listing.title }}</p>
+                                    <span class="text-xs font-semibold px-3 py-1 rounded-full {{ application.status_class }} capitalize">
+                                        {{ application.get_status_display }}
+                                    </span>
+                                </div>
+                                <p class="text-sm text-gray-500">{{ application.listing.band_name }}</p>
+                                <p class="text-xs text-gray-400">Updated {{ application.updated_at|date:"M d, Y" }}</p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="text-center py-10">
+                        <p class="text-gray-500">No applications yet. Start by browsing new listings.</p>
+                        <a href="{% url 'listings:feed' %}" class="text-purple-600 font-medium mt-2 inline-block">Browse opportunities →</a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-gray-900">Band Invitations</h2>
+                    <a href="{% url 'invitations:musician_invitations' %}" class="text-sm text-purple-600 font-medium hover:text-purple-700">See all</a>
+                </div>
+                {% if recent_invitations %}
+                    <ul class="space-y-4">
+                        {% for invitation in recent_invitations %}
+                            <li class="border border-gray-100 rounded-xl p-4 flex flex-col gap-2">
+                                <div class="flex items-center justify-between">
+                                    <p class="font-semibold text-gray-900">{{ invitation.listing.title }}</p>
+                                    <span class="text-xs font-semibold px-3 py-1 rounded-full {{ invitation.status_class }} capitalize">
+                                        {{ invitation.get_status_display }}
+                                    </span>
+                                </div>
+                                <p class="text-sm text-gray-500">From {{ invitation.band_admin.username }}</p>
+                                <p class="text-xs text-gray-400">Sent {{ invitation.created_at|date:"M d, Y" }}</p>
+                                {% if invitation.message %}
+                                    <p class="text-sm text-gray-600 border-t border-dashed border-gray-100 pt-2">“{{ invitation.message|truncatechars:120 }}”</p>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="text-center py-10">
+                        <p class="text-gray-500">No invitations yet. Keep your profile up to date to attract bands.</p>
+                        <a href="{% url 'accounts:musician_profile' %}" class="text-purple-600 font-medium mt-2 inline-block">Review your profile →</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
