@@ -18,12 +18,7 @@
                         <div class="flex-1">
                             <div class="flex items-center space-x-3 mb-2">
                                 <h3 class="text-xl font-bold text-gray-900">{{ invitation.listing.title }}</h3>
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
-                                    {% if invitation.status == 'pending' %}bg-yellow-100 text-yellow-800
-                                    {% elif invitation.status == 'accepted' %}bg-green-100 text-green-800
-                                    {% else %}bg-red-100 text-red-800{% endif %}">
-                                    {{ invitation.get_status_display }}
-                                </span>
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {% if invitation.status == 'pending' %}bg-yellow-100 text-yellow-800 {% elif invitation.status == 'accepted' %}bg-green-100 text-green-800 {% else %}bg-red-100 text-red-800{% endif %}">{{ invitation.get_status_display }}</span>
                             </div>
                             <div class="flex flex-col space-y-1 text-sm text-gray-600 mb-4">
                                 <span class="font-medium text-[#4F2FC0]">{{ invitation.listing.band_name }}</span>
@@ -32,7 +27,6 @@
                             </div>
                         </div>
                     </div>
-
                     {% if invitation.message %}
                         <div class="mb-4 flex-grow">
                             <h4 class="text-sm font-medium text-gray-700 mb-2">Message:</h4>
@@ -41,14 +35,12 @@
                     {% else %}
                         <div class="flex-grow"></div>
                     {% endif %}
-
                     {% if invitation.status == 'pending' %}
                         <div class="flex space-x-3 mb-4">
                             <button onclick="respondToInvitation({{ invitation.id }}, 'accepted')" class="flex-1 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500">Accept</button>
                             <button onclick="respondToInvitation({{ invitation.id }}, 'declined')" class="flex-1 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500">Decline</button>
                         </div>
                     {% endif %}
-
                     <div class="flex items-center justify-between text-sm text-gray-500 border-t border-gray-200 pt-4 mt-auto">
                         <div class="flex items-center">
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
@@ -72,20 +64,14 @@
     <div class="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
         <div class="flex justify-between items-center mb-6">
             <h3 class="text-2xl font-bold text-gray-900">Listing Details</h3>
-            <button onclick="closeListingModal()" class="text-gray-400 hover:text-gray-600">
-                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
+            <button onclick="closeListingModal()" class="text-gray-400 hover:text-gray-600"><svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
         </div>
-
         <div id="listingDetails">
             <div class="text-center py-4">
                 <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
                 <p class="text-gray-500 mt-2">Loading...</p>
             </div>
         </div>
-
         <div class="border-t border-gray-200 pt-4 mt-6">
             <div class="flex justify-end space-x-3">
                 <button onclick="closeListingModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500">Close</button>
@@ -93,4 +79,98 @@
         </div>
     </div>
 </div>
+
+<script>
+let currentInvitationId = null;
+
+function openInvitationModal(invitationId, listingId) {
+    currentInvitationId = invitationId;
+    document.getElementById('listingModal').classList.remove('hidden');
+
+    // Fetch listing details
+    fetch(`{% url 'invitations:listing_details' 0 %}`.replace('0', listingId))
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                document.getElementById('listingDetails').innerHTML =
+                    '<p class="text-red-600">Error loading listing details.</p>';
+                return;
+            }
+
+            // Build the listing details HTML
+            let detailsHTML = `
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="text-xl font-semibold text-gray-900">${data.title}</h4>
+                        <p class="text-lg text-gray-700">${data.band_name}</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-sm font-medium text-gray-700">Band Admin:</p>
+                            <p class="text-sm text-gray-600">${data.band_admin}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-700">Location:</p>
+                            <p class="text-sm text-gray-600">${data.location}</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p class="text-sm font-medium text-gray-700 mb-2">Description:</p>
+                        <p class="text-sm text-gray-600 leading-relaxed">${data.description}</p>
+                    </div>
+
+                    <div>
+                        <p class="text-sm font-medium text-gray-700 mb-2">Instruments Needed:</p>
+                        <div class="flex flex-wrap gap-2">
+                            ${data.instruments_needed.map(instrument =>
+                                `<span class="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">${instrument}</span>`
+                            ).join('')}
+                        </div>
+                    </div>
+
+                    <div>
+                        <p class="text-sm font-medium text-gray-700 mb-2">Genres:</p>
+                        <div class="flex flex-wrap gap-2">
+                            ${data.genres.map(genre =>
+                                `<span class="inline-block bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">${genre}</span>`
+                            ).join('')}
+                        </div>
+                    </div>
+
+                    <div class="text-sm text-gray-500">
+                        ${data.posted_date}
+                    </div>
+                </div>
+            `;
+            document.getElementById('listingDetails').innerHTML = detailsHTML;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('listingDetails').innerHTML =
+                '<p class="text-red-600">Error loading listing details.</p>';
+        });
+}
+
+function closeListingModal() {
+    document.getElementById('listingModal').classList.add('hidden');
+    currentInvitationId = null;
+    // Reset loader for next open
+    setTimeout(() => {
+        document.getElementById('listingDetails').innerHTML = `
+            <div class="text-center py-4">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                <p class="text-gray-500 mt-2">Loading...</p>
+            </div>`;
+    }, 300);
+}
+
+// Close modal when clicking outside
+document.getElementById('listingModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeListingModal();
+    }
+});
+</script>
 {% endblock %}
