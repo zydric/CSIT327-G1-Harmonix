@@ -138,6 +138,14 @@
                                            class="editable-field w-full px-4 py-2 bg-gray-100 text-gray-600 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#4F2FC0] focus:border-transparent" readonly>
                                 </div>
                             </div>
+
+                            <!-- Bio -->
+                            <div>
+                                <label class="block font-semibold text-gray-900 mb-2">Bio</label>
+                                <textarea name="bio" id="bioInput" rows="4" 
+                                          class="editable-field w-full px-4 py-2 bg-gray-100 text-gray-600 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#4F2FC0] focus:border-transparent resize-none" readonly
+                                          placeholder="Tell bands about yourself, your experience, and what you're looking for...">{{ user.bio|default:"" }}</textarea>
+                            </div>
                         </div>
                     </div>
 
@@ -309,6 +317,12 @@
         if (locationInput) {
             locationInput.value = '{{ user.location|escapejs }}';
             locationInput.classList.remove('location-valid', 'location-invalid');
+        }
+        
+        // Reset bio field
+        const bioInput = document.getElementById('bioInput');
+        if (bioInput) {
+            bioInput.value = '{{ user.bio|default:""|escapejs }}';
         }
         
         // Destroy location autocomplete instance

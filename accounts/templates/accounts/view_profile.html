@@ -60,6 +60,14 @@
                 {% if profile_user.is_musician %}
                 <!-- Musician Profile -->
                 <div class="space-y-6">
+                    {% if profile_user.bio %}
+                    <!-- Bio -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3">About</h3>
+                        <p class="text-gray-700 whitespace-pre-line">{{ profile_user.bio }}</p>
+                    </div>
+                    {% endif %}
+
                     {% if profile_user.instruments %}
                     <!-- Instruments -->
                     <div>
@@ -84,7 +92,7 @@
                     </div>
                     {% endif %}
 
-                    {% if not profile_user.instruments and not profile_user.genres %}
+                    {% if not profile_user.instruments and not profile_user.genres and not profile_user.bio %}
                     <div class="text-center py-8">
                         <svg class="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>

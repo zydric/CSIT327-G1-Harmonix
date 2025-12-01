@@ -46,6 +46,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     location = models.CharField(max_length=100, blank=True, null=True)
     genres = models.CharField(max_length=200, blank=True, null=True)
     instruments = models.CharField(max_length=200, blank=True, null=True)
+    bio = models.TextField(blank=True, null=True, help_text="Short bio (musicians only)")
     
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)

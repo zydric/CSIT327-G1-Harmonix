@@ -299,6 +299,7 @@ def musician_profile_view(request):
         new_location = request.POST.get('location', '').strip()
         new_instruments = request.POST.get('instruments', '').strip()
         new_genres = request.POST.get('genres', '').strip()
+        new_bio = request.POST.get('bio', '').strip()
 
         # Validate username if it changed
         if new_username != user.username:
@@ -317,6 +318,7 @@ def musician_profile_view(request):
             user.location = new_location
             user.instruments = new_instruments
             user.genres = new_genres
+            user.bio = new_bio
             user.save()
             
             messages.success(request, 'Profile updated successfully!')
