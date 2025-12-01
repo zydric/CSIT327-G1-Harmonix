@@ -6,7 +6,7 @@ def landing_page(request):
         if request.user.is_musician:
             return redirect('musician_dashboard')
         if request.user.is_band_admin:
-            return redirect('listings:feed')
+            return redirect('band_admin_dashboard')
         return redirect('listings:feed')
 
     return render(request, 'landing.html')

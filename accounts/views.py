@@ -17,6 +17,7 @@ from harmonix.constants import GENRE_CHOICES, INSTRUMENT_CHOICES
 from .models import User
 from applications.models import Application
 from invitations.models import Invitation
+from listings.models import Listing
 
 # Registration View
 @csrf_protect
@@ -120,7 +121,7 @@ def login_view(request):
                 if user.is_musician:
                     next_page = 'musician_dashboard'
                 elif user.is_band_admin:
-                    next_page = 'listings:feed'
+                    next_page = 'band_admin_dashboard'
                 else:
                     next_page = 'listings:feed'
             return redirect(next_page)
@@ -176,6 +177,55 @@ def musician_dashboard(request):
     }
 
     return render(request, 'dashboard/musician_dashboard.html', context)
+
+
+@login_required
+def band_admin_dashboard(request):
+    """Dashboard landing page for band admins."""
+    user = request.user
+
+    if not user.is_band_admin:
+        messages.error(request, 'Band admin dashboard is only available to band admin accounts.')
+        return redirect('listings:feed')
+
+    # Get band admin's listings
+    listings_qs = Listing.objects.filter(band_admin=user)
+    # Get applications to band admin's listings
+    applications_qs = Application.objects.filter(listing__band_admin=user).exclude(status='draft')
+    # Get invitations sent by the band admin
+    invitations_qs = Invitation.objects.filter(band_admin=user)
+
+    stats = {
+        'active_listings': listings_qs.filter(is_active=True).count(),
+        'applications_total': applications_qs.count(),
+        'applications_pending': applications_qs.filter(status='pending').count(),
+        'invitations_sent': invitations_qs.count(),
+        'invitations_pending': invitations_qs.filter(status='pending').count(),
+    }
+
+    recent_listings = listings_qs.filter(is_active=True).order_by('-created_at')[:3]
+    recent_applications = applications_qs.select_related('musician', 'listing').order_by('-created_at')[:3]
+
+    status_styles = {
+        'pending': 'bg-yellow-100 text-yellow-800 border border-yellow-200',
+        'accepted': 'bg-green-100 text-green-800 border border-green-200',
+        'rejected': 'bg-red-100 text-red-800 border border-red-200',
+        'draft': 'bg-gray-100 text-gray-800 border border-gray-200',
+        'declined': 'bg-red-100 text-red-800 border border-red-200',
+    }
+
+    default_status_style = 'bg-gray-100 text-gray-800 border border-gray-200'
+    for application in recent_applications:
+        application.status_class = status_styles.get(application.status, default_status_style)
+
+    context = {
+        'stats': stats,
+        'recent_listings': recent_listings,
+        'recent_applications': recent_applications,
+    }
+
+    return render(request, 'dashboard/band_admin_dashboard.html', context)
+
 
 # View Profile 
 @login_required

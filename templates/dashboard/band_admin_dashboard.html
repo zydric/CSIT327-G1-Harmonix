@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block title %}Band Admin Dashboard | Harmonix{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Welcome Header -->
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-900">Welcome back, {{ request.user.username }}!</h1>
+        <p class="text-gray-500 mt-1">Manage your band listings and find the perfect musicians</p>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="bg-white rounded-lg border border-gray-200 p-5">
+            <p class="text-sm text-[#4F2FC0] font-medium">Active Listings</p>
+            <p class="text-4xl font-bold text-gray-900 mt-1">{{ stats.active_listings }}</p>
+            <p class="text-sm text-gray-500 mt-1">Open positions</p>
+        </div>
+        <div class="bg-white rounded-lg border border-gray-200 p-5">
+            <p class="text-sm text-[#4F2FC0] font-medium">Applications</p>
+            <p class="text-4xl font-bold text-gray-900 mt-1">{{ stats.applications_total }}</p>
+            <p class="text-sm text-yellow-800 mt-1">{{ stats.applications_pending }} pending review</p>
+        </div>
+        <div class="bg-white rounded-lg border border-gray-200 p-5">
+            <p class="text-sm text-gray-600 font-medium">Invitations Sent</p>
+            <p class="text-4xl font-bold text-gray-900 mt-1">{{ stats.invitations_sent }}</p>
+            <p class="text-sm text-gray-500 mt-1">Awaiting responses</p>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="bg-white rounded-lg border border-gray-200 p-5 mb-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <a href="{% url 'listings:create' %}"
+               class="flex items-center justify-center gap-2 rounded-lg bg-[#4F2FC0] px-4 py-3 text-white font-medium hover:bg-[#3f24a0] transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Create New Listing
+            </a>
+            <a href="{% url 'invitations:band_admin_invite' %}"
+               class="flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-700 font-medium hover:text-[#4F2FC0] transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+                Browse Musicians
+            </a>
+            <a href="{% url 'invitations:band_admin_invite' %}"
+               class="flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-700 font-medium hover:text-[#4F2FC0] transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                View Invitations
+            </a>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Your Active Listings -->
+        <div class="bg-white rounded-lg border border-gray-200 p-5">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-gray-900">Your Active Listings</h2>
+                <a href="{% url 'listings:feed' %}" class="text-sm text-[#4F2FC0] font-medium hover:text-[#3f24a0] flex items-center gap-1">
+                    View all <span>→</span>
+                </a>
+            </div>
+            {% if recent_listings %}
+                <div class="space-y-3">
+                    {% for listing in recent_listings %}
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <a href="{% url 'listings:detail' pk=listing.pk %}" class="font-semibold text-gray-900 hover:text-[#4F2FC0] block truncate">{{ listing.title }}</a>
+                            <p class="text-sm text-gray-500 mt-1 line-clamp-2">{{ listing.description|truncatechars:50 }}</p>
+                            <div class="flex items-center gap-2 mt-3 flex-wrap">
+                                {% for genre in listing.genres_list %}
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">{{ genre }}</span>
+                                {% endfor %}
+                                <span class="flex items-center gap-1 text-xs text-gray-400">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                    {{ listing.band_admin.location|default:"—" }}
+                                </span>
+                                <span class="flex items-center gap-1 text-xs text-gray-400">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
+                                    </svg>
+                                    {% for instrument in listing.instruments_list %}{{ instrument }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-1 mt-2 text-xs text-gray-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                Posted {{ listing.created_at|date:"M d" }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-8">
+                    <p class="text-gray-500">No active listings yet.</p>
+                    <a href="{% url 'listings:create' %}" class="text-[#4F2FC0] font-medium mt-2 inline-block">Create your first listing →</a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Recent Applications -->
+        <div class="bg-white rounded-lg border border-gray-200 p-5">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-gray-900">Recent Applications</h2>
+                <a href="{% url 'applications:my_applications' %}" class="text-sm text-[#4F2FC0] font-medium hover:text-[#3f24a0] flex items-center gap-1">
+                    View all <span>→</span>
+                </a>
+            </div>
+            {% if recent_applications %}
+                <div class="space-y-3">
+                    {% for application in recent_applications %}
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-start justify-between gap-2">
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-semibold text-gray-900 truncate">{{ application.musician.username }}</p>
+                                    <p class="text-sm text-gray-500 truncate">Applied to: {{ application.listing.title }}</p>
+                                    {% if application.message %}
+                                        <p class="text-sm text-gray-600 mt-2">"{{ application.message|truncatechars:80 }}"</p>
+                                    {% endif %}
+                                    <div class="flex items-center gap-1 mt-2 text-xs text-gray-400">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                        {{ application.created_at|date:"M d" }}
+                                    </div>
+                                </div>
+                                <span class="text-xs font-medium px-3 py-1 rounded-full {{ application.status_class }}">
+                                    {{ application.get_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-8">
+                    <p class="text-gray-500">No applications yet.</p>
+                    <a href="{% url 'listings:create' %}" class="text-[#4F2FC0] font-medium mt-2 inline-block">Create a listing to attract musicians →</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
