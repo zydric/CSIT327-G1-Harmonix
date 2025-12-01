@@ -101,8 +101,8 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = 'accounts.User'
 
-# Security cookie settings — toggle for production
-if ENV == 'production' or not DEBUG:
+# Security cookie settings — only enable in actual production environment
+if ENV == 'production':
     CSRF_COOKIE_SECURE = True
     SESSION_COOKIE_SECURE = True
     SECURE_SSL_REDIRECT = True
