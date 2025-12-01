@@ -30,3 +30,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),  # User authentication and profiles
 ]
+
+# Custom error handlers
+handler400 = 'harmonix.views.handler400'
+handler403 = 'harmonix.views.handler403'
+handler404 = 'harmonix.views.handler404'
+handler500 = 'harmonix.views.handler500'
