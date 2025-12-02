@@ -12,20 +12,25 @@
 
     <!-- Stats Row -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <!-- Applications Stat -->
         <div class="bg-white rounded-lg border border-gray-200 p-5">
             <p class="text-sm text-[#4F2FC0] font-medium">Applications</p>
             <p class="text-4xl font-bold text-gray-900 mt-1">{{ stats.applications_total }}</p>
             <p class="text-sm text-yellow-800 mt-1">{{ stats.applications_pending }} pending</p>
         </div>
+
+        <!-- Invitations Stat -->
         <div class="bg-white rounded-lg border border-gray-200 p-5">
             <p class="text-sm text-[#4F2FC0] font-medium">Invitations</p>
             <p class="text-4xl font-bold text-gray-900 mt-1">{{ stats.invitations_total }}</p>
             <p class="text-sm text-yellow-800 mt-1">{{ stats.invitations_pending }} pending</p>
         </div>
+
+        <!-- Drafts Stat -->
         <div class="bg-white rounded-lg border border-gray-200 p-5">
-            <p class="text-sm text-gray-600 font-medium">Drafts</p>
+            <p class="text-sm text-gray-600 font-medium">Draft Applications</p>
             <p class="text-4xl font-bold text-gray-900 mt-1">{{ stats.drafts_total }}</p>
-            <p class="text-sm text-gray-500 mt-1">Saved messages</p>
+            <p class="text-sm text-gray-500 mt-1">Saved for later</p>
         </div>
     </div>
 
@@ -70,32 +75,53 @@
             {% if recent_applications %}
                 <div class="space-y-3">
                     {% for application in recent_applications %}
-                        <div class="border border-gray-200 rounded-lg p-4">
-                            <div class="flex items-start justify-between gap-2">
+                        <a href="{% url 'listings:detail' pk=application.listing.pk %}" class="block border border-gray-200 rounded-lg p-4 hover:border-[#4F2FC0] hover:shadow-sm transition-all">
+                            <div class="flex items-start gap-3">
+                                <!-- Avatar -->
+                                <div class="flex-shrink-0">
+                                    {% if application.listing.band_admin.profile_picture %}
+                                    <img src="{{ application.listing.band_admin.profile_picture }}" alt="{{ application.listing.band_name }}" class="w-12 h-12 rounded-full object-cover">
+                                    {% else %}
+                                    <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold" style="background-color: {{ application.listing.band_admin.get_avatar_color }}">
+                                        {{ application.listing.band_admin.get_avatar_initial }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Content -->
                                 <div class="flex-1 min-w-0">
-                                    <p class="font-semibold text-gray-900 truncate">{{ application.listing.title }}</p>
-                                    <p class="text-sm text-gray-500 truncate">{{ application.listing.band_name }}</p>
-                                    <div class="flex items-center gap-3 mt-2 text-xs text-gray-400">
-                                        <span class="flex items-center gap-1">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                            </svg>
-                                            {{ application.listing.location|default:"—" }}
-                                        </span>
-                                        <span class="flex items-center gap-1">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                            </svg>
-                                            {{ application.created_at|date:"M d" }}
+                                    <div class="flex items-start justify-between gap-2 mb-1">
+                                        <div class="flex-1 min-w-0">
+                                            <p class="font-semibold text-gray-900 truncate">{{ application.listing.title }}</p>
+                                            <p class="text-sm text-gray-600 truncate">{{ application.listing.band_name }}</p>
+                                        </div>
+                                        <span class="text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap {{ application.status_class }}">
+                                            {{ application.get_status_display }}
                                         </span>
                                     </div>
+                                    
+                                    <!-- Instruments needed -->
+                                    {% if application.listing.instruments_list %}
+                                    <div class="flex flex-wrap gap-1 mt-2">
+                                        {% for instrument in application.listing.instruments_list|slice:":2" %}
+                                        <span class="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs">{{ instrument }}</span>
+                                        {% endfor %}
+                                        {% if application.listing.instruments_list|length > 2 %}
+                                        <span class="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs">+{{ application.listing.instruments_list|length|add:"-2" }}</span>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <!-- Date -->
+                                    <div class="flex items-center gap-1 mt-2 text-xs text-gray-500">
+                                        <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                        Applied {{ application.created_at|date:"M d, Y" }}
+                                    </div>
                                 </div>
-                                <span class="text-xs font-medium px-3 py-1 rounded-full {{ application.status_class }}">
-                                    {{ application.get_status_display }}
-                                </span>
                             </div>
-                        </div>
+                        </a>
                     {% endfor %}
                 </div>
             {% else %}
@@ -117,30 +143,58 @@
             {% if recent_invitations %}
                 <div class="space-y-3">
                     {% for invitation in recent_invitations %}
-                        <div class="border border-gray-200 rounded-lg p-4">
-                            <div class="flex items-start justify-between gap-2">
-                                <div class="flex-1 min-w-0">
-                                    <p class="font-semibold text-gray-900 truncate">{{ invitation.listing.band_name }}</p>
-                                    {% if invitation.message %}
-                                        <p class="text-sm text-gray-600 mt-1">{{ invitation.message|truncatechars:80 }}</p>
+                        <a href="{% url 'listings:detail' pk=invitation.listing.pk %}" class="block border border-gray-200 rounded-lg p-4 hover:border-[#4F2FC0] hover:shadow-sm transition-all">
+                            <div class="flex items-start gap-3">
+                                <!-- Avatar -->
+                                <div class="flex-shrink-0">
+                                    {% if invitation.band_admin.profile_picture %}
+                                    <img src="{{ invitation.band_admin.profile_picture }}" alt="{{ invitation.band_admin.username }}" class="w-12 h-12 rounded-full object-cover">
+                                    {% else %}
+                                    <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold" style="background-color: {{ invitation.band_admin.get_avatar_color }}">
+                                        {{ invitation.band_admin.get_avatar_initial }}
+                                    </div>
                                     {% endif %}
-                                    <div class="flex items-center gap-2 mt-2 flex-wrap">
-                                        {% for genre in invitation.listing.genres_list %}
-                                            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">{{ genre }}</span>
-                                        {% endfor %}
-                                        <span class="flex items-center gap-1 text-xs text-gray-400 ml-2">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                            </svg>
-                                            {{ invitation.created_at|date:"M d" }}
+                                </div>
+                                
+                                <!-- Content -->
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-start justify-between gap-2 mb-1">
+                                        <div class="flex-1 min-w-0">
+                                            <p class="font-semibold text-gray-900 truncate">{{ invitation.listing.band_name }}</p>
+                                            <p class="text-sm text-gray-600 truncate">{{ invitation.listing.title }}</p>
+                                        </div>
+                                        <span class="text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap {{ invitation.status_class }}">
+                                            {{ invitation.get_status_display }}
                                         </span>
                                     </div>
+                                    
+                                    <!-- Message preview -->
+                                    {% if invitation.message %}
+                                    <p class="text-sm text-gray-600 mt-2 line-clamp-2">{{ invitation.message }}</p>
+                                    {% endif %}
+                                    
+                                    <!-- Genres -->
+                                    {% if invitation.listing.genres_list %}
+                                    <div class="flex flex-wrap gap-1 mt-2">
+                                        {% for genre in invitation.listing.genres_list|slice:":2" %}
+                                        <span class="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs">{{ genre }}</span>
+                                        {% endfor %}
+                                        {% if invitation.listing.genres_list|length > 2 %}
+                                        <span class="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs">+{{ invitation.listing.genres_list|length|add:"-2" }}</span>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <!-- Date -->
+                                    <div class="flex items-center gap-1 mt-2 text-xs text-gray-500">
+                                        <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                        Invited {{ invitation.created_at|date:"M d, Y" }}
+                                    </div>
                                 </div>
-                                <span class="text-xs font-medium px-3 py-1 rounded-full {{ invitation.status_class }}">
-                                    {{ invitation.get_status_display }}
-                                </span>
                             </div>
-                        </div>
+                        </a>
                     {% endfor %}
                 </div>
             {% else %}
