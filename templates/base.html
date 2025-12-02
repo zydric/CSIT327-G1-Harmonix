@@ -58,28 +58,38 @@
         /* Enhanced Dropdown Styling */
         select {
             cursor: pointer;
+            font-weight: 500;
         }
         
+        /* Note: Native option styling is extremely limited by browsers for security.
+           For fully custom styled dropdowns, a JavaScript library would be needed.
+           These styles apply maximum allowed styling within browser constraints. */
         select option {
-            padding: 8px 12px;
-            background-color: white;
-            color: #1f2937;
+            padding: 10px;
+            font-weight: 500;
         }
         
-        select option:hover,
         select option:checked {
-            background: linear-gradient(to right, #f3f4f6, #f9fafb);
-            color: #4F2FC0;
+            background: #4F2FC0;
+            color: white;
+            font-weight: 600;
         }
         
-        select option:disabled {
-            color: #9ca3af;
+        select option:hover {
+            background-color: #f3f4f6;
         }
         
-        /* Firefox specific option styling */
+        /* Webkit browsers (Chrome, Safari, Edge) */
+        select option:checked {
+            background: linear-gradient(#4F2FC0, #4F2FC0);
+            background-color: #4F2FC0 !important;
+            color: white !important;
+        }
+        
+        /* Firefox */
         @-moz-document url-prefix() {
             select option:checked {
-                background-color: #4F2FC0 !important;
+                background: #4F2FC0 !important;
                 color: white !important;
             }
         }
