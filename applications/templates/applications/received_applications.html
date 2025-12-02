@@ -121,18 +121,20 @@
                     <!-- Action Buttons -->
                     {% if application.status == 'pending' %}
                     <div class="flex space-x-2 ml-4">
-                        <form method="post" action="{% url 'applications:update_status' pk=application.pk %}" class="inline">
+                        <form method="post" action="{% url 'applications:update_status' pk=application.pk %}" class="inline" id="acceptForm{{ application.pk }}">
                             {% csrf_token %}
                             <input type="hidden" name="status" value="accepted">
-                            <button type="submit" 
+                            <button type="button" 
+                                    onclick="confirmAcceptApplication('{{ application.musician.username }}', '{{ application.listing.title }}', {{ application.pk }})"
                                     class="px-4 py-2 !bg-green-600 !text-white text-sm rounded-md hover:!bg-green-700 transition-colors font-medium">
                                 Accept
                             </button>
                         </form>
-                        <form method="post" action="{% url 'applications:update_status' pk=application.pk %}" class="inline">
+                        <form method="post" action="{% url 'applications:update_status' pk=application.pk %}" class="inline" id="rejectForm{{ application.pk }}">
                             {% csrf_token %}
                             <input type="hidden" name="status" value="rejected">
-                            <button type="submit" 
+                            <button type="button" 
+                                    onclick="confirmRejectApplication('{{ application.musician.username }}', '{{ application.listing.title }}', {{ application.pk }})"
                                     class="px-4 py-2 !bg-red-600 !text-white text-sm rounded-md hover:!bg-red-700 transition-colors font-medium">
                                 Reject
                             </button>
@@ -227,5 +229,31 @@ function applyFilters() {
 
 // Real-time search
 document.getElementById('searchApplications')?.addEventListener('input', applyFilters);
+
+// Confirm accept application
+function confirmAcceptApplication(musicianName, listingTitle, applicationId) {
+    showConfirmModal({
+        title: 'Accept Application',
+        message: `Are you sure you want to accept ${musicianName}'s application for "${listingTitle}"?`,
+        confirmText: 'Accept',
+        type: 'success',
+        onConfirm: function() {
+            document.getElementById('acceptForm' + applicationId).submit();
+        }
+    });
+}
+
+// Confirm reject application
+function confirmRejectApplication(musicianName, listingTitle, applicationId) {
+    showConfirmModal({
+        title: 'Reject Application',
+        message: `Are you sure you want to reject ${musicianName}'s application for "${listingTitle}"?`,
+        confirmText: 'Reject',
+        type: 'danger',
+        onConfirm: function() {
+            document.getElementById('rejectForm' + applicationId).submit();
+        }
+    });
+}
 </script>
 {% endblock %}

@@ -71,6 +71,135 @@
         {% endblock %}
     </main>
     
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <!-- Background overlay -->
+            <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeConfirmModal()"></div>
+            
+            <!-- Center modal -->
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            
+            <!-- Modal panel -->
+            <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-6 pt-6 pb-4">
+                    <!-- Icon -->
+                    <div class="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full" id="confirmModalIcon">
+                        <!-- Icon will be inserted here -->
+                    </div>
+                    
+                    <!-- Title -->
+                    <h3 class="text-2xl font-bold text-gray-900 text-center mb-3" id="confirmModalTitle">
+                        Confirm Action
+                    </h3>
+                    
+                    <!-- Message -->
+                    <p class="text-base text-gray-600 text-center mb-6" id="confirmModalMessage">
+                        Are you sure you want to proceed?
+                    </p>
+                </div>
+                
+                <!-- Actions -->
+                <div class="bg-gray-50 px-6 py-4 flex flex-col-reverse sm:flex-row sm:gap-3 gap-3">
+                    <button type="button" 
+                            onclick="closeConfirmModal()" 
+                            class="w-full inline-flex justify-center rounded-lg border-2 border-gray-300 px-6 py-3 bg-white text-base font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all">
+                        Cancel
+                    </button>
+                    <button type="button" 
+                            id="confirmModalButton"
+                            class="w-full inline-flex justify-center rounded-lg border border-transparent px-6 py-3 bg-red-600 text-base font-semibold text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all">
+                        Confirm
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Global Confirmation Modal Script -->
+    <script>
+        let confirmModalCallback = null;
+        
+        function showConfirmModal(options = {}) {
+            const modal = document.getElementById('confirmModal');
+            const title = document.getElementById('confirmModalTitle');
+            const message = document.getElementById('confirmModalMessage');
+            const button = document.getElementById('confirmModalButton');
+            const icon = document.getElementById('confirmModalIcon');
+            
+            // Set content
+            title.textContent = options.title || 'Confirm Action';
+            message.textContent = options.message || 'Are you sure you want to proceed?';
+            button.textContent = options.confirmText || 'Confirm';
+            
+            // Set button style based on type
+            const type = options.type || 'danger';
+            button.className = 'w-full inline-flex justify-center rounded-lg border border-transparent px-6 py-3 text-base font-semibold text-white focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all';
+            
+            if (type === 'danger') {
+                button.classList.add('bg-red-600', 'hover:bg-red-700', 'focus:ring-red-500');
+                icon.className = 'flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-red-100';
+                icon.innerHTML = `<svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>`;
+            } else if (type === 'warning') {
+                button.classList.add('bg-yellow-600', 'hover:bg-yellow-700', 'focus:ring-yellow-500');
+                icon.className = 'flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-yellow-100';
+                icon.innerHTML = `<svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>`;
+            } else if (type === 'success') {
+                button.classList.add('bg-green-600', 'hover:bg-green-700', 'focus:ring-green-500');
+                icon.className = 'flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-green-100';
+                icon.innerHTML = `<svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>`;
+            } else {
+                button.classList.add('bg-[#4F2FC0]', 'hover:bg-[#3f24a0]', 'focus:ring-[#4F2FC0]');
+                icon.className = 'flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-purple-100';
+                icon.innerHTML = `<svg class="w-8 h-8 text-[#4F2FC0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>`;
+            }
+            
+            // Store callback
+            confirmModalCallback = options.onConfirm || null;
+            
+            // Show modal
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeConfirmModal() {
+            const modal = document.getElementById('confirmModal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+            confirmModalCallback = null;
+        }
+        
+        function confirmModalAction() {
+            if (confirmModalCallback) {
+                confirmModalCallback();
+            }
+            closeConfirmModal();
+        }
+        
+        // Attach confirm action to button
+        document.addEventListener('DOMContentLoaded', function() {
+            const confirmButton = document.getElementById('confirmModalButton');
+            if (confirmButton) {
+                confirmButton.onclick = confirmModalAction;
+            }
+        });
+        
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeConfirmModal();
+            }
+        });
+    </script>
+    
     <!-- Extra JavaScript -->
     {% block extra_js %}
     {% endblock %}

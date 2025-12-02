@@ -279,13 +279,19 @@ function confirmWithdraw(applicationId, listingTitle) {
     // Check if this is likely a draft based on the button text (simple approach)
     const isDraft = event.target.textContent.includes('Delete');
     const actionText = isDraft ? 'delete your draft for' : 'withdraw your application to';
-    const actionWord = isDraft ? 'deleted' : 'withdrawn';
+    const confirmButtonText = isDraft ? 'Delete Draft' : 'Withdraw';
     
-    if (confirm(`Are you sure you want to ${actionText} "${listingTitle}"?\n\nThis action cannot be undone.`)) {
-        const form = document.getElementById('withdrawForm');
-        form.action = `/applications/withdraw/${applicationId}/`;
-        form.submit();
-    }
+    showConfirmModal({
+        title: isDraft ? 'Delete Draft' : 'Withdraw Application',
+        message: `Are you sure you want to ${actionText} "${listingTitle}"? This action cannot be undone.`,
+        confirmText: confirmButtonText,
+        type: 'danger',
+        onConfirm: function() {
+            const form = document.getElementById('withdrawForm');
+            form.action = `/applications/withdraw/${applicationId}/`;
+            form.submit();
+        }
+    });
 }
 
 function openDraftModal(applicationId, listingTitle, bandName, listingId, currentMessage) {

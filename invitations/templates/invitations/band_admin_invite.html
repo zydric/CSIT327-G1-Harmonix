@@ -529,12 +529,24 @@
         const message = document.getElementById('inviteMessage').value.trim();
 
         if (!listingId) {
-            alert('Please select a listing first.');
+            showConfirmModal({
+                title: 'Missing Information',
+                message: 'Please select a listing first.',
+                confirmText: 'OK',
+                type: 'warning',
+                onConfirm: function() {}
+            });
             return;
         }
 
         if (!currentMusicianId) {
-            alert('Error: No musician selected.');
+            showConfirmModal({
+                title: 'Error',
+                message: 'No musician selected.',
+                confirmText: 'OK',
+                type: 'danger',
+                onConfirm: function() {}
+            });
             return;
         }
 
@@ -554,15 +566,35 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert(data.message);
-                    closeInviteModal();
+                    showConfirmModal({
+                        title: 'Success!',
+                        message: data.message,
+                        confirmText: 'OK',
+                        type: 'success',
+                        onConfirm: function() {
+                            closeInviteModal();
+                            location.reload();
+                        }
+                    });
                 } else {
-                    alert(data.error || 'An error occurred while sending the invitation.');
+                    showConfirmModal({
+                        title: 'Error',
+                        message: data.error || 'An error occurred while sending the invitation.',
+                        confirmText: 'OK',
+                        type: 'danger',
+                        onConfirm: function() {}
+                    });
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred while sending the invitation.');
+                showConfirmModal({
+                    title: 'Error',
+                    message: 'An error occurred while sending the invitation.',
+                    confirmText: 'OK',
+                    type: 'danger',
+                    onConfirm: function() {}
+                });
             });
     }
 

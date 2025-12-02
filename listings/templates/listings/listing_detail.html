@@ -369,40 +369,51 @@ function loadDraft() {
 // Withdraw Application Confirmation
 {% if user_has_applied and user_application %}
 function confirmWithdrawApplication() {
-    if (confirm('Are you sure you want to withdraw your application to "{{ listing.title }}"?\n\nThis action cannot be undone.')) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '{% url "applications:withdraw" pk=user_application.pk %}';
-        
-        const csrfToken = document.createElement('input');
-        csrfToken.type = 'hidden';
-        csrfToken.name = 'csrfmiddlewaretoken';
-        csrfToken.value = '{{ csrf_token }}';
-        
-        form.appendChild(csrfToken);
-        document.body.appendChild(form);
-        form.submit();
-    }
+    showConfirmModal({
+        title: 'Withdraw Application',
+        message: 'Are you sure you want to withdraw your application to "{{ listing.title }}"? This action cannot be undone.',
+        confirmText: 'Withdraw',
+        type: 'danger',
+        onConfirm: function() {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{% url "applications:withdraw" pk=user_application.pk %}';
+            
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = 'csrfmiddlewaretoken';
+            csrfToken.value = '{{ csrf_token }}';
+            
+            form.appendChild(csrfToken);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    });
 }
 {% endif %}
 
 // Delete Confirmation
 function confirmDelete() {
-    if (confirm('Are you sure you want to delete this listing? This action cannot be undone.')) {
-        // Create and submit delete form
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '{% url "listings:delete" pk=listing.pk %}';
-        
-        const csrfToken = document.createElement('input');
-        csrfToken.type = 'hidden';
-        csrfToken.name = 'csrfmiddlewaretoken';
-        csrfToken.value = '{{ csrf_token }}';
-        
-        form.appendChild(csrfToken);
-        document.body.appendChild(form);
-        form.submit();
-    }
+    showConfirmModal({
+        title: 'Delete Listing',
+        message: 'Are you sure you want to delete this listing? This action cannot be undone and all applications will be removed.',
+        confirmText: 'Delete',
+        type: 'danger',
+        onConfirm: function() {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{% url "listings:delete" pk=listing.pk %}';
+            
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = 'csrfmiddlewaretoken';
+            csrfToken.value = '{{ csrf_token }}';
+            
+            form.appendChild(csrfToken);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    });
 }
 
 // Close modal when clicking outside

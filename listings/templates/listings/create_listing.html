@@ -243,7 +243,7 @@ function addCustomInstrument() {
     const instrumentsGrid = instrumentsSection?.querySelector('.grid');
     
     if (!instrumentsGrid) {
-        alert('Could not find instruments grid.');
+        console.error('Could not find instruments grid.');
         return;
     }
     
@@ -251,7 +251,8 @@ function addCustomInstrument() {
     const existingLabels = Array.from(instrumentsGrid.querySelectorAll('span'))
         .map(span => span.textContent.trim());
     if (existingLabels.includes(value)) {
-        alert('This instrument already exists in the list.');
+        // Silently ignore duplicates - better UX than showing alert
+        input.value = '';
         return;
     }
     
@@ -313,7 +314,7 @@ function addCustomGenre() {
     const genresGrid = genresSection?.querySelector('.grid');
     
     if (!genresGrid) {
-        alert('Could not find genres grid.');
+        console.error('Could not find genres grid.');
         return;
     }
     
@@ -321,7 +322,8 @@ function addCustomGenre() {
     const existingLabels = Array.from(genresGrid.querySelectorAll('span'))
         .map(span => span.textContent.trim());
     if (existingLabels.includes(value)) {
-        alert('This genre already exists in the list.');
+        // Silently ignore duplicates - better UX than showing alert
+        input.value = '';
         return;
     }
     
@@ -423,8 +425,17 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Confirm navigation away from unsaved changes
     document.getElementById('cancelBtn').addEventListener('click', function(e) {
-        if (formChanged && !confirm('You have unsaved changes. Are you sure you want to cancel?')) {
+        if (formChanged) {
             e.preventDefault();
+            showConfirmModal({
+                title: 'Unsaved Changes',
+                message: 'You have unsaved changes. Are you sure you want to cancel? All changes will be lost.',
+                confirmText: 'Discard Changes',
+                type: 'warning',
+                onConfirm: function() {
+                    window.location.href = '{% url "listings:feed" %}';
+                }
+            });
         }
     });
     

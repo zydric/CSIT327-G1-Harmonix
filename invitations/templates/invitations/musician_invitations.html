@@ -224,33 +224,50 @@ function closeListingModal() {
 }
 
 function respondToInvitation(invitationId, response) {
-    if (!confirm(`Are you sure you want to ${response} this invitation?`)) {
-        return;
-    }
-
-    fetch('{% url "invitations:respond_invitation" %}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': '{{ csrf_token }}'
-        },
-        body: JSON.stringify({
-            invitation_id: invitationId,
-            response: response
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert(data.message);
-            location.reload(); // Refresh the page to show updated status
-        } else {
-            alert(data.error || 'An error occurred.');
+    const isAccept = response === 'accepted';
+    
+    showConfirmModal({
+        title: isAccept ? 'Accept Invitation' : 'Decline Invitation',
+        message: `Are you sure you want to ${response === 'accepted' ? 'accept' : 'decline'} this invitation?`,
+        confirmText: isAccept ? 'Accept' : 'Decline',
+        type: isAccept ? 'success' : 'warning',
+        onConfirm: function() {
+            fetch('{% url "invitations:respond_invitation" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    invitation_id: invitationId,
+                    response: response
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload(); // Refresh the page to show updated status
+                } else {
+                    showConfirmModal({
+                        title: 'Error',
+                        message: data.error || 'An error occurred.',
+                        confirmText: 'OK',
+                        type: 'danger',
+                        onConfirm: function() {}
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showConfirmModal({
+                    title: 'Error',
+                    message: 'An error occurred while responding to the invitation.',
+                    confirmText: 'OK',
+                    type: 'danger',
+                    onConfirm: function() {}
+                });
+            });
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while responding to the invitation.');
     });
 }
 

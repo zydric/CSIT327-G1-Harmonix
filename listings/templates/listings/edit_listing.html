@@ -273,9 +273,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Cancel button confirmation
     document.getElementById('cancelBtn').addEventListener('click', function(e) {
         if (formChanged) {
-            if (!confirm('You have unsaved changes. Are you sure you want to cancel?')) {
-                e.preventDefault();
-            }
+            e.preventDefault();
+            showConfirmModal({
+                title: 'Unsaved Changes',
+                message: 'You have unsaved changes. Are you sure you want to cancel? All changes will be lost.',
+                confirmText: 'Discard Changes',
+                type: 'warning',
+                onConfirm: function() {
+                    window.location.href = '{% url \"listings:detail\" pk=listing.pk %}';
+                }
+            });
         }
     });
     
