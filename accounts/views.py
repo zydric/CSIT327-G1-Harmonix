@@ -8,6 +8,7 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 import re
 from django.utils.http import urlsafe_base64_decode
+from .locations import is_valid_location, search_locations
 from django.utils.encoding import force_str
 from .forms import PasswordResetRequestForm, SetPasswordForm
 from .emails import send_password_reset_email
@@ -263,9 +264,9 @@ def band_profile_view(request):
                 messages.error(request, 'This username is already taken.')
                 return render(request, 'accounts/band_profile.html', {'user': user})
         
-        # Validate location format if provided
-        if new_location and not is_valid_location_format(new_location):
-            messages.error(request, 'Please enter location in the format: City, Country (e.g., Cebu, Philippines)')
+        # Validate location using predefined location data
+        if new_location and not is_valid_location(new_location):
+            messages.error(request, 'Please enter a valid location from the suggested options (e.g., Cebu, Philippines)')
             return render(request, 'accounts/band_profile.html', {'user': user})
 
         try:
@@ -307,9 +308,9 @@ def musician_profile_view(request):
                 messages.error(request, 'This username is already taken.')
                 return render(request, 'accounts/musician_profile.html', {'user': user})
         
-        # Validate location format if provided
-        if new_location and not is_valid_location_format(new_location):
-            messages.error(request, 'Please enter location in the format: City, Country (e.g., Cebu, Philippines)')
+        # Validate location using predefined location data
+        if new_location and not is_valid_location(new_location):
+            messages.error(request, 'Please enter a valid location from the suggested options (e.g., Cebu, Philippines)')
             return render(request, 'accounts/musician_profile.html', {'user': user})
 
         try:
@@ -429,28 +430,7 @@ def validate_registration_data(username, email, password1, password2, role, sele
     
     return field_errors
 
-# Location Validation
-def is_valid_location_format(location):
-    """
-    Validate location format: City, Country
-    """
-    if not location or location.strip() == '':
-        return True  # Empty is okay
-    
-    # Check for "City, Country" format
-    parts = location.split(',')
-    if len(parts) != 2:
-        return False
-    
-    city = parts[0].strip()
-    country = parts[1].strip()
-    
-    # Both parts should be non-empty and contain only valid characters
-    valid_name_pattern = re.compile(r'^[a-zA-Z\s\-.\'()]+$')
-    
-    return (city and country and 
-            valid_name_pattern.match(city) and 
-            valid_name_pattern.match(country))
+
 
 # Password Reset Views
 @csrf_protect
@@ -529,3 +509,30 @@ def password_reset_complete(request):
     Show confirmation that password has been reset successfully.
     """
     return render(request, 'accounts/password_reset_complete.html')
+
+# ==============================================
+# Location Search API
+# ==============================================
+from django.http import JsonResponse
+
+def location_search_api(request):
+    #GETS request from JavaScript API call
+    # Only accept GET requests
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Extracts and validate query parameters
+    query = request.GET.get('q', '').strip()
+    limit = min(int(request.GET.get('limit', 10)), 20)  # Cap at 20 results
+    
+    # Basic Validation
+    if not query or len(query) < 2:
+        return JsonResponse({'locations': []})
+    
+    # Calls the search function (delegates to locations.py)
+    matching_locations = search_locations(query, limit=limit)
+    
+    return JsonResponse({
+        'locations': matching_locations,
+        'count': len(matching_locations)
+    })
