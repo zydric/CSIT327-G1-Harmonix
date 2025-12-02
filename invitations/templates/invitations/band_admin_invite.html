@@ -4,12 +4,11 @@
 {% block title %}Browse Musicians - Harmonix{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <div class="max-w-5xl mx-auto">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Header -->
         <div class="mb-8">
-            <h1 class="text-4xl font-bold text-gray-900">Browse Musicians</h1>
-            <p class="text-gray-600 mt-2">Showing {{ musicians|length }} musicians</p>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Browse Musicians</h1>
+            <p class="text-gray-600">Showing {{ musicians|length }} musicians</p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -26,7 +25,7 @@
                         {% if user.instruments %}
                         <div class="flex flex-wrap gap-1">
                             {% for instrument in user.instruments_list %}
-                            <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">{{ instrument }}</span>
+                            <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">{{ instrument }}</span>
                             {% endfor %}
                         </div>
                         {% endif %}
@@ -145,13 +144,13 @@
                 <div class="mb-6 flex items-center space-x-3">
                     <span class="text-sm text-gray-600 font-medium">Sort by:</span>
                     <div class="flex space-x-2">
-                        <button onclick="sortMusicians('alphabetical')" id="sortAlphabetical"
-                            class="px-4 py-2 text-sm font-medium rounded-lg border transition-colors bg-white text-gray-700 border-gray-300 hover:bg-gray-50">
-                            A-Z
-                        </button>
                         <button onclick="sortMusicians('newest')" id="sortNewest"
                             class="px-4 py-2 text-sm font-medium rounded-lg border transition-colors bg-[#4F2FC0] text-white border-[#4F2FC0]">
                             Newest
+                        </button>
+                        <button onclick="sortMusicians('oldest')" id="sortOldest"
+                            class="px-4 py-2 text-sm font-medium rounded-lg border transition-colors bg-white text-gray-700 border-gray-300 hover:bg-gray-50">
+                            Oldest
                         </button>
                     </div>
                 </div>
@@ -205,14 +204,10 @@
                 <div class="flex items-start gap-4 mb-4">
                     <!-- Avatar -->
                     <div class="flex-shrink-0">
-                        {% if musician.profile_picture %}
-                        <img src="{{ musician.profile_picture }}" alt="{{ musician.username }}"
-                            class="w-12 h-12 rounded-full object-cover">
-                        {% else %}
-                        <div class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center">
-                            <span class="text-gray-600 font-semibold">{{ musician.username|first|upper }}</span>
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-lg" 
+                             style="background-color: {{ musician.get_avatar_color }}">
+                            {{ musician.get_avatar_initial }}
                         </div>
-                        {% endif %}
                     </div>
                     <!-- Name & Handle -->
                     <div class="flex-1 min-w-0">
@@ -224,12 +219,9 @@
                 <!-- Location -->
                 {% if musician.location %}
                 <div class="flex items-center text-gray-600 mb-4">
-                    <svg class="h-4 w-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
-                        </path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <svg class="h-4 w-4 mr-2 flex-shrink-0 text-[#4F2FC0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                     </svg>
                     <span class="text-sm">{{ musician.location }}</span>
                 </div>
@@ -239,11 +231,16 @@
                 {% if musician.instruments_list %}
                 <div class="mb-3">
                     <div class="flex flex-wrap gap-1">
-                        {% for instrument in musician.instruments_list %}
-                        <span class="inline-block bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-xs font-medium">
+                        {% for instrument in musician.instruments_list|slice:":2" %}
+                        <span class="inline-block bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs font-medium">
                             {{ instrument }}
                         </span>
                         {% endfor %}
+                        {% if musician.instruments_list|length > 2 %}
+                        <span class="inline-block bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs font-medium">
+                            +{{ musician.instruments_list|length|add:"-2" }} more
+                        </span>
+                        {% endif %}
                     </div>
                 </div>
                 {% endif %}
@@ -252,11 +249,16 @@
                 {% if musician.genres_list %}
                 <div class="mb-4">
                     <div class="flex flex-wrap gap-1">
-                        {% for genre in musician.genres_list %}
-                        <span class="inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-medium">
+                        {% for genre in musician.genres_list|slice:":2" %}
+                        <span class="inline-block bg-purple-100 text-[#4F2FC0] px-2 py-0.5 rounded text-xs font-medium">
                             {{ genre }}
                         </span>
                         {% endfor %}
+                        {% if musician.genres_list|length > 2 %}
+                        <span class="inline-block bg-purple-100 text-[#4F2FC0] px-2 py-0.5 rounded text-xs font-medium">
+                            +{{ musician.genres_list|length|add:"-2" }} more
+                        </span>
+                        {% endif %}
                     </div>
                 </div>
                 {% endif %}
@@ -300,10 +302,10 @@
                 </div>
                 {% endif %}
 
-                <!-- View Profile & Invite Button -->
+                <!-- Invite Button -->
                 <button onclick="openInviteModal({{ musician.id }}, '{{ musician.username|escapejs }}')"
                     class="w-full bg-[#4F2FC0] text-white px-4 py-2 rounded-md font-medium hover:bg-[#3d1fa0] focus:outline-none focus:ring-2 focus:ring-[#4F2FC0] mt-auto">
-                    View Profile & Invite
+                    Invite
                 </button>
             </div>
                         {% endfor %}
@@ -383,6 +385,16 @@
         <div class="p-8 flex flex-col h-full bg-white overflow-y-auto">
             <h3 class="text-2xl font-semibold text-gray-900 mb-6">Send Invitation</h3>
             
+            <!-- Error Message -->
+            <div id="inviteError" class="mb-4 hidden p-3 bg-red-50 border border-red-200 rounded-lg">
+                <div class="flex items-start">
+                    <svg class="w-5 h-5 text-red-600 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                    </svg>
+                    <p id="inviteErrorText" class="text-sm text-red-800"></p>
+                </div>
+            </div>
+
             <div class="mb-6">
                 <label class="block text-sm font-medium text-gray-900 mb-2">Select Your Band Listing:</label>
                 <select id="listingSelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F2FC0]">
@@ -522,31 +534,30 @@
         currentMusicianId = null;
         currentMusicianData = null;
         document.getElementById('inviteModal').classList.add('hidden');
+        // Clear error message
+        document.getElementById('inviteError').classList.add('hidden');
+        document.getElementById('inviteErrorText').textContent = '';
     }
 
     function sendInvitation() {
         const listingId = document.getElementById('listingSelect').value;
         const message = document.getElementById('inviteMessage').value.trim();
+        const errorDiv = document.getElementById('inviteError');
+        const errorText = document.getElementById('inviteErrorText');
+
+        // Hide previous errors
+        errorDiv.classList.add('hidden');
 
         if (!listingId) {
-            showConfirmModal({
-                title: 'Missing Information',
-                message: 'Please select a listing first.',
-                confirmText: 'OK',
-                type: 'warning',
-                onConfirm: function() {}
-            });
+            errorText.textContent = 'Please select a listing first.';
+            errorDiv.classList.remove('hidden');
+            document.getElementById('listingSelect').focus();
             return;
         }
 
         if (!currentMusicianId) {
-            showConfirmModal({
-                title: 'Error',
-                message: 'No musician selected.',
-                confirmText: 'OK',
-                type: 'danger',
-                onConfirm: function() {}
-            });
+            errorText.textContent = 'No musician selected. Please try again.';
+            errorDiv.classList.remove('hidden');
             return;
         }
 
@@ -566,35 +577,17 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    showConfirmModal({
-                        title: 'Success!',
-                        message: data.message,
-                        confirmText: 'OK',
-                        type: 'success',
-                        onConfirm: function() {
-                            closeInviteModal();
-                            location.reload();
-                        }
-                    });
+                    closeInviteModal();
+                    location.reload();
                 } else {
-                    showConfirmModal({
-                        title: 'Error',
-                        message: data.error || 'An error occurred while sending the invitation.',
-                        confirmText: 'OK',
-                        type: 'danger',
-                        onConfirm: function() {}
-                    });
+                    errorText.textContent = data.error || 'An error occurred while sending the invitation.';
+                    errorDiv.classList.remove('hidden');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                showConfirmModal({
-                    title: 'Error',
-                    message: 'An error occurred while sending the invitation.',
-                    confirmText: 'OK',
-                    type: 'danger',
-                    onConfirm: function() {}
-                });
+                errorText.textContent = 'An error occurred while sending the invitation. Please try again.';
+                errorDiv.classList.remove('hidden');
             });
     }
 
@@ -655,33 +648,37 @@
         document.getElementById('musiciansGrid').classList.remove('hidden');
     }
 
+    let originalMusicianOrder = [];
+    
     function sortMusicians(sortType) {
         currentSort = sortType;
         const grid = document.getElementById('musiciansGrid');
         if (!grid) return;
         
-        const musicians = Array.from(grid.querySelectorAll('[data-musician-id]'));
+        // Store original order on first call
+        if (originalMusicianOrder.length === 0) {
+            originalMusicianOrder = Array.from(grid.querySelectorAll('[data-musician-id]'));
+        }
         
-        musicians.sort((a, b) => {
-            if (sortType === 'alphabetical') {
-                const nameA = a.querySelector('h3')?.textContent.toLowerCase() || '';
-                const nameB = b.querySelector('h3')?.textContent.toLowerCase() || '';
-                return nameA.localeCompare(nameB);
-            }
-            // For 'newest', keep original order (reverse to get newest first)
-            return 0;
-        });
+        let musicians;
+        if (sortType === 'oldest') {
+            // Reverse of original order for oldest first
+            musicians = [...originalMusicianOrder].reverse();
+        } else {
+            // Use original order for newest
+            musicians = [...originalMusicianOrder];
+        }
         
         // Clear grid and re-append sorted musicians
         grid.innerHTML = '';
         musicians.forEach(musician => grid.appendChild(musician));
         
         // Update button styles
-        document.getElementById('sortAlphabetical').className = sortType === 'alphabetical' 
+        document.getElementById('sortNewest').className = sortType === 'newest'
             ? 'px-4 py-2 text-sm font-medium rounded-lg border transition-colors bg-[#4F2FC0] text-white border-[#4F2FC0]'
             : 'px-4 py-2 text-sm font-medium rounded-lg border transition-colors bg-white text-gray-700 border-gray-300 hover:bg-gray-50';
         
-        document.getElementById('sortNewest').className = sortType === 'newest'
+        document.getElementById('sortOldest').className = sortType === 'oldest'
             ? 'px-4 py-2 text-sm font-medium rounded-lg border transition-colors bg-[#4F2FC0] text-white border-[#4F2FC0]'
             : 'px-4 py-2 text-sm font-medium rounded-lg border transition-colors bg-white text-gray-700 border-gray-300 hover:bg-gray-50';
     }

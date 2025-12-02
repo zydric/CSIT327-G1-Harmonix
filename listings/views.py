@@ -52,8 +52,8 @@ def listings_view(request):
             listings = listings.filter(location__icontains=location_filter)
 
         # Apply sorting
-        if sort_by == 'alphabetical':
-            listings = listings.order_by('title')
+        if sort_by == 'oldest':
+            listings = listings.order_by('created_at')
         elif sort_by == 'positions':
             # Sort by number of instruments (most positions first)
             # This requires fetching all and sorting in Python since we can't easily do this in SQL
@@ -77,8 +77,8 @@ def listings_view(request):
         listings = Listing.objects.filter(band_admin=user)
         
         # Apply sorting for band admins too
-        if sort_by == 'alphabetical':
-            listings = listings.order_by('title')
+        if sort_by == 'oldest':
+            listings = listings.order_by('created_at')
         else:  # Default to newest
             listings = listings.order_by('-created_at')
             

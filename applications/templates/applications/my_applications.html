@@ -73,13 +73,13 @@
         <!-- Applications List -->
         <div class="space-y-6" id="applicationsList">
             {% for application in applications %}
-            <div class="application-card rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200
+            <div class="application-card rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200 {% if application.status == 'pending' %}border-l-[6px] border-l-amber-300{% elif application.status == 'accepted' %}border-l-[6px] border-l-green-300{% elif application.status == 'rejected' %}border-l-[6px] border-l-red-300{% elif application.status == 'draft' %}border-l-[6px] border-l-gray-300{% endif %}
                 {% if application.status == 'draft' %}bg-gray-50
                 {% else %}bg-white{% endif %}" 
                 data-status="{{ application.status }}">
                 
                 <!-- Card Content -->
-                <div class="p-6 {% if application.status == 'pending' %}border-t-[6px] border-t-amber-500 rounded-t-lg{% elif application.status == 'accepted' %}border-t-[6px] border-t-green-500 rounded-t-lg{% elif application.status == 'rejected' %}border-t-[6px] border-t-red-500 rounded-t-lg{% endif %}">
+                <div class="p-6">
                     <div class="flex items-start gap-3">
                         <!-- Avatar -->
                         <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0" 
@@ -109,10 +109,10 @@
                             {% if application.listing.instruments_list %}
                             <div class="flex flex-wrap gap-1 mt-2">
                                 {% for instrument in application.listing.instruments_list|slice:":2" %}
-                                <span class="inline-block bg-white text-gray-700 px-2 py-0.5 rounded text-xs border border-gray-200">{{ instrument }}</span>
+                                <span class="inline-block bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs">{{ instrument }}</span>
                                 {% endfor %}
                                 {% if application.listing.instruments_list|length > 2 %}
-                                <span class="inline-block bg-white text-gray-700 px-2 py-0.5 rounded text-xs border border-gray-200">+{{ application.listing.instruments_list|length|add:"-2" }}</span>
+                                <span class="inline-block bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs">+{{ application.listing.instruments_list|length|add:"-2" }} more</span>
                                 {% endif %}
                             </div>
                             {% endif %}

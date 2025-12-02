@@ -15,7 +15,6 @@
         <div class="bg-white rounded-lg border border-gray-200 p-5">
             <p class="text-sm text-[#4F2FC0] font-medium">Active Listings</p>
             <p class="text-4xl font-bold text-gray-900 mt-1">{{ stats.active_listings }}</p>
-            <p class="text-sm text-gray-500 mt-1">Open positions</p>
         </div>
         <div class="bg-white rounded-lg border border-gray-200 p-5">
             <p class="text-sm text-[#4F2FC0] font-medium">Applications</p>
@@ -84,10 +83,10 @@
                                     <!-- Instruments and Genres -->
                                     <div class="flex flex-wrap gap-1 mt-2">
                                         {% for instrument in listing.instruments_list|slice:":2" %}
-                                        <span class="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs">{{ instrument }}</span>
+                                        <span class="inline-block bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs">{{ instrument }}</span>
                                         {% endfor %}
                                         {% if listing.instruments_list|length > 2 %}
-                                        <span class="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs">+{{ listing.instruments_list|length|add:"-2" }}</span>
+                                        <span class="inline-block bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs">+{{ listing.instruments_list|length|add:"-2" }}</span>
                                         {% endif %}
                                     </div>
                                     
@@ -152,10 +151,10 @@
                                     {% if invitation.musician.instruments_list %}
                                     <div class="flex flex-wrap gap-1 mt-2">
                                         {% for instrument in invitation.musician.instruments_list|slice:":2" %}
-                                        <span class="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs">{{ instrument }}</span>
+                                        <span class="inline-block bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs">{{ instrument }}</span>
                                         {% endfor %}
                                         {% if invitation.musician.instruments_list|length > 2 %}
-                                        <span class="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs">+{{ invitation.musician.instruments_list|length|add:"-2" }}</span>
+                                        <span class="inline-block bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs">+{{ invitation.musician.instruments_list|length|add:"-2" }}</span>
                                         {% endif %}
                                     </div>
                                     {% endif %}

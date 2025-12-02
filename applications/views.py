@@ -111,7 +111,7 @@ def update_application_status(request, pk):
         else:
             messages.error(request, "Invalid status provided.")
     
-    return redirect('listings:detail', pk=application.listing.pk)
+    return redirect('applications:my_applications')
 
 
 @login_required

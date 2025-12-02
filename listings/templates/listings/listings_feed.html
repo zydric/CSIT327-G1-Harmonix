@@ -30,7 +30,7 @@
                         {% if user.instruments %}
                         <div class="flex flex-wrap gap-1">
                             {% for instrument in user.instruments_list %}
-                            <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">{{ instrument }}</span>
+                            <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">{{ instrument }}</span>
                             {% endfor %}
                         </div>
                         {% endif %}
@@ -141,17 +141,6 @@
                                 {% endif %}
                             </p>
                         </div>
-                        
-                        {% if is_band_admin %}
-                        <!-- Create Listing Button for Band Admins -->
-                        <a href="{% url 'listings:create' %}" 
-                           class="px-6 py-2 bg-[#4F2FC0] text-white rounded-lg font-medium hover:bg-[#3f24a0] transition-colors flex items-center">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-                            Create Listing
-                        </a>
-                        {% endif %}
                     </div>
                 </div>
 
@@ -176,23 +165,36 @@
                 </div>
                 {% endif %}
 
-                <!-- Sort Buttons -->
-                <div class="mb-6 flex items-center space-x-3">
+                <!-- Sort Buttons and Create Listing -->
+                <div class="mb-6 flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
                     <span class="text-sm text-gray-600 font-medium">Sort by:</span>
                     <div class="flex space-x-2">
-                        <a href="?{% if current_filters.search %}search={{ current_filters.search }}&{% endif %}{% if current_filters.genre %}genre={{ current_filters.genre }}&{% endif %}{% if current_filters.instrument %}instrument={{ current_filters.instrument }}&{% endif %}sort=alphabetical{% if page_obj.number > 1 %}&page={{ page_obj.number }}{% endif %}" 
-                           class="px-4 py-2 text-sm font-medium rounded-lg border transition-colors {% if current_filters.sort == 'alphabetical' %}bg-[#4F2FC0] text-white border-[#4F2FC0]{% else %}bg-white text-gray-700 border-gray-300 hover:bg-gray-50{% endif %}">
-                            A-Z
-                        </a>
                         <a href="?{% if current_filters.search %}search={{ current_filters.search }}&{% endif %}{% if current_filters.genre %}genre={{ current_filters.genre }}&{% endif %}{% if current_filters.instrument %}instrument={{ current_filters.instrument }}&{% endif %}sort=newest{% if page_obj.number > 1 %}&page={{ page_obj.number }}{% endif %}" 
                            class="px-4 py-2 text-sm font-medium rounded-lg border transition-colors {% if current_filters.sort == 'newest' or not current_filters.sort %}bg-[#4F2FC0] text-white border-[#4F2FC0]{% else %}bg-white text-gray-700 border-gray-300 hover:bg-gray-50{% endif %}">
                             Newest
+                        </a>
+                        <a href="?{% if current_filters.search %}search={{ current_filters.search }}&{% endif %}{% if current_filters.genre %}genre={{ current_filters.genre }}&{% endif %}{% if current_filters.instrument %}instrument={{ current_filters.instrument }}&{% endif %}sort=oldest{% if page_obj.number > 1 %}&page={{ page_obj.number }}{% endif %}" 
+                           class="px-4 py-2 text-sm font-medium rounded-lg border transition-colors {% if current_filters.sort == 'oldest' %}bg-[#4F2FC0] text-white border-[#4F2FC0]{% else %}bg-white text-gray-700 border-gray-300 hover:bg-gray-50{% endif %}">
+                            Oldest
                         </a>
                         <a href="?{% if current_filters.search %}search={{ current_filters.search }}&{% endif %}{% if current_filters.genre %}genre={{ current_filters.genre }}&{% endif %}{% if current_filters.instrument %}instrument={{ current_filters.instrument }}&{% endif %}sort=positions{% if page_obj.number > 1 %}&page={{ page_obj.number }}{% endif %}" 
                            class="px-4 py-2 text-sm font-medium rounded-lg border transition-colors {% if current_filters.sort == 'positions' %}bg-[#4F2FC0] text-white border-[#4F2FC0]{% else %}bg-white text-gray-700 border-gray-300 hover:bg-gray-50{% endif %}">
                             Most Positions
                         </a>
                     </div>
+                    </div>
+                    
+                    {% if is_band_admin %}
+                    <!-- Create Listing Button for Band Admins -->
+                    <a href="{% url 'listings:create' %}" 
+                       class="px-6 py-2 bg-[#4F2FC0] text-white rounded-lg font-medium hover:bg-[#3f24a0] transition-colors flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Create Listing
+                    </a>
+                    {% endif %}
                 </div>
 
                 <!-- Listings Feed -->
@@ -246,16 +248,16 @@
                         <!-- Description -->
                         <p class="text-sm text-gray-700 mb-4 line-clamp-2">{{ listing.description|truncatechars:120 }}</p>
 
-                        <!-- Badges: Genres (max 3 visible) -->
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            {% for genre in listing.genres_list|slice:":3" %}
-                                <span class="px-2 py-1 bg-purple-100 text-[#4F2FC0] rounded-full text-xs font-medium">
+                        <!-- Badges: Genres (max 2 visible) -->
+                        <div class="flex flex-wrap gap-1 mb-4">
+                            {% for genre in listing.genres_list|slice:":2" %}
+                                <span class="px-2 py-0.5 bg-purple-100 text-[#4F2FC0] rounded text-xs font-medium">
                                     {{ genre }}
                                 </span>
                             {% endfor %}
-                            {% if listing.genres_list|length > 3 %}
-                                <span class="text-xs text-gray-500 font-medium self-center">
-                                    +{{ listing.genres_list|length|add:"-3" }} more
+                            {% if listing.genres_list|length > 2 %}
+                                <span class="px-2 py-0.5 bg-purple-100 text-[#4F2FC0] rounded text-xs font-medium">
+                                    +{{ listing.genres_list|length|add:"-2" }} more
                                 </span>
                             {% endif %}
                         </div>
@@ -264,24 +266,24 @@
                         <div class="flex items-center gap-4 text-xs text-gray-500">
                             <!-- Instruments (max 2 badges) -->
                             <div class="flex items-center gap-1">
-                                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 text-blue-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
                                 </svg>
                                 <div class="flex flex-wrap gap-1">
                                     {% for instrument in listing.instruments_list|slice:":2" %}
-                                    <span class="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs">{{ instrument }}</span>
+                                    <span class="inline-block bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs">{{ instrument }}</span>
                                     {% endfor %}
                                     {% if listing.instruments_list|length > 2 %}
-                                    <span class="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs">+{{ listing.instruments_list|length|add:"-2" }}</span>
+                                    <span class="inline-block bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs">+{{ listing.instruments_list|length|add:"-2" }}</span>
                                     {% endif %}
                                 </div>
                             </div>
 
                             <!-- Location -->
                             <div class="flex items-center gap-1">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                                 </svg>
                                 <span>{{ listing.location|truncatechars:20 }}</span>
                             </div>
@@ -301,33 +303,7 @@
                             {% endif %}
                         </div>
 
-                        <!-- Recent Applications (Only shown for band admin's own listings) -->
-                        {% if is_band_admin and listing.band_admin == user %}
-                        {% with applications=listing.applications.all|slice:":3" %}
-                        {% if applications %}
-                        <div class="mt-6 pt-6 border-t border-gray-200">
-                            <h4 class="font-semibold text-base mb-4 text-gray-800">Recent Applications</h4>
-                            <div class="space-y-3">
-                                {% for application in applications %}
-                                <div class="flex items-center justify-between px-3 py-3 bg-gray-50 rounded-lg border border-gray-200" onclick="event.preventDefault();">
-                                    <div class="flex-1">
-                                        <p class="font-medium text-gray-900 text-sm">{{ application.musician.username }}</p>
-                                        <p class="text-xs text-gray-600 mt-1">{{ application.message|truncatewords:15 }}</p>
-                                        <p class="text-xs text-gray-500 mt-1">Applied {{ application.created_at|date:"M d, Y" }}</p>
-                                    </div>
-                                    <span class="px-3 py-1 text-xs font-medium rounded-full 
-                                        {% if application.status == 'accepted' %}bg-green-100 text-green-700
-                                        {% elif application.status == 'rejected' %}bg-red-100 text-red-700
-                                        {% else %}bg-gray-100 text-gray-700{% endif %}">
-                                        {{ application.status }}
-                                    </span>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        {% endif %}
-                        {% endwith %}
-                        {% endif %}
+
                     </a>
                     {% empty %}
                     <!-- Empty State -->
