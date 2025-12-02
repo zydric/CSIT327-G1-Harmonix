@@ -173,9 +173,19 @@
                     </div>
                 </div>
                 {% else %}
-                <!-- Musicians Grid -->
-                <div id="musiciansGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {% for musician in musicians %}
+                    {% if musicians %}
+                    <!-- No Results Message (shown by JavaScript when filters hide all musicians) -->
+                    <div id="noResultsMessage" class="hidden bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+                        <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">No musicians match your filters</h3>
+                        <p class="text-gray-500">Try adjusting your search or filter criteria to see more results.</p>
+                    </div>
+
+                    <!-- Musicians Grid -->
+                    <div id="musiciansGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {% for musician in musicians %}
             <div
                 class="bg-white rounded-lg shadow-md border border-gray-200 p-6 flex flex-col h-full hover:shadow-lg transition-shadow"
                 data-musician-id="{{ musician.id }}"
@@ -294,17 +304,18 @@
                     View Profile & Invite
                 </button>
             </div>
-            {% empty %}
-            <!-- Empty State -->
-            <div class="col-span-full bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-                <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                </svg>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">No musicians found</h3>
-                <p class="text-gray-500">Try adjusting your filters or search terms to find more musicians.</p>
-            </div>
-            {% endfor %}
-        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <!-- Empty State -->
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+                        <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">No musicians found</h3>
+                        <p class="text-gray-500">There are currently no musicians available to invite.</p>
+                    </div>
+                    {% endif %}
         {% endif %}
     </div>
 </div>
@@ -570,6 +581,7 @@
         const filterLocation = document.getElementById('filterLocation').value.toLowerCase();
         const musicians = document.querySelectorAll('#musiciansGrid > div');
         
+        let visibleCount = 0;
         musicians.forEach(musician => {
             const text = musician.textContent.toLowerCase();
             const matchesSearch = searchTerm === '' || text.includes(searchTerm);
@@ -579,10 +591,22 @@
             
             if (matchesSearch && matchesInstrument && matchesGenre && matchesLocation) {
                 musician.style.display = 'block';
+                visibleCount++;
             } else {
                 musician.style.display = 'none';
             }
         });
+        
+        // Show/hide no results message
+        const noResultsMsg = document.getElementById('noResultsMessage');
+        const musiciansGrid = document.getElementById('musiciansGrid');
+        if (visibleCount === 0) {
+            noResultsMsg.classList.remove('hidden');
+            musiciansGrid.classList.add('hidden');
+        } else {
+            noResultsMsg.classList.add('hidden');
+            musiciansGrid.classList.remove('hidden');
+        }
     }
 
     function clearFilters() {
@@ -591,6 +615,10 @@
         document.getElementById('filterGenre').value = '';
         document.getElementById('filterLocation').value = '';
         applyMusicianFilters();
+        
+        // Ensure grid is visible and no results message is hidden
+        document.getElementById('noResultsMessage').classList.add('hidden');
+        document.getElementById('musiciansGrid').classList.remove('hidden');
     }
 
     function sortMusicians(sortType) {
