@@ -23,6 +23,7 @@ def listings_view(request):
     search_query = request.GET.get('search', '')
     genre_filter = request.GET.get('genre', '')
     instrument_filter = request.GET.get('instrument', '')
+    location_filter = request.GET.get('location', '')
     sort_by = request.GET.get('sort', 'newest')  # Default to newest
     
     if user.is_musician:
@@ -46,6 +47,9 @@ def listings_view(request):
             # Convert filter value to proper case for matching
             instrument_display = dict(Listing.INSTRUMENT_CHOICES).get(instrument_filter, instrument_filter)
             listings = listings.filter(instruments_needed__icontains=instrument_display)
+        
+        if location_filter:
+            listings = listings.filter(location__icontains=location_filter)
 
         # Apply sorting
         if sort_by == 'alphabetical':
@@ -87,6 +91,7 @@ def listings_view(request):
             'search': search_query,
             'genre': genre_filter,
             'instrument': instrument_filter,
+            'location': location_filter,
             'sort': sort_by,
         },
         'page_obj': page_obj,  # Add page object for pagination controls

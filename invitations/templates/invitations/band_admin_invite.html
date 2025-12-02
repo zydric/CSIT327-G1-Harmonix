@@ -38,8 +38,7 @@
                     {% endif %}
                 </div>
 
-                {% if user.is_band_admin %}
-                <!-- Filters Card (Only for Musicians) -->
+                <!-- Filters Card -->
                 <div class="bg-white rounded-lg shadow-sm p-6">
                     <div class="flex items-center mb-4">
                         <svg class="w-5 h-5 text-gray-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -48,26 +47,29 @@
                         <h3 class="font-semibold text-gray-900">Filters</h3>
                     </div>
                     
-                    <form method="GET" action="{% url 'listings:feed' %}" class="space-y-4" id="filterForm">
-                        <!-- Search -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Search</label>
-                            <input type="text" name="search" value="{{ current_filters.search }}" 
-                                   placeholder="Search listings..." 
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#4F2FC0] focus:border-transparent">
-                        </div>
-
+                    <div class="space-y-4">
                         <!-- Genre Filter -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Genre</label>
                             <div class="relative">
-                                <select name="genre" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#4F2FC0] focus:border-transparent appearance-none bg-white pr-8">
+                                <select id="filterGenre" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#4F2FC0] focus:border-transparent appearance-none bg-white pr-8">
                                     <option value="">All genres</option>
-                                    {% for key, display in filter_options.genres %}
-                                    <option value="{{ key }}" {% if current_filters.genre == key %}selected{% endif %}>{{ display }}</option>
-                                    {% endfor %}
+                                    <option value="rock">Rock</option>
+                                    <option value="pop">Pop</option>
+                                    <option value="indie">Indie</option>
+                                    <option value="hip-hop">Hip-Hop</option>
+                                    <option value="electronic">Electronic</option>
+                                    <option value="jazz">Jazz</option>
+                                    <option value="blues">Blues</option>
+                                    <option value="metal">Metal</option>
+                                    <option value="punk">Punk</option>
+                                    <option value="alternative">Alternative</option>
+                                    <option value="folk">Folk</option>
+                                    <option value="country">Country</option>
+                                    <option value="r&b">R&B</option>
+                                    <option value="classical">Classical</option>
+                                    <option value="opm">OPM</option>
                                 </select>
-                                <!-- Custom dropdown arrow -->
                                 <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
                                     <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -80,13 +82,19 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Instrument</label>
                             <div class="relative">
-                                <select name="instrument" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#4F2FC0] focus:border-transparent appearance-none bg-white pr-8">
+                                <select id="filterInstrument" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#4F2FC0] focus:border-transparent appearance-none bg-white pr-8">
                                     <option value="">All instruments</option>
-                                    {% for key, display in filter_options.instruments %}
-                                    <option value="{{ key }}" {% if current_filters.instrument == key %}selected{% endif %}>{{ display }}</option>
-                                    {% endfor %}
+                                    <option value="guitar">Guitar</option>
+                                    <option value="bass">Bass</option>
+                                    <option value="drums">Drums</option>
+                                    <option value="piano">Piano</option>
+                                    <option value="vocals">Vocals</option>
+                                    <option value="keyboard">Keyboard</option>
+                                    <option value="violin">Violin</option>
+                                    <option value="saxophone">Saxophone</option>
+                                    <option value="trumpet">Trumpet</option>
+                                    <option value="percussion">Percussion</option>
                                 </select>
-                                <!-- Custom dropdown arrow -->
                                 <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
                                     <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -95,33 +103,54 @@
                             </div>
                         </div>
 
-                        <!-- Filter Buttons -->
+                        <!-- Location Filter -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                            <input type="text" 
+                                   id="filterLocation"
+                                   placeholder="Enter city or area..."
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#4F2FC0] focus:border-transparent">
+                        </div>
+
                         <div class="space-y-2">
-                            <button type="submit" class="w-full px-4 py-2 bg-[#4F2FC0] text-white rounded-md text-sm font-medium hover:bg-[#3f24a0] transition-colors">
+                            <button onclick="applyMusicianFilters()" class="w-full px-4 py-2 bg-[#4F2FC0] text-white rounded-md text-sm font-medium hover:bg-[#3f24a0] transition-colors">
                                 Apply Filters
                             </button>
-                            <a href="{% url 'listings:feed' %}" class="block w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-md text-sm font-medium text-center hover:bg-gray-200 transition-colors">
+                            <button onclick="clearFilters()" class="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-200 transition-colors">
                                 Clear Filters
-                            </a>
+                            </button>
                         </div>
-                    </form>
+                    </div>
                 </div>
-                {% endif %}
             </div>
 
-            <!-- Right content -->
+            <!-- Main Content Area -->
             <div class="lg:col-span-3">
+                <!-- Search Bar -->
+                <div class="mb-8">
+                    <div class="relative">
+                        <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <input type="text" 
+                               id="searchMusicians"
+                               placeholder="Search by musician name, instrument, or genre..."
+                               class="w-full pl-12 pr-4 py-4 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F2FC0] focus:border-transparent transition-all">
+                    </div>
+                </div>
+
+                <!-- Sort Buttons -->
                 <div class="mb-6 flex items-center space-x-3">
                     <span class="text-sm text-gray-600 font-medium">Sort by:</span>
                     <div class="flex space-x-2">
-                        <a href="?{% if current_filters.search %}search={{ current_filters.search }}&{% endif %}{% if current_filters.genre %}genre={{ current_filters.genre }}&{% endif %}{% if current_filters.instrument %}instrument={{ current_filters.instrument }}&{% endif %}sort=alphabetical{% if page_obj.number > 1 %}&page={{ page_obj.number }}{% endif %}"
-                            class="px-4 py-2 text-sm font-medium rounded-lg border transition-colors {% if current_filters.sort == 'alphabetical' %}bg-[#4F2FC0] text-white border-[#4F2FC0]{% else %}bg-white text-gray-700 border-gray-300 hover:bg-gray-50{% endif %}">
+                        <button onclick="sortMusicians('alphabetical')" id="sortAlphabetical"
+                            class="px-4 py-2 text-sm font-medium rounded-lg border transition-colors bg-white text-gray-700 border-gray-300 hover:bg-gray-50">
                             A-Z
-                        </a>
-                        <a href="?{% if current_filters.search %}search={{ current_filters.search }}&{% endif %}{% if current_filters.genre %}genre={{ current_filters.genre }}&{% endif %}{% if current_filters.instrument %}instrument={{ current_filters.instrument }}&{% endif %}sort=newest{% if page_obj.number > 1 %}&page={{ page_obj.number }}{% endif %}"
-                            class="px-4 py-2 text-sm font-medium rounded-lg border transition-colors {% if current_filters.sort == 'newest' or not current_filters.sort %}bg-[#4F2FC0] text-white border-[#4F2FC0]{% else %}bg-white text-gray-700 border-gray-300 hover:bg-gray-50{% endif %}">
+                        </button>
+                        <button onclick="sortMusicians('newest')" id="sortNewest"
+                            class="px-4 py-2 text-sm font-medium rounded-lg border transition-colors bg-[#4F2FC0] text-white border-[#4F2FC0]">
                             Newest
-                        </a>
+                        </button>
                     </div>
                 </div>
 
@@ -144,9 +173,19 @@
                     </div>
                 </div>
                 {% else %}
-                <!-- Musicians Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {% for musician in musicians %}
+                    {% if musicians %}
+                    <!-- No Results Message (shown by JavaScript when filters hide all musicians) -->
+                    <div id="noResultsMessage" class="hidden bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+                        <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">No musicians match your filters</h3>
+                        <p class="text-gray-500">Try adjusting your search or filter criteria to see more results.</p>
+                    </div>
+
+                    <!-- Musicians Grid -->
+                    <div id="musiciansGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {% for musician in musicians %}
             <div
                 class="bg-white rounded-lg shadow-md border border-gray-200 p-6 flex flex-col h-full hover:shadow-lg transition-shadow"
                 data-musician-id="{{ musician.id }}"
@@ -265,12 +304,18 @@
                     View Profile & Invite
                 </button>
             </div>
-            {% empty %}
-            <div class="col-span-full text-center py-12">
-                <p class="text-gray-500 text-lg">No musicians found.</p>
-            </div>
-            {% endfor %}
-        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <!-- Empty State -->
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+                        <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">No musicians found</h3>
+                        <p class="text-gray-500">There are currently no musicians available to invite.</p>
+                    </div>
+                    {% endif %}
         {% endif %}
     </div>
 </div>
@@ -278,10 +323,11 @@
 <!-- Two-column modal layout with musician profile on left, invitation form on right -->
 {% if active_listings %}
 <div id="inviteModal" 
-     class="fixed inset-0 bg-black bg-opacity-70 transition-opacity duration-300 hidden flex items-center justify-center z-50"
+     class="fixed inset-0 bg-black bg-opacity-70 transition-opacity duration-300 hidden z-50"
      aria-hidden="true">
+    <div class="flex items-center justify-center min-h-screen p-4">
     
-    <div class="relative bg-white rounded-lg shadow-xl w-full max-w-4xl mx-4 grid grid-cols-1 md:grid-cols-2 overflow-hidden max-h-[90vh]">
+        <div class="relative bg-white rounded-lg shadow-xl w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 overflow-hidden max-h-[90vh]">
         
         <button onclick="closeInviteModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10">
             <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -363,6 +409,7 @@
                 </button>
             </div>
         </div>
+    </div>
     </div>
 </div>
 {% endif %}
@@ -518,10 +565,94 @@
     }
 
     // Close modal when clicking outside
-    document.getElementById('inviteModal').addEventListener('click', function (e) {
+    document.getElementById('inviteModal')?.addEventListener('click', function (e) {
         if (e.target === this) {
             closeInviteModal();
         }
     });
+
+    // Search and filter functionality
+    let currentSort = 'newest';
+
+    function applyMusicianFilters() {
+        const searchTerm = document.getElementById('searchMusicians').value.toLowerCase();
+        const filterInstrument = document.getElementById('filterInstrument').value.toLowerCase();
+        const filterGenre = document.getElementById('filterGenre').value.toLowerCase();
+        const filterLocation = document.getElementById('filterLocation').value.toLowerCase();
+        const musicians = document.querySelectorAll('#musiciansGrid > div');
+        
+        let visibleCount = 0;
+        musicians.forEach(musician => {
+            const text = musician.textContent.toLowerCase();
+            const matchesSearch = searchTerm === '' || text.includes(searchTerm);
+            const matchesInstrument = filterInstrument === '' || text.includes(filterInstrument);
+            const matchesGenre = filterGenre === '' || text.includes(filterGenre);
+            const matchesLocation = filterLocation === '' || text.includes(filterLocation);
+            
+            if (matchesSearch && matchesInstrument && matchesGenre && matchesLocation) {
+                musician.style.display = 'block';
+                visibleCount++;
+            } else {
+                musician.style.display = 'none';
+            }
+        });
+        
+        // Show/hide no results message
+        const noResultsMsg = document.getElementById('noResultsMessage');
+        const musiciansGrid = document.getElementById('musiciansGrid');
+        if (visibleCount === 0) {
+            noResultsMsg.classList.remove('hidden');
+            musiciansGrid.classList.add('hidden');
+        } else {
+            noResultsMsg.classList.add('hidden');
+            musiciansGrid.classList.remove('hidden');
+        }
+    }
+
+    function clearFilters() {
+        document.getElementById('searchMusicians').value = '';
+        document.getElementById('filterInstrument').value = '';
+        document.getElementById('filterGenre').value = '';
+        document.getElementById('filterLocation').value = '';
+        applyMusicianFilters();
+        
+        // Ensure grid is visible and no results message is hidden
+        document.getElementById('noResultsMessage').classList.add('hidden');
+        document.getElementById('musiciansGrid').classList.remove('hidden');
+    }
+
+    function sortMusicians(sortType) {
+        currentSort = sortType;
+        const grid = document.getElementById('musiciansGrid');
+        if (!grid) return;
+        
+        const musicians = Array.from(grid.querySelectorAll('[data-musician-id]'));
+        
+        musicians.sort((a, b) => {
+            if (sortType === 'alphabetical') {
+                const nameA = a.querySelector('h3')?.textContent.toLowerCase() || '';
+                const nameB = b.querySelector('h3')?.textContent.toLowerCase() || '';
+                return nameA.localeCompare(nameB);
+            }
+            // For 'newest', keep original order (reverse to get newest first)
+            return 0;
+        });
+        
+        // Clear grid and re-append sorted musicians
+        grid.innerHTML = '';
+        musicians.forEach(musician => grid.appendChild(musician));
+        
+        // Update button styles
+        document.getElementById('sortAlphabetical').className = sortType === 'alphabetical' 
+            ? 'px-4 py-2 text-sm font-medium rounded-lg border transition-colors bg-[#4F2FC0] text-white border-[#4F2FC0]'
+            : 'px-4 py-2 text-sm font-medium rounded-lg border transition-colors bg-white text-gray-700 border-gray-300 hover:bg-gray-50';
+        
+        document.getElementById('sortNewest').className = sortType === 'newest'
+            ? 'px-4 py-2 text-sm font-medium rounded-lg border transition-colors bg-[#4F2FC0] text-white border-[#4F2FC0]'
+            : 'px-4 py-2 text-sm font-medium rounded-lg border transition-colors bg-white text-gray-700 border-gray-300 hover:bg-gray-50';
+    }
+
+    // Real-time search only, filters applied on button click
+    document.getElementById('searchMusicians')?.addEventListener('input', applyMusicianFilters);
 </script>
 {% endblock %}

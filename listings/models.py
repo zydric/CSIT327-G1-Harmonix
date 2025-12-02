@@ -9,9 +9,9 @@ class Listing(models.Model):
     GENRE_CHOICES = GENRE_CHOICES
     INSTRUMENT_CHOICES = INSTRUMENT_CHOICES
     # Basic Info
-    title = models.CharField(max_length=200, help_text="e.g., 'Lead Guitarist Needed'")
-    band_name = models.CharField(max_length=100, help_text="Name of the band posting this opportunity")
-    description = models.TextField(help_text="Detailed description of the opportunity and requirements")
+    title = models.CharField(max_length=80, help_text="e.g., 'Lead Guitarist Needed' (max 80 chars)")
+    band_name = models.CharField(max_length=50, help_text="Name of the band posting this opportunity (max 50 chars)")
+    description = models.TextField(max_length=500, help_text="Detailed description of the opportunity and requirements (max 500 chars)")
     
     # Who posted it (must be a band admin)
     band_admin = models.ForeignKey(

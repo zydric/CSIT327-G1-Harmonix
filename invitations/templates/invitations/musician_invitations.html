@@ -11,34 +11,56 @@
         <p class="text-gray-600">View and respond to band invitations.</p>
     </div>
 
+    <!-- Search Bar -->
+    <div class="mb-8">
+        <div class="relative">
+            <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            <input type="text" 
+                   id="searchInvitations"
+                   placeholder="Search by band name, listing title, or status..."
+                   class="w-full pl-12 pr-4 py-4 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F2FC0] focus:border-transparent transition-all">
+        </div>
+    </div>
+
     <!-- Invitations List -->
     {% if invitations %}
         <div class="space-y-6">
             {% for invitation in invitations %}
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <!-- Invitation Header -->
+                    <!-- Invitation Header with Avatar -->
                     <div class="flex justify-between items-start mb-4">
-                        <div class="flex-1">
-                            <!-- Band Name with Status Badge -->
-                            <div class="flex items-center space-x-3 mb-2">
-                                <h3 class="text-xl font-bold text-gray-900">
-                                    {{ invitation.listing.title }}
-                                </h3>
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
-                                    {% if invitation.status == 'pending' %}bg-yellow-100 text-yellow-800
-                                    {% elif invitation.status == 'accepted' %}bg-green-100 text-green-800
-                                    {% else %}bg-red-100 text-red-800{% endif %}">
-                                    {{ invitation.get_status_display }}
-                                </span>
+                        <div class="flex items-start gap-3 flex-1">
+                            <!-- Band Admin Avatar -->
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-lg shrink-0" 
+                                 style="background-color: {{ invitation.band_admin.get_avatar_color }};">
+                                {{ invitation.band_admin.get_avatar_initial }}
                             </div>
+                            
+                            <!-- Content -->
+                            <div class="flex-1 min-w-0">
+                                <!-- Band Name with Status Badge -->
+                                <div class="flex items-center gap-3 mb-2">
+                                    <h3 class="text-xl font-bold text-gray-900">
+                                        {{ invitation.listing.title }}
+                                    </h3>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                                        {% if invitation.status == 'pending' %}bg-yellow-100 text-yellow-800
+                                        {% elif invitation.status == 'accepted' %}bg-green-100 text-green-800
+                                        {% else %}bg-red-100 text-red-800{% endif %}">
+                                        {{ invitation.get_status_display }}
+                                    </span>
+                                </div>
 
-                            <!-- Band and User Information -->
-                            <div class="flex items-center space-x-4 text-sm text-gray-600 mb-4">
-                                <span class="font-medium text-[#4F2FC0]">{{ invitation.listing.band_name }}</span>
-                                <span>From: {{ invitation.band_admin.username }}</span>
-                                {% if invitation.band_admin.location %}
-                                    <span>{{ invitation.band_admin.location }}</span>
-                                {% endif %}
+                                <!-- Band and User Information -->
+                                <div class="flex items-center space-x-4 text-sm text-gray-600 mb-4">
+                                    <span class="font-medium text-[#4F2FC0]">{{ invitation.listing.band_name }}</span>
+                                    <span>From: {{ invitation.band_admin.username }}</span>
+                                    {% if invitation.band_admin.location %}
+                                        <span>{{ invitation.band_admin.location }}</span>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
 
@@ -245,6 +267,21 @@ document.getElementById('listingModal').addEventListener('click', function(e) {
     if (e.target === this) {
         closeListingModal();
     }
+});
+
+// Real-time search for invitations
+document.getElementById('searchInvitations')?.addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const invitations = document.querySelectorAll('.space-y-6 > div');
+    
+    invitations.forEach(invitation => {
+        const text = invitation.textContent.toLowerCase();
+        if (searchTerm === '' || text.includes(searchTerm)) {
+            invitation.style.display = 'block';
+        } else {
+            invitation.style.display = 'none';
+        }
+    });
 });
 </script>
 {% endblock %}
