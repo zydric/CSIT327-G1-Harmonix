@@ -1,38 +1,55 @@
 <!-- Reusable Button Component
-Usage: {% include 'components/button.html' with text='Click Me' href='#' variant='primary' %}
-Variants: primary, secondary, danger, outline
+Usage: {% include 'components/button.html' with text='Click Me' href='#' variant='primary' size='md' %}
+Variants: primary, secondary, outline, ghost, danger
+Sizes: sm, md, lg
 -->
 {% if href %}
 <a href="{{ href }}" 
-   class="inline-block px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap
+   class="inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#4F2FC0] focus:ring-offset-2 whitespace-nowrap
+   {% if size == 'sm' %}px-3 py-1.5 text-sm
+   {% elif size == 'lg' %}px-6 py-2.5 text-lg
+   {% else %}px-4 py-2 text-base{% endif %}
    {% if variant == 'primary' or not variant %}
        bg-[#4F2FC0] text-white hover:bg-[#3f24a0]
    {% elif variant == 'secondary' %}
-       bg-gray-100 text-gray-700 hover:bg-gray-200
+       border-2 border-[#4F2FC0] text-[#4F2FC0] hover:bg-[#4F2FC0] hover:text-white
+   {% elif variant == 'outline' %}
+       border border-gray-300 text-gray-700 hover:bg-gray-50
+   {% elif variant == 'ghost' %}
+       text-gray-700 hover:text-[#4F2FC0] hover:bg-gray-100
    {% elif variant == 'danger' %}
        bg-red-600 text-white hover:bg-red-700
-   {% elif variant == 'outline' %}
-       border-2 border-[#4F2FC0] text-[#4F2FC0] hover:bg-[#4F2FC0] hover:text-white
    {% endif %}
    {% if full_width %}w-full text-center{% endif %}
    {{ extra_classes }}">
+    {% if icon_left %}{{ icon_left|safe }}{% endif %}
     {{ text }}
+    {% if icon_right %}{{ icon_right|safe }}{% endif %}
 </a>
 {% else %}
 <button type="{{ type|default:'button' }}" 
-        class="px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap
+        {% if disabled %}disabled{% endif %}
+        class="inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#4F2FC0] focus:ring-offset-2 whitespace-nowrap
+        {% if size == 'sm' %}px-3 py-1.5 text-sm
+        {% elif size == 'lg' %}px-6 py-2.5 text-lg
+        {% else %}px-4 py-2 text-base{% endif %}
         {% if variant == 'primary' or not variant %}
             bg-[#4F2FC0] text-white hover:bg-[#3f24a0]
         {% elif variant == 'secondary' %}
-            bg-gray-100 text-gray-700 hover:bg-gray-200
+            border-2 border-[#4F2FC0] text-[#4F2FC0] hover:bg-[#4F2FC0] hover:text-white
+        {% elif variant == 'outline' %}
+            border border-gray-300 text-gray-700 hover:bg-gray-50
+        {% elif variant == 'ghost' %}
+            text-gray-700 hover:text-[#4F2FC0] hover:bg-gray-100
         {% elif variant == 'danger' %}
             bg-red-600 text-white hover:bg-red-700
-        {% elif variant == 'outline' %}
-            border-2 border-[#4F2FC0] text-[#4F2FC0] hover:bg-[#4F2FC0] hover:text-white
         {% endif %}
+        {% if disabled %}opacity-50 cursor-not-allowed{% endif %}
         {% if full_width %}w-full{% endif %}
         {{ extra_classes }}"
         {% if onclick %}onclick="{{ onclick }}"{% endif %}>
+    {% if icon_left %}{{ icon_left|safe }}{% endif %}
     {{ text }}
+    {% if icon_right %}{{ icon_right|safe }}{% endif %}
 </button>
 {% endif %}

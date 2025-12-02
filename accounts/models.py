@@ -1,6 +1,22 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 from django.utils import timezone
+import hashlib
+
+
+# ============================
+# Avatar Color Configuration
+# ============================
+AVATAR_COLORS = [
+    '#EF4444',  # red-500
+    '#F59E0B',  # amber-500
+    '#10B981',  # emerald-500
+    '#3B82F6',  # blue-500
+    '#8B5CF6',  # violet-500
+    '#EC4899',  # pink-500
+    '#14B8A6',  # teal-500
+    '#F97316',  # orange-500
+]
 
 
 # ============================
@@ -96,6 +112,15 @@ class User(AbstractBaseUser, PermissionsMixin):
             # Convert lowercase keys to display labels (e.g., 'rock' -> 'Rock')
             return [GENRE_DICT.get(genre.lower(), genre.capitalize()) for genre in genres]
         return []
+    
+    def get_avatar_color(self):
+        """Generate consistent color based on user ID"""
+        hash_value = int(hashlib.md5(str(self.id).encode()).hexdigest(), 16)
+        return AVATAR_COLORS[hash_value % len(AVATAR_COLORS)]
+
+    def get_avatar_initial(self):
+        """Get first letter of username in uppercase"""
+        return self.username[0].upper() if self.username else '?'
 
 
 # ============================
