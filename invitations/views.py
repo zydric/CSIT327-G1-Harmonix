@@ -132,7 +132,7 @@ def band_sent_invitations(request):
     context = {
         'invitations': invitations,
     }
-    
+    #Change the html here according to your own page
     return render(request, 'invitations/band_admin_sent.html', context)
 
 @login_required
