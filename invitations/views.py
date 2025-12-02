@@ -133,7 +133,7 @@ def band_sent_invitations(request):
         'invitations': invitations,
     }
     #Change the html here according to your own page
-    return render(request, 'invitations/band_admin_sent.html', context)
+    return render(request, 'invitations/band_sent_invites.html', context)
 
 @login_required
 @csrf_exempt
