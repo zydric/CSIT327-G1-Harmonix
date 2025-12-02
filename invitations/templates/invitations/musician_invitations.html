@@ -11,6 +11,19 @@
         <p class="text-gray-600">View and respond to band invitations.</p>
     </div>
 
+    <!-- Search Bar -->
+    <div class="mb-8">
+        <div class="relative">
+            <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            <input type="text" 
+                   id="searchInvitations"
+                   placeholder="Search by band name, listing title, or status..."
+                   class="w-full pl-12 pr-4 py-4 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F2FC0] focus:border-transparent transition-all">
+        </div>
+    </div>
+
     <!-- Invitations List -->
     {% if invitations %}
         <div class="space-y-6">
@@ -254,6 +267,21 @@ document.getElementById('listingModal').addEventListener('click', function(e) {
     if (e.target === this) {
         closeListingModal();
     }
+});
+
+// Real-time search for invitations
+document.getElementById('searchInvitations')?.addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const invitations = document.querySelectorAll('.space-y-6 > div');
+    
+    invitations.forEach(invitation => {
+        const text = invitation.textContent.toLowerCase();
+        if (searchTerm === '' || text.includes(searchTerm)) {
+            invitation.style.display = 'block';
+        } else {
+            invitation.style.display = 'none';
+        }
+    });
 });
 </script>
 {% endblock %}

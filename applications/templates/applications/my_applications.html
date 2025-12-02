@@ -24,6 +24,19 @@
             </p>
         </div>
 
+        <!-- Search Bar -->
+        <div class="mb-8">
+            <div class="relative">
+                <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <input type="text" 
+                       id="searchMyApplications"
+                       placeholder="Search by band name, listing title, or status..."
+                       class="w-full pl-12 pr-4 py-4 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F2FC0] focus:border-transparent transition-all">
+            </div>
+        </div>
+
         <!-- Applications List -->
         <div class="space-y-6">
             {% for application in applications %}
@@ -266,6 +279,21 @@ document.getElementById('draftModal')?.addEventListener('click', function(e) {
     if (e.target === this) {
         hideDraftModal();
     }
+});
+
+// Real-time search for applications
+document.getElementById('searchMyApplications')?.addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const applications = document.querySelectorAll('.space-y-6 > div');
+    
+    applications.forEach(application => {
+        const text = application.textContent.toLowerCase();
+        if (searchTerm === '' || text.includes(searchTerm)) {
+            application.style.display = 'block';
+        } else {
+            application.style.display = 'none';
+        }
+    });
 });
 </script>
 {% endblock %}

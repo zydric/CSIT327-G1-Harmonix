@@ -157,23 +157,23 @@
 
                 <!-- Search Bar (Top of content) -->
                 {% if is_musician %}
-                <form method="GET" action="{% url 'listings:feed' %}" class="mb-6">
-                    <div class="relative">
-                        <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="mb-8">
+                    <form method="GET" action="{% url 'listings:feed' %}" class="relative">
+                        <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                         <input type="text" 
                                name="search" 
                                value="{{ current_filters.search }}"
-                               placeholder="Search listings, bands, instruments..."
-                               class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F2FC0] focus:border-transparent">
+                               placeholder="Search by band name, listing title, or description..."
+                               class="w-full pl-12 pr-4 py-4 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F2FC0] focus:border-transparent transition-all">
                         <!-- Preserve other filters -->
                         {% if current_filters.genre %}<input type="hidden" name="genre" value="{{ current_filters.genre }}">{% endif %}
                         {% if current_filters.instrument %}<input type="hidden" name="instrument" value="{{ current_filters.instrument }}">{% endif %}
                         {% if current_filters.location %}<input type="hidden" name="location" value="{{ current_filters.location }}">{% endif %}
                         {% if current_filters.sort %}<input type="hidden" name="sort" value="{{ current_filters.sort }}">{% endif %}
-                    </div>
-                </form>
+                    </form>
+                </div>
                 {% endif %}
 
                 <!-- Sort Buttons -->

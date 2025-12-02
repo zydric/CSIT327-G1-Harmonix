@@ -24,6 +24,19 @@
             </p>
         </div>
 
+        <!-- Search Bar -->
+        <div class="mb-8">
+            <div class="relative">
+                <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <input type="text" 
+                       id="searchApplications"
+                       placeholder="Search by musician name, listing title, or instruments..."
+                       class="w-full pl-12 pr-4 py-4 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F2FC0] focus:border-transparent transition-all">
+            </div>
+        </div>
+
         <!-- Filter Tabs -->
         <div class="mb-6">
             <div class="border-b border-gray-200">
@@ -174,8 +187,12 @@
 </div>
 
 <script>
+let currentStatusFilter = 'all';
+
 function filterApplications(status) {
-    const applications = document.querySelectorAll('.application-card');
+    currentStatusFilter = status;
+    applyFilters();
+    
     const tabs = document.querySelectorAll('nav button');
     
     // Update tab styling
@@ -187,17 +204,28 @@ function filterApplications(status) {
     // Find the clicked tab and highlight it
     event.target.classList.remove('border-transparent', 'text-gray-500');
     event.target.classList.add('border-[#4F2FC0]', 'text-[#4F2FC0]');
+}
+
+function applyFilters() {
+    const searchTerm = document.getElementById('searchApplications').value.toLowerCase();
+    const applications = document.querySelectorAll('.application-card');
     
-    // Show/hide applications based on status
     applications.forEach(application => {
         const applicationStatus = application.getAttribute('data-status');
+        const text = application.textContent.toLowerCase();
         
-        if (status === 'all' || applicationStatus === status) {
+        const matchesStatus = currentStatusFilter === 'all' || applicationStatus === currentStatusFilter;
+        const matchesSearch = searchTerm === '' || text.includes(searchTerm);
+        
+        if (matchesStatus && matchesSearch) {
             application.style.display = 'block';
         } else {
             application.style.display = 'none';
         }
     });
 }
+
+// Real-time search
+document.getElementById('searchApplications')?.addEventListener('input', applyFilters);
 </script>
 {% endblock %}
