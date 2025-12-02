@@ -37,7 +37,7 @@ class ListingForm(forms.ModelForm):
 
     class Meta:
         model = Listing
-        fields = ['title', 'band_name', 'description', 'instruments_needed', 'genres', 'is_active']
+        fields = ['title', 'band_name', 'description', 'location', 'instruments_needed', 'genres', 'is_active']
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'w-full px-4 py-3 bg-white border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 font-medium transition-colors',
@@ -51,6 +51,10 @@ class ListingForm(forms.ModelForm):
                 'class': 'w-full px-4 py-3 bg-white border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 leading-relaxed transition-colors',
                 'rows': 6,
                 'placeholder': 'Describe the opportunity, requirements, and what you\'re looking for in detail...'
+            }),
+            'location': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-3 bg-white border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 font-medium transition-colors',
+                'placeholder': 'e.g., "Sugbo Mercado, Sea Grove, JPark Resort"'
             }),
         }
         # help_texts = {
@@ -131,6 +135,16 @@ class ListingForm(forms.ModelForm):
             raise ValidationError("Maximum 4 genres can be selected.")
         
         return genres
+
+    def clean_location(self):
+        location = self.cleaned_data.get('location')
+        if not location:
+            raise ValidationError("Location is required.")
+        
+        if len(location.strip()) < 3:
+            raise ValidationError("Location must be at least 3 characters long.")
+        
+        return location.strip()
 
     def save(self, commit=True):
         instance = super().save(commit=False)

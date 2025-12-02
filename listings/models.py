@@ -32,6 +32,12 @@ class Listing(models.Model):
         help_text="Comma-separated list: 'Rock, Alternative, Jazz'"
     )
     
+    # Location
+    location = models.CharField(
+        max_length=200,
+        help_text="Location where the band is based or where performances will take place"
+    )
+    
     # Status
     is_active = models.BooleanField(
         default=True,
