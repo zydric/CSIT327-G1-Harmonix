@@ -54,6 +54,15 @@ def listings_view(request):
         # Apply sorting
         if sort_by == 'alphabetical':
             listings = listings.order_by('title')
+        elif sort_by == 'positions':
+            # Sort by number of instruments (most positions first)
+            # This requires fetching all and sorting in Python since we can't easily do this in SQL
+            listings_list = list(listings)
+            listings_list.sort(key=lambda x: len(x.instruments_list), reverse=True)
+            # Convert back to queryset for pagination
+            from django.db.models.query import QuerySet
+            # For pagination to work, we need to use the list directly
+            listings = listings_list
         else:  # Default to newest
             listings = listings.order_by('-created_at')
         

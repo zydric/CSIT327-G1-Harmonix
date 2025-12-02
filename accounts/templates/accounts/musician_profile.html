@@ -154,6 +154,24 @@
                                           placeholder="Tell bands about yourself, your experience, and what you're looking for...">{{ user.bio|default:"" }}</textarea>
                                 <p class="text-sm text-gray-500 mt-1">A short description about yourself as a musician (<span id="bioCharCount">{{ user.bio|length|default:0 }}</span>/500 characters)</p>
                             </div>
+
+                            <!-- Availability Toggle -->
+                            <div>
+                                <label class="block font-semibold text-gray-900 mb-2">Availability Status</label>
+                                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                    <div>
+                                        <p class="font-medium text-gray-900">Available for new opportunities</p>
+                                        <p class="text-sm text-gray-500 mt-1">Let bands know you're open to joining new projects</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" name="availability" id="availabilityToggle" 
+                                               {% if user.availability %}checked{% endif %}
+                                               class="sr-only peer"
+                                               disabled>
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#4F2FC0]"></div>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -286,6 +304,12 @@
             field.classList.add('bg-white', 'text-gray-900');
         });
         
+        // Enable availability toggle
+        const availabilityToggle = document.getElementById('availabilityToggle');
+        if (availabilityToggle) {
+            availabilityToggle.disabled = false;
+        }
+        
         // Initialize location autocomplete
         const locationInput = document.getElementById('locationInput');
         if (locationInput && !locationAutocomplete) {
@@ -331,6 +355,13 @@
             field.classList.add('bg-gray-100', 'text-gray-600');
             field.classList.remove('bg-white', 'text-gray-900');
         });
+        
+        // Disable availability toggle and reset to original value
+        const availabilityToggle = document.getElementById('availabilityToggle');
+        if (availabilityToggle) {
+            availabilityToggle.disabled = true;
+            availabilityToggle.checked = {{ user.availability|lower }};
+        }
         
         // Reset location field and remove autocomplete styling
         const locationInput = document.getElementById('locationInput');

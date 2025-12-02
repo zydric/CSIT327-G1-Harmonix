@@ -37,7 +37,7 @@ class ListingForm(forms.ModelForm):
 
     class Meta:
         model = Listing
-        fields = ['title', 'band_name', 'description', 'location', 'instruments_needed', 'genres', 'is_active']
+        fields = ['title', 'band_name', 'description', 'location', 'instruments_needed', 'genres', 'current_lineup', 'is_active']
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'w-full px-4 py-3 bg-white border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 font-medium transition-colors',
@@ -55,6 +55,11 @@ class ListingForm(forms.ModelForm):
             'location': forms.TextInput(attrs={
                 'class': 'w-full px-4 py-3 bg-white border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 font-medium transition-colors',
                 'placeholder': 'e.g., "Sugbo Mercado, Sea Grove, JPark Resort"'
+            }),
+            'current_lineup': forms.Textarea(attrs={
+                'class': 'w-full px-4 py-3 bg-white border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 leading-relaxed transition-colors',
+                'rows': 3,
+                'placeholder': 'e.g., "Lead Guitar: John, Bass: Sarah, Drums: [Looking]" (Optional)'
             }),
         }
         # help_texts = {

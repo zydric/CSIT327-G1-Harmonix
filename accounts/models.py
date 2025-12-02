@@ -64,6 +64,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     instruments = models.CharField(max_length=200, blank=True, null=True)
     bio = models.TextField(blank=True, null=True, help_text="Short bio (musicians only)")
     
+    # Musician-specific fields
+    availability = models.BooleanField(default=True, help_text="Available for new opportunities")
+    
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

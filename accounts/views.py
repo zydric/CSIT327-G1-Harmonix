@@ -320,6 +320,7 @@ def musician_profile_view(request):
             user.instruments = new_instruments
             user.genres = new_genres
             user.bio = new_bio
+            user.availability = request.POST.get('availability') == 'on'
             user.save()
             
             messages.success(request, 'Profile updated successfully!')

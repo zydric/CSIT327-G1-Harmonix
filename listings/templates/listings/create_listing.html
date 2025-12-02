@@ -106,12 +106,12 @@
                         {% endif %}
                     </div>
 
-                    <!-- Instruments Needed -->
+                    <!-- Open Positions -->
                     <div class="bg-purple-50 p-6 rounded-lg border-2 border-purple-200">
                         <label class="block text-base font-semibold text-gray-900 mb-2">
-                            Instruments Needed *
+                            Open Positions *
                         </label>
-                        <p class="text-sm text-gray-600 mb-4">Select the instruments you're looking for</p>
+                        <p class="text-sm text-gray-600 mb-4">Select the positions you're looking to fill</p>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                             {% for choice in form.instruments_needed %}
                                 <label class="flex items-center p-3 border border-gray-200 rounded-md hover:bg-gray-50 cursor-pointer transition-colors">
@@ -174,6 +174,22 @@
                         {% if form.genres.errors %}
                             <div class="mt-2">
                                 {% for error in form.genres.errors %}
+                                    <p class="text-red-600 text-sm">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Current Lineup (Optional) -->
+                    <div>
+                        <label class="block text-base font-semibold text-gray-900 mb-2">
+                            Current Lineup <span class="text-sm font-normal text-gray-500">(Optional)</span>
+                        </label>
+                        <p class="text-sm text-gray-600 mb-2">Share your current band members for transparency</p>
+                        {{ form.current_lineup }}
+                        {% if form.current_lineup.errors %}
+                            <div class="mt-2">
+                                {% for error in form.current_lineup.errors %}
                                     <p class="text-red-600 text-sm">{{ error }}</p>
                                 {% endfor %}
                             </div>

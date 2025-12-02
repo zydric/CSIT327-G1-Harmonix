@@ -38,6 +38,13 @@ class Listing(models.Model):
         help_text="Location where the band is based or where performances will take place"
     )
     
+    # Current Lineup (optional)
+    current_lineup = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Current band members (optional, for transparency)"
+    )
+    
     # Status
     is_active = models.BooleanField(
         default=True,
@@ -76,6 +83,11 @@ class Listing(models.Model):
         genres = [genre.strip() for genre in self.genres.split(',') if genre.strip()]
         # Convert lowercase keys to display labels (e.g., 'rock' -> 'Rock')
         return [GENRE_DICT.get(genre.lower(), genre.capitalize()) for genre in genres]
+    
+    @property
+    def open_positions_count(self):
+        """Returns the number of open positions"""
+        return len(self.instruments_list)
     
     @property
     def application_count(self):
