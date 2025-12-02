@@ -194,14 +194,13 @@
                 <!-- Listings Feed -->
                 <div class="space-y-6">
                     {% for listing in listings %}
-                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all cursor-pointer overflow-hidden" 
-                         onclick="window.location.href='{% url 'listings:detail' pk=listing.pk %}'">
+                    <a href="{% url 'listings:detail' pk=listing.pk %}" class="block bg-white rounded-lg border border-gray-200 p-6 hover:border-[#4F2FC0] hover:shadow-sm transition-all">
                         
                         <!-- Header: Avatar + Band Info + Action Button -->
                         <div class="flex items-start justify-between mb-4">
                             <div class="flex items-center gap-3 flex-1 min-w-0">
                                 <!-- Avatar -->
-                                <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0"
+                                <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0"
                                      style="background-color: {{ listing.band_admin.get_avatar_color }};">
                                     {{ listing.band_admin.get_avatar_initial }}
                                 </div>
@@ -214,12 +213,12 @@
                             
                             <!-- Action Button -->
                             {% if is_musician %}
-                            <button onclick="event.stopPropagation(); window.location.href='{% url 'listings:detail' pk=listing.pk %}'" 
+                            <button onclick="event.preventDefault(); window.location.href='{% url 'listings:detail' pk=listing.pk %}'" 
                                     class="px-4 py-2 bg-[#4F2FC0] text-white rounded-md text-sm font-medium hover:bg-[#3f24a0] transition-colors whitespace-nowrap flex-shrink-0">
                                 View
                             </button>
                             {% elif is_band_admin %}
-                            <button onclick="event.stopPropagation(); window.location.href='{% url 'listings:edit' pk=listing.pk %}'" 
+                            <button onclick="event.preventDefault(); window.location.href='{% url 'listings:edit' pk=listing.pk %}'" 
                                     class="px-4 py-2 bg-[#4F2FC0] text-white rounded-md text-sm font-medium hover:bg-[#3f24a0] transition-colors whitespace-nowrap flex-shrink-0 flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
                                     <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
@@ -254,19 +253,19 @@
 
                         <!-- Metadata: Compact Icons -->
                         <div class="flex items-center gap-4 text-xs text-gray-500">
-                            <!-- Instruments (max 2) -->
+                            <!-- Instruments (max 2 badges) -->
                             <div class="flex items-center gap-1">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
                                 </svg>
-                                <span>
+                                <div class="flex flex-wrap gap-1">
                                     {% for instrument in listing.instruments_list|slice:":2" %}
-                                        {{ instrument }}{% if not forloop.last %}, {% endif %}
+                                    <span class="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs">{{ instrument }}</span>
                                     {% endfor %}
                                     {% if listing.instruments_list|length > 2 %}
-                                        +{{ listing.instruments_list|length|add:"-2" }}
+                                    <span class="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs">+{{ listing.instruments_list|length|add:"-2" }}</span>
                                     {% endif %}
-                                </span>
+                                </div>
                             </div>
 
                             <!-- Location -->
@@ -301,7 +300,7 @@
                             <h4 class="font-semibold text-base mb-4 text-gray-800">Recent Applications</h4>
                             <div class="space-y-3">
                                 {% for application in applications %}
-                                <div class="flex items-center justify-between px-3 py-3 bg-gray-50 rounded-lg border border-gray-200" onclick="event.stopPropagation();">
+                                <div class="flex items-center justify-between px-3 py-3 bg-gray-50 rounded-lg border border-gray-200" onclick="event.preventDefault();">
                                     <div class="flex-1">
                                         <p class="font-medium text-gray-900 text-sm">{{ application.musician.username }}</p>
                                         <p class="text-xs text-gray-600 mt-1">{{ application.message|truncatewords:15 }}</p>
@@ -320,10 +319,10 @@
                         {% endif %}
                         {% endwith %}
                         {% endif %}
-                    </div>
+                    </a>
                     {% empty %}
                     <!-- Empty State -->
-                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+                    <div class="bg-white rounded-lg border border-gray-200 p-12 text-center">
                         <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
                         </svg>

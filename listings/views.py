@@ -139,6 +139,22 @@ def listing_detail(request, pk):
     """
     listing = get_object_or_404(Listing, pk=pk)
     
+    # Determine back URL based on referer or query param
+    back_url = request.GET.get('from')
+    back_label = "Back to Listings"
+    
+    if not back_url:
+        referer = request.META.get('HTTP_REFERER', '')
+        if 'dashboard' in referer:
+            back_url = 'musician_dashboard' if request.user.is_musician else 'band_admin_dashboard'
+            back_label = "Back to Dashboard"
+        else:
+            back_url = 'listings:feed'
+    else:
+        # If 'from' param is provided, set appropriate label
+        if back_url in ['musician_dashboard', 'band_admin_dashboard']:
+            back_label = "Back to Dashboard"
+    
     # Check if current user has already applied (for musicians)
     user_has_applied = False
     user_application = None
@@ -166,6 +182,8 @@ def listing_detail(request, pk):
         'applications': applications,
         'is_owner': request.user == listing.band_admin,
         'can_apply': request.user.is_musician and not user_has_applied and listing.is_active,
+        'back_url': back_url,
+        'back_label': back_label,
     }
     
     return render(request, 'listings/listing_detail.html', context)
