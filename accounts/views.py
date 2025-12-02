@@ -205,7 +205,7 @@ def band_admin_dashboard(request):
     }
 
     recent_listings = listings_qs.filter(is_active=True).order_by('-created_at')[:3]
-    recent_applications = applications_qs.select_related('musician', 'listing').order_by('-created_at')[:3]
+    recent_invitations = invitations_qs.select_related('musician', 'listing').order_by('-created_at')[:3]
 
     status_styles = {
         'pending': 'bg-yellow-100 text-yellow-800 border border-yellow-200',
@@ -216,13 +216,13 @@ def band_admin_dashboard(request):
     }
 
     default_status_style = 'bg-gray-100 text-gray-800 border border-gray-200'
-    for application in recent_applications:
-        application.status_class = status_styles.get(application.status, default_status_style)
+    for invitation in recent_invitations:
+        invitation.status_class = status_styles.get(invitation.status, default_status_style)
 
     context = {
         'stats': stats,
         'recent_listings': recent_listings,
-        'recent_applications': recent_applications,
+        'recent_invitations': recent_invitations,
     }
 
     return render(request, 'dashboard/band_admin_dashboard.html', context)

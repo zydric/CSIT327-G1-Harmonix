@@ -15,6 +15,7 @@ urlpatterns = [
     path('respond/', views.respond_to_invitation, name='respond_invitation'),
 
     path('sent/', views.band_sent_invites, name='band_sent_invites'),
+    path('<int:invitation_id>/withdraw/', views.withdraw_invitation, name='withdraw_invitation'),
     
     # API Endpoints
     path('listing/<int:listing_id>/', views.get_listing_details, name='listing_details'),

@@ -157,12 +157,21 @@ def listing_detail(request, pk):
         if 'dashboard' in referer:
             back_url = 'musician_dashboard' if request.user.is_musician else 'band_admin_dashboard'
             back_label = "Back to Dashboard"
+        elif 'invitations' in referer:
+            if request.user.is_musician:
+                back_url = 'invitations:musician_invitations'
+                back_label = "Back to Invitations"
+            else:
+                back_url = 'invitations:band_sent_invites'
+                back_label = "Back to Invitations"
         else:
             back_url = 'listings:feed'
     else:
         # If 'from' param is provided, set appropriate label
         if back_url in ['musician_dashboard', 'band_admin_dashboard']:
             back_label = "Back to Dashboard"
+        elif 'invitations' in back_url:
+            back_label = "Back to Invitations"
     
     # Check if current user has already applied (for musicians)
     # Note: Draft applications don't count as "applied"

@@ -367,6 +367,7 @@ function loadDraft() {
 }
 
 // Withdraw Application Confirmation
+{% if user_has_applied and user_application %}
 function confirmWithdrawApplication() {
     if (confirm('Are you sure you want to withdraw your application to "{{ listing.title }}"?\n\nThis action cannot be undone.')) {
         const form = document.createElement('form');
@@ -383,6 +384,7 @@ function confirmWithdrawApplication() {
         form.submit();
     }
 }
+{% endif %}
 
 // Delete Confirmation
 function confirmDelete() {

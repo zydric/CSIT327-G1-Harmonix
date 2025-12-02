@@ -198,49 +198,56 @@ def get_listing_details(request, listing_id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+
+@login_required
+def withdraw_invitation(request, invitation_id):
+    """Withdraw a pending invitation"""
+    
+    if request.method != 'POST':
+        messages.error(request, 'Invalid request method.')
+        return redirect('invitations:band_sent_invites')
+    
+    # Only band admins can withdraw invitations
+    if not request.user.is_band_admin:
+        messages.error(request, 'Access denied.')
+        return redirect('listings:feed')
+    
+    try:
+        # Get the invitation (must belong to the current band admin and be pending)
+        invitation = get_object_or_404(
+            Invitation, 
+            id=invitation_id, 
+            band_admin=request.user,
+            status='pending'
+        )
+        
+        musician_name = invitation.musician.username
+        listing_title = invitation.listing.title
+        
+        # Delete the invitation
+        invitation.delete()
+        
+        messages.success(request, f'Successfully withdrew invitation to {musician_name} for "{listing_title}".')
+        
+    except Exception as e:
+        messages.error(request, f'Failed to withdraw invitation: {str(e)}')
+    
+    return redirect('invitations:band_sent_invites')
+
 @login_required
 def band_sent_invites(request):
-    # --- MOCK DATA START ---
-    # We create a list of dictionaries that look exactly like your database models
-    mock_invitations = [
-        {
-            'id': 1,
-            'status': 'pending',
-            'created_at': datetime.now() - timedelta(days=2), # Sent 2 days ago
-            'message': "We love your drumming style! Would you be interested in jamming with us this weekend? We have a gig coming up at the Roxy.",
-            'listing': {
-                'title': 'Indie Rock Drummer Needed'
-            },
-            'recipient': {
-                'username': 'alexdrums',
-                'get_full_name': 'Alex Martinez', # In a dict, we just put the string here
-                'profile': {
-                    'location': 'Los Angeles, CA',
-                    'instrument': 'Drums, Percussion'
-                }
-            }
-        },
-        {
-            'id': 2,
-            'status': 'accepted',
-            'created_at': datetime.now() - timedelta(days=10), # Sent 10 days ago
-            'message': "Hey Sarah! We are looking for a synth player for our pop cover band. Check out our profile!",
-            'listing': {
-                'title': 'Synth Pop Keys Needed'
-            },
-            'recipient': {
-                'username': 'sarahkeys',
-                'get_full_name': 'Sarah Jenkins',
-                'first_name': 'Sarah', # Needed for the 'accepted' footer message
-                'profile': {
-                    'location': 'San Diego, CA',
-                    'instrument': 'Piano, Synthesizer'
-                }
-            }
-        }
-    ]
-    # --- MOCK DATA END ---
-
-    return render(request, 'invitations/band_sent_invites.html', {
-        'invitations': mock_invitations
-    })
+    """Display invitations sent by band admins (Band Admin View)"""
+    
+    # Only band admins can access this page
+    if not request.user.is_band_admin:
+        messages.error(request, "Access denied. Only band admins can view sent invitations.")
+        return redirect('listings:feed')
+    
+    # Get all invitations sent by this band admin
+    invitations = Invitation.objects.filter(band_admin=request.user).select_related('musician', 'listing').order_by('-created_at')
+    
+    context = {
+        'invitations': invitations,
+    }
+    
+    return render(request, 'invitations/band_sent_invites.html', context)
