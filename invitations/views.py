@@ -104,6 +104,37 @@ def send_invitation(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+"""
+FOR TREASURE:
+In the frontend it can be entered as 
+{% for inv in invitations %}
+
+{{ inv.get_status_display }}
+{{ inv.musician.username }}
+{{ inv.listing.title }}
+{{ inv.listing.description }}
+
+{% endfor %}
+refer to models.py in the invitations folder and listings folder for more details
+"""
+@login_required
+@csrf_exempt
+def band_sent_invitations(request):
+    """Display invitations sent by band admins (Band Admin View)"""
+    
+    # Only band admins can access this page
+    if not request.user.is_band_admin:
+        messages.error(request, "Access denied. Only band admins can view sent invitations.")
+        return redirect('listings:feed')
+    
+    # Get all invitations sent by this band admin
+    invitations = Invitation.objects.filter(band_admin=request.user).select_related('musician', 'listing')
+    
+    context = {
+        'invitations': invitations,
+    }
+    #Change the html here according to your own page
+    return render(request, 'invitations/band_sent_invites.html', context)
 
 @login_required
 @csrf_exempt
