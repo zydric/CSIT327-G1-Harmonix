@@ -59,7 +59,7 @@
     {% block extra_css %}
     {% endblock %}
 </head>
-<body class="bg-gray-50 min-h-screen pt-16">
+<body class="bg-gray-50 min-h-screen {% block body_classes %}pt-16{% endblock %}">
     <!-- Navigation -->
     {% block navbar %}
     {% include 'components/navbar.html' %}
