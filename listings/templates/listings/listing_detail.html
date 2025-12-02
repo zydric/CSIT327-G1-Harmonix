@@ -51,6 +51,28 @@
                                 </svg>
                                 Delete
                             </button>
+                        {% elif pending_invitation %}
+                            <!-- Pending Invitation Actions -->
+                            <div class="flex items-center gap-3">
+                                <form method="post" action="{% url 'invitations:respond_invitation' pk=pending_invitation.pk %}" class="inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="response" value="accepted">
+                                    <button type="submit" 
+                                            class="px-6 py-2 bg-[#4F2FC0] text-white rounded-md font-medium hover:bg-[#3f24a0] transition-colors flex items-center gap-2">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        Accept Invitation
+                                    </button>
+                                </form>
+                                <button onclick="confirmDeclineInvitation({{ pending_invitation.pk }})" 
+                                        class="px-6 py-2 bg-red-200 text-red-900 rounded-md font-medium hover:bg-red-300 transition-colors flex items-center gap-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                    Decline
+                                </button>
+                            </div>
                         {% elif can_apply %}
                             <!-- Musician Apply Button -->
                             <button onclick="showApplicationModal()" 
@@ -385,6 +407,38 @@ function confirmWithdrawApplication() {
             csrfToken.value = '{{ csrf_token }}';
             
             form.appendChild(csrfToken);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    });
+}
+{% endif %}
+
+// Decline Invitation Confirmation
+{% if pending_invitation %}
+function confirmDeclineInvitation(invitationId) {
+    showConfirmModal({
+        title: 'Decline Invitation',
+        message: 'Are you sure you want to decline this invitation?',
+        confirmText: 'Decline',
+        type: 'warning',
+        onConfirm: function() {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/invitations/respond/${invitationId}/`;
+            
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = 'csrfmiddlewaretoken';
+            csrfToken.value = '{{ csrf_token }}';
+            
+            const response = document.createElement('input');
+            response.type = 'hidden';
+            response.name = 'response';
+            response.value = 'declined';
+            
+            form.appendChild(csrfToken);
+            form.appendChild(response);
             document.body.appendChild(form);
             form.submit();
         }

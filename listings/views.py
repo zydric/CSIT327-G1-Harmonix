@@ -177,6 +177,7 @@ def listing_detail(request, pk):
     # Note: Draft applications don't count as "applied"
     user_has_applied = False
     user_application = None
+    pending_invitation = None
     
     if request.user.is_musician:
         try:
@@ -187,6 +188,17 @@ def listing_detail(request, pk):
             )
             user_has_applied = True
         except Application.DoesNotExist:
+            pass
+        
+        # Check if user has a pending invitation for this listing
+        from invitations.models import Invitation
+        try:
+            pending_invitation = Invitation.objects.get(
+                musician=request.user,
+                listing=listing,
+                status='pending'
+            )
+        except Invitation.DoesNotExist:
             pass
     
     # Get all applications for this listing (for band admin who owns it)
@@ -200,9 +212,10 @@ def listing_detail(request, pk):
         'user': request.user,
         'user_has_applied': user_has_applied,
         'user_application': user_application,
+        'pending_invitation': pending_invitation,
         'applications': applications,
         'is_owner': request.user == listing.band_admin,
-        'can_apply': request.user.is_musician and not user_has_applied and listing.is_active,
+        'can_apply': request.user.is_musician and not user_has_applied and listing.is_active and not pending_invitation,
         'back_url': back_url,
         'back_label': back_label,
     }
