@@ -48,6 +48,8 @@
                     </div>
                     
                     <div class="space-y-4">
+                        <!-- Availability Filter - REMOVED since we only show available musicians -->
+                        
                         <!-- Genre Filter -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Genre</label>
@@ -76,17 +78,6 @@
                                     </svg>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- Availability Filter -->
-                        <div>
-                            <label class="flex items-center justify-between cursor-pointer p-3 bg-gray-50 rounded-md hover:bg-gray-100 transition">
-                                <div>
-                                    <span class="text-sm font-medium text-gray-700">Available Only</span>
-                                    <p class="text-xs text-gray-500 mt-0.5">Show musicians open to opportunities</p>
-                                </div>
-                                <input type="checkbox" id="filterAvailable" checked class="w-4 h-4 text-[#4F2FC0] bg-gray-100 border-gray-300 rounded focus:ring-[#4F2FC0] focus:ring-2">
-                            </label>
                         </div>
 
                         <!-- Instrument Filter -->
@@ -228,19 +219,6 @@
                         <h3 class="text-lg font-semibold text-gray-900">{{ musician.username }}</h3>
                         <p class="text-sm text-gray-600">@{{ musician.handle|default:musician.username }}</p>
                     </div>
-                    <!-- Availability Badge -->
-                    {% if musician.availability %}
-                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200 flex-shrink-0">
-                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 8 8">
-                            <circle cx="4" cy="4" r="3" />
-                        </svg>
-                        Available
-                    </span>
-                    {% else %}
-                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200 flex-shrink-0">
-                        Not Available
-                    </span>
-                    {% endif %}
                 </div>
 
                 <!-- Location -->
@@ -603,7 +581,6 @@
         const filterInstrument = document.getElementById('filterInstrument').value.toLowerCase();
         const filterGenre = document.getElementById('filterGenre').value.toLowerCase();
         const filterLocation = document.getElementById('filterLocation').value.toLowerCase();
-        const filterAvailable = document.getElementById('filterAvailable').checked;
         const musicians = document.querySelectorAll('#musiciansGrid > div');
         
         let visibleCount = 0;
@@ -613,9 +590,8 @@
             const matchesInstrument = filterInstrument === '' || text.includes(filterInstrument);
             const matchesGenre = filterGenre === '' || text.includes(filterGenre);
             const matchesLocation = filterLocation === '' || text.includes(filterLocation);
-            const matchesAvailable = !filterAvailable || text.includes('available');
             
-            if (matchesSearch && matchesInstrument && matchesGenre && matchesLocation && matchesAvailable) {
+            if (matchesSearch && matchesInstrument && matchesGenre && matchesLocation) {
                 musician.style.display = 'block';
                 visibleCount++;
             } else {
@@ -640,7 +616,6 @@
         document.getElementById('filterInstrument').value = '';
         document.getElementById('filterGenre').value = '';
         document.getElementById('filterLocation').value = '';
-        document.getElementById('filterAvailable').checked = true;
         applyMusicianFilters();
         
         // Ensure grid is visible and no results message is hidden
@@ -681,7 +656,6 @@
 
     // Real-time search and filters
     document.getElementById('searchMusicians')?.addEventListener('input', applyMusicianFilters);
-    document.getElementById('filterAvailable')?.addEventListener('change', applyMusicianFilters);
     document.getElementById('filterInstrument')?.addEventListener('change', applyMusicianFilters);
     document.getElementById('filterGenre')?.addEventListener('change', applyMusicianFilters);
     document.getElementById('filterLocation')?.addEventListener('change', applyMusicianFilters);
