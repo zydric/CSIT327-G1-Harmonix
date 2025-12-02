@@ -16,4 +16,7 @@ urlpatterns = [
     path('password-reset/done/', views.password_reset_done, name='password_reset_done'),
     path('reset/<uidb64>/<token>/', views.password_reset_confirm, name='password_reset_confirm'),
     path('reset/complete/', views.password_reset_complete, name='password_reset_complete'),
+    
+    # API endpoints
+    path('api/location-search/', views.location_search_api, name='location_search_api'),
 ]

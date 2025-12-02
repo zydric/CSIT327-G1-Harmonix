@@ -154,8 +154,8 @@
             </form>
 </div>
 
-<!-- Include Location Autocomplete JS -->
-<script src="{% static 'accounts/js/location-autocomplete.js' %}"></script>
+<!-- Include Simplified Location Autocomplete JS -->
+<script src="{% static 'accounts/js/simple-location-autocomplete.js' %}"></script>
 
 <script>
     // Location Autocomplete Instance
@@ -210,10 +210,7 @@
         // Initialize location autocomplete
         const locationInput = document.getElementById('locationInput');
         if (locationInput && !locationAutocomplete) {
-            locationAutocomplete = new LocationAutocomplete(locationInput, {
-                placeholder: 'Enter city, country (e.g., Cebu, Philippines)',
-                validateFormat: true
-            });
+            locationAutocomplete = new LocationAutocomplete(locationInput);
         }
         
         // Show genres section
