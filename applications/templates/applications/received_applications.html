@@ -52,45 +52,57 @@
         <div class="space-y-6">
             {% for application in applications %}
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 application-card" data-status="{{ application.status }}">
-                <!-- Application Header -->
+                <!-- Application Header with Avatar -->
                 <div class="flex justify-between items-start mb-4">
-                    <div class="flex-1">
-                        <div class="flex items-center space-x-3 mb-2">
-                            <h3 class="text-xl font-bold text-gray-900">{{ application.musician.username }}</h3>
-                            <span class="px-3 py-1 text-sm font-medium rounded-full 
-                                {% if application.status == 'pending' %}bg-yellow-100 text-yellow-800
-                                {% elif application.status == 'accepted' %}bg-green-100 text-green-800
-                                {% else %}bg-red-100 text-red-800{% endif %}">
-                                {{ application.get_status_display }}
-                            </span>
+                    <div class="flex items-start gap-3 flex-1">
+                        <!-- Musician Avatar -->
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-lg shrink-0" 
+                             style="background-color: {{ application.musician.get_avatar_color }};">
+                            {{ application.musician.get_avatar_initial }}
                         </div>
                         
-                        <div class="text-sm text-gray-600 mb-3">
-                            Applied to: 
-                            <a href="{% url 'listings:detail' pk=application.listing.pk %}" 
-                               class="font-medium text-[#4F2FC0] hover:text-purple-700">
-                                {{ application.listing.title }}
-                            </a>
-                        </div>
+                        <!-- Content -->
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mb-2">
+                                <h3 class="text-xl font-bold text-gray-900">{{ application.musician.username }}</h3>
+                                <span class="px-3 py-1 text-sm font-medium rounded-full 
+                                    {% if application.status == 'pending' %}bg-yellow-100 text-yellow-800
+                                    {% elif application.status == 'accepted' %}bg-green-100 text-green-800
+                                    {% else %}bg-red-100 text-red-800{% endif %}">
+                                    {{ application.get_status_display }}
+                                </span>
+                            </div>
+                            
+                            <div class="text-sm text-gray-600 mb-3">
+                                Applied to: 
+                                <a href="{% url 'listings:detail' pk=application.listing.pk %}" 
+                                   class="font-medium text-[#4F2FC0] hover:text-purple-700">
+                                    {{ application.listing.title }}
+                                </a>
+                            </div>
 
-                        <!-- Musician's Instruments -->
-                        {% if application.musician.instruments %}
-                        <div class="flex flex-wrap gap-2 mb-3">
-                            {% for instrument in application.musician.instruments_list %}
-                            <span class="px-2 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">{{ instrument }}</span>
-                            {% endfor %}
-                        </div>
-                        {% endif %}
+                            <!-- Musician's Instruments -->
+                            {% if application.musician.instruments %}
+                            <div class="flex flex-wrap gap-2 mb-3">
+                                {% for instrument in application.musician.instruments_list|slice:":2" %}
+                                <span class="px-2 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">{{ instrument }}</span>
+                                {% endfor %}
+                                {% if application.musician.instruments_list|length > 2 %}
+                                <span class="px-2 py-1 bg-gray-100 text-gray-600 text-sm rounded-full">+{{ application.musician.instruments_list|length|add:"-2" }} more</span>
+                                {% endif %}
+                            </div>
+                            {% endif %}
 
-                        <!-- Musician's Location -->
-                        {% if application.musician.location %}
-                        <div class="flex items-center text-sm text-gray-600 mb-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
-                            </svg>
-                            {{ application.musician.location }}
+                            <!-- Musician's Location -->
+                            {% if application.musician.location %}
+                            <div class="flex items-center text-sm text-gray-600 mb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                                </svg>
+                                {{ application.musician.location }}
+                            </div>
+                            {% endif %}
                         </div>
-                        {% endif %}
                     </div>
                     
                     <!-- Action Buttons -->

@@ -94,6 +94,9 @@ class ListingForm(forms.ModelForm):
         if len(title.strip()) < 10:
             raise ValidationError("Title must be at least 10 characters long.")
         
+        if len(title.strip()) > 80:
+            raise ValidationError("Title cannot exceed 80 characters.")
+        
         return title.strip()
 
     def clean_band_name(self):
@@ -103,6 +106,9 @@ class ListingForm(forms.ModelForm):
         
         if len(band_name.strip()) < 2:
             raise ValidationError("Band name must be at least 2 characters long.")
+        
+        if len(band_name.strip()) > 50:
+            raise ValidationError("Band name cannot exceed 50 characters.")
         
         return band_name.strip()
 
@@ -114,6 +120,9 @@ class ListingForm(forms.ModelForm):
         if len(description.strip()) < 50:
             raise ValidationError("Description must be at least 50 characters long to provide enough detail.")
         
+        if len(description.strip()) > 500:
+            raise ValidationError("Description cannot exceed 500 characters.")
+        
         return description.strip()
 
     def clean_instruments_needed(self):
@@ -121,8 +130,8 @@ class ListingForm(forms.ModelForm):
         if not instruments:
             raise ValidationError("At least one instrument must be selected.")
         
-        if len(instruments) > 5:
-            raise ValidationError("Maximum 5 instruments can be selected.")
+        if len(instruments) > 3:
+            raise ValidationError("Maximum 3 instruments can be selected. Choose your primary needs.")
         
         return instruments
 
@@ -131,8 +140,8 @@ class ListingForm(forms.ModelForm):
         if not genres:
             raise ValidationError("At least one genre must be selected.")
         
-        if len(genres) > 4:
-            raise ValidationError("Maximum 4 genres can be selected.")
+        if len(genres) > 3:
+            raise ValidationError("Maximum 3 genres can be selected. Choose your main styles.")
         
         return genres
 

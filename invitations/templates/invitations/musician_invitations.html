@@ -16,29 +16,38 @@
         <div class="space-y-6">
             {% for invitation in invitations %}
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <!-- Invitation Header -->
+                    <!-- Invitation Header with Avatar -->
                     <div class="flex justify-between items-start mb-4">
-                        <div class="flex-1">
-                            <!-- Band Name with Status Badge -->
-                            <div class="flex items-center space-x-3 mb-2">
-                                <h3 class="text-xl font-bold text-gray-900">
-                                    {{ invitation.listing.title }}
-                                </h3>
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
-                                    {% if invitation.status == 'pending' %}bg-yellow-100 text-yellow-800
-                                    {% elif invitation.status == 'accepted' %}bg-green-100 text-green-800
-                                    {% else %}bg-red-100 text-red-800{% endif %}">
-                                    {{ invitation.get_status_display }}
-                                </span>
+                        <div class="flex items-start gap-3 flex-1">
+                            <!-- Band Admin Avatar -->
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-lg shrink-0" 
+                                 style="background-color: {{ invitation.band_admin.get_avatar_color }};">
+                                {{ invitation.band_admin.get_avatar_initial }}
                             </div>
+                            
+                            <!-- Content -->
+                            <div class="flex-1 min-w-0">
+                                <!-- Band Name with Status Badge -->
+                                <div class="flex items-center gap-3 mb-2">
+                                    <h3 class="text-xl font-bold text-gray-900">
+                                        {{ invitation.listing.title }}
+                                    </h3>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                                        {% if invitation.status == 'pending' %}bg-yellow-100 text-yellow-800
+                                        {% elif invitation.status == 'accepted' %}bg-green-100 text-green-800
+                                        {% else %}bg-red-100 text-red-800{% endif %}">
+                                        {{ invitation.get_status_display }}
+                                    </span>
+                                </div>
 
-                            <!-- Band and User Information -->
-                            <div class="flex items-center space-x-4 text-sm text-gray-600 mb-4">
-                                <span class="font-medium text-[#4F2FC0]">{{ invitation.listing.band_name }}</span>
-                                <span>From: {{ invitation.band_admin.username }}</span>
-                                {% if invitation.band_admin.location %}
-                                    <span>{{ invitation.band_admin.location }}</span>
-                                {% endif %}
+                                <!-- Band and User Information -->
+                                <div class="flex items-center space-x-4 text-sm text-gray-600 mb-4">
+                                    <span class="font-medium text-[#4F2FC0]">{{ invitation.listing.band_name }}</span>
+                                    <span>From: {{ invitation.band_admin.username }}</span>
+                                    {% if invitation.band_admin.location %}
+                                        <span>{{ invitation.band_admin.location }}</span>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
 

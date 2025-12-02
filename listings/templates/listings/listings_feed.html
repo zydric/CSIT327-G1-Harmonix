@@ -53,13 +53,10 @@
                     </div>
                     
                     <form method="GET" action="{% url 'listings:feed' %}" class="space-y-4" id="filterForm">
-                        <!-- Search -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Search</label>
-                            <input type="text" name="search" value="{{ current_filters.search }}" 
-                                   placeholder="Search listings..." 
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#4F2FC0] focus:border-transparent">
-                        </div>
+                        <!-- Preserve search from top bar -->
+                        {% if current_filters.search %}
+                        <input type="hidden" name="search" value="{{ current_filters.search }}">
+                        {% endif %}
 
                         <!-- Genre Filter -->
                         <div>
@@ -97,6 +94,16 @@
                                     </svg>
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- Location Filter -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                            <input type="text" 
+                                   name="location" 
+                                   value="{{ current_filters.location }}"
+                                   placeholder="Enter city or area..."
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#4F2FC0] focus:border-transparent">
                         </div>
 
                         <!-- Filter Buttons -->
@@ -148,6 +155,27 @@
                     </div>
                 </div>
 
+                <!-- Search Bar (Top of content) -->
+                {% if is_musician %}
+                <form method="GET" action="{% url 'listings:feed' %}" class="mb-6">
+                    <div class="relative">
+                        <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <input type="text" 
+                               name="search" 
+                               value="{{ current_filters.search }}"
+                               placeholder="Search listings, bands, instruments..."
+                               class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F2FC0] focus:border-transparent">
+                        <!-- Preserve other filters -->
+                        {% if current_filters.genre %}<input type="hidden" name="genre" value="{{ current_filters.genre }}">{% endif %}
+                        {% if current_filters.instrument %}<input type="hidden" name="instrument" value="{{ current_filters.instrument }}">{% endif %}
+                        {% if current_filters.location %}<input type="hidden" name="location" value="{{ current_filters.location }}">{% endif %}
+                        {% if current_filters.sort %}<input type="hidden" name="sort" value="{{ current_filters.sort }}">{% endif %}
+                    </div>
+                </form>
+                {% endif %}
+
                 <!-- Sort Buttons -->
                 <div class="mb-6 flex items-center space-x-3">
                     <span class="text-sm text-gray-600 font-medium">Sort by:</span>
@@ -166,32 +194,33 @@
                 <!-- Listings Feed -->
                 <div class="space-y-6">
                     {% for listing in listings %}
-                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer overflow-hidden min-w-0" 
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all cursor-pointer overflow-hidden" 
                          onclick="window.location.href='{% url 'listings:detail' pk=listing.pk %}'">
-                        <!-- Listing Header -->
-                        <div class="flex justify-between items-start mb-4 min-w-0">
-                            <div class="flex-1 min-w-0">
-                                <h3 class="text-xl font-bold text-gray-900 mb-1 hover:text-[#4F2FC0] transition-colors break-words">
-                                    {{ listing.title }}
-                                </h3>
-                                <div class="flex items-center space-x-4 text-sm text-gray-600">
-                                    <span class="font-medium text-[#4F2FC0]">{{ listing.band_name }}</span>
-                                    <div class="flex space-x-2">
-                                        {% for genre in listing.genres_list %}
-                                        <span class="px-2 py-1 bg-purple-100 text-[#4F2FC0] rounded-full text-xs font-medium">{{ genre }}</span>
-                                        {% endfor %}
-                                    </div>
+                        
+                        <!-- Header: Avatar + Band Info + Action Button -->
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex items-center gap-3 flex-1 min-w-0">
+                                <!-- Avatar -->
+                                <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0"
+                                     style="background-color: {{ listing.band_admin.get_avatar_color }};">
+                                    {{ listing.band_admin.get_avatar_initial }}
+                                </div>
+                                <!-- Band Info -->
+                                <div class="min-w-0 flex-1">
+                                    <h4 class="font-semibold text-gray-900 truncate">{{ listing.band_name }}</h4>
+                                    <p class="text-xs text-gray-500">@{{ listing.band_admin.username }} • {{ listing.posted_date_display|slice:"7:" }}</p>
                                 </div>
                             </div>
                             
+                            <!-- Action Button -->
                             {% if is_musician %}
                             <button onclick="event.stopPropagation(); window.location.href='{% url 'listings:detail' pk=listing.pk %}'" 
-                                    class="px-6 py-2 bg-[#4F2FC0] text-white rounded-lg font-medium hover:bg-[#3f24a0] transition-colors whitespace-nowrap">
-                                View Details
+                                    class="px-4 py-2 bg-[#4F2FC0] text-white rounded-md text-sm font-medium hover:bg-[#3f24a0] transition-colors whitespace-nowrap flex-shrink-0">
+                                View
                             </button>
                             {% elif is_band_admin %}
                             <button onclick="event.stopPropagation(); window.location.href='{% url 'listings:edit' pk=listing.pk %}'" 
-                                    class="px-6 py-2 text-white rounded-lg font-medium hover:opacity-90 transition whitespace-nowrap flex items-center gap-2" style="background-color: var(--primary-color);">
+                                    class="px-4 py-2 bg-[#4F2FC0] text-white rounded-md text-sm font-medium hover:bg-[#3f24a0] transition-colors whitespace-nowrap flex-shrink-0 flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
                                     <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
                                     <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
@@ -201,48 +230,64 @@
                             {% endif %}
                         </div>
 
+                        <!-- Title -->
+                        <h3 class="text-xl font-bold text-gray-900 mb-2 hover:text-[#4F2FC0] transition-colors">
+                            {{ listing.title|truncatechars:80 }}
+                        </h3>
+
                         <!-- Description -->
-                        <p class="text-gray-700 mb-4 break-words" style="word-break: break-word; overflow-wrap: anywhere;">{{ listing.description|truncatewords:30 }}</p>
+                        <p class="text-sm text-gray-700 mb-4 line-clamp-2">{{ listing.description|truncatechars:120 }}</p>
 
-                        <!-- Metadata -->
-                        <div class="flex items-center space-x-6 text-sm text-gray-500">
-                            <!-- Posted Date -->
-                            <div class="flex items-center">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                </svg>
-                                {{ listing.posted_date_display }}
-                            </div>
+                        <!-- Badges: Genres (max 3 visible) -->
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            {% for genre in listing.genres_list|slice:":3" %}
+                                <span class="px-2 py-1 bg-purple-100 text-[#4F2FC0] rounded-full text-xs font-medium">
+                                    {{ genre }}
+                                </span>
+                            {% endfor %}
+                            {% if listing.genres_list|length > 3 %}
+                                <span class="text-xs text-gray-500 font-medium self-center">
+                                    +{{ listing.genres_list|length|add:"-3" }} more
+                                </span>
+                            {% endif %}
+                        </div>
 
-                            <!-- Instruments Needed -->
-                            <div class="flex items-center">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <!-- Metadata: Compact Icons -->
+                        <div class="flex items-center gap-4 text-xs text-gray-500">
+                            <!-- Instruments (max 2) -->
+                            <div class="flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
                                 </svg>
-                                {% for instrument in listing.instruments_list %}
-                                    {{ instrument }}{% if not forloop.last %}, {% endif %}
-                                {% endfor %}
-                            </div>
-
-                            <!-- Application Count -->
-                            <div class="flex items-center">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                                </svg>
-                                {{ listing.application_count }} application{{ listing.application_count|pluralize }}
+                                <span>
+                                    {% for instrument in listing.instruments_list|slice:":2" %}
+                                        {{ instrument }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                    {% if listing.instruments_list|length > 2 %}
+                                        +{{ listing.instruments_list|length|add:"-2" }}
+                                    {% endif %}
+                                </span>
                             </div>
 
                             <!-- Location -->
-                            <div class="flex items-center">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                 </svg>
-                                {{ listing.location }}
+                                <span>{{ listing.location|truncatechars:20 }}</span>
+                            </div>
+
+                            <!-- Application Count -->
+                            <div class="flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                </svg>
+                                <span>{{ listing.application_count }}</span>
                             </div>
 
                             {% if not listing.is_active %}
-                            <span class="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">
+                            <span class="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium ml-auto">
                                 Inactive
                             </span>
                             {% endif %}

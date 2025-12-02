@@ -28,21 +28,33 @@
         <div class="space-y-6">
             {% for application in applications %}
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <!-- Application Header -->
+                <!-- Application Header with Avatar -->
                 <div class="flex justify-between items-start mb-4">
-                    <div class="flex-1">
-                        <h3 class="text-xl font-bold text-gray-900 mb-1">
-                            <a href="{% url 'listings:detail' pk=application.listing.pk %}" 
-                               class="hover:text-[#4F2FC0] transition-colors">
-                                {{ application.listing.title }}
-                            </a>
-                        </h3>
-                        <div class="flex items-center space-x-4 text-sm text-gray-600">
-                            <span class="font-medium text-[#4F2FC0]">{{ application.listing.band_name }}</span>
-                            <div class="flex space-x-2">
-                                {% for genre in application.listing.genres_list %}
-                                <span class="px-2 py-1 bg-purple-100 text-[#4F2FC0] rounded-full text-xs font-medium">{{ genre }}</span>
-                                {% endfor %}
+                    <div class="flex items-start gap-3 flex-1">
+                        <!-- Avatar -->
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-lg shrink-0" 
+                             style="background-color: {{ application.listing.band_admin.get_avatar_color }};">
+                            {{ application.listing.band_admin.get_avatar_initial }}
+                        </div>
+                        
+                        <!-- Content -->
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-xl font-bold text-gray-900 mb-1">
+                                <a href="{% url 'listings:detail' pk=application.listing.pk %}" 
+                                   class="hover:text-[#4F2FC0] transition-colors">
+                                    {{ application.listing.title }}
+                                </a>
+                            </h3>
+                            <div class="flex items-center space-x-4 text-sm text-gray-600">
+                                <span class="font-medium text-[#4F2FC0]">{{ application.listing.band_name }}</span>
+                                <div class="flex flex-wrap gap-1">
+                                    {% for genre in application.listing.genres_list|slice:":3" %}
+                                    <span class="px-2 py-1 bg-purple-100 text-[#4F2FC0] rounded-full text-xs font-medium">{{ genre }}</span>
+                                    {% endfor %}
+                                    {% if application.listing.genres_list|length > 3 %}
+                                    <span class="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">+{{ application.listing.genres_list|length|add:"-3" }} more</span>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                     </div>
