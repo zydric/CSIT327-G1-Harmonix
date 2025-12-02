@@ -11,6 +11,8 @@ urlpatterns = [
     # Musician Views  
     path('received/', views.musician_received_invitations, name='musician_invitations'),
     path('respond/', views.respond_to_invitation, name='respond_invitation'),
+
+    path('sent/', views.band_sent_invites, name='band_sent_invites'),
     
     # API Endpoints
     path('listing/<int:listing_id>/', views.get_listing_details, name='listing_details'),
