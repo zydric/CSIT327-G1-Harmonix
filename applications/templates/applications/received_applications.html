@@ -234,7 +234,7 @@ document.getElementById('searchApplications')?.addEventListener('input', applyFi
 function confirmAcceptApplication(musicianName, listingTitle, applicationId) {
     showConfirmModal({
         title: 'Accept Application',
-        message: `Are you sure you want to accept ${musicianName}'s application for "${listingTitle}"?`,
+        message: 'Are you sure you want to accept this application?',
         confirmText: 'Accept',
         type: 'success',
         onConfirm: function() {
@@ -247,7 +247,7 @@ function confirmAcceptApplication(musicianName, listingTitle, applicationId) {
 function confirmRejectApplication(musicianName, listingTitle, applicationId) {
     showConfirmModal({
         title: 'Reject Application',
-        message: `Are you sure you want to reject ${musicianName}'s application for "${listingTitle}"?`,
+        message: 'Are you sure you want to reject this application?',
         confirmText: 'Reject',
         type: 'danger',
         onConfirm: function() {
