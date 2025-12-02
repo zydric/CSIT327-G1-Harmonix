@@ -12,17 +12,47 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Custom Styles -->
     <style>
         :root {
+            /* Brand Colors */
             --primary-color: #4F2FC0;
             --primary-hover: #3f24a0;
             --light-bg: #F3EFF8;
+            
+            /* CSS Custom Properties for Enhanced Theming */
+            --radius: 0.75rem;
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            
+            /* Shadows */
+            --shadow-elegant: 0 8px 32px -8px rgba(79, 47, 192, 0.15);
+            --shadow-card: 0 4px 16px -4px rgba(0, 0, 0, 0.1);
+            
+            /* Gradients */
+            --gradient-primary: linear-gradient(135deg, #4F2FC0, #3f24a0);
         }
+        
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        
+        /* Utility Classes */
+        .transition-smooth {
+            transition: var(--transition-smooth);
+        }
+        
+        .shadow-elegant {
+            box-shadow: var(--shadow-elegant);
+        }
+        
+        .shadow-card {
+            box-shadow: var(--shadow-card);
+        }
+        
+        .bg-gradient-primary {
+            background: var(--gradient-primary);
         }
     </style>
     
