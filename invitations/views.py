@@ -7,7 +7,8 @@ import json
 from accounts.models import User
 from listings.models import Listing
 from .models import Invitation
-
+import datetime
+from datetime import datetime, timedelta
 
 @login_required
 def band_admin_invite_musicians(request):
@@ -165,3 +166,50 @@ def get_listing_details(request, listing_id):
         
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+@login_required
+def band_sent_invites(request):
+    # --- MOCK DATA START ---
+    # We create a list of dictionaries that look exactly like your database models
+    mock_invitations = [
+        {
+            'id': 1,
+            'status': 'pending',
+            'created_at': datetime.now() - timedelta(days=2), # Sent 2 days ago
+            'message': "We love your drumming style! Would you be interested in jamming with us this weekend? We have a gig coming up at the Roxy.",
+            'listing': {
+                'title': 'Indie Rock Drummer Needed'
+            },
+            'recipient': {
+                'username': 'alexdrums',
+                'get_full_name': 'Alex Martinez', # In a dict, we just put the string here
+                'profile': {
+                    'location': 'Los Angeles, CA',
+                    'instrument': 'Drums, Percussion'
+                }
+            }
+        },
+        {
+            'id': 2,
+            'status': 'accepted',
+            'created_at': datetime.now() - timedelta(days=10), # Sent 10 days ago
+            'message': "Hey Sarah! We are looking for a synth player for our pop cover band. Check out our profile!",
+            'listing': {
+                'title': 'Synth Pop Keys Needed'
+            },
+            'recipient': {
+                'username': 'sarahkeys',
+                'get_full_name': 'Sarah Jenkins',
+                'first_name': 'Sarah', # Needed for the 'accepted' footer message
+                'profile': {
+                    'location': 'San Diego, CA',
+                    'instrument': 'Piano, Synthesizer'
+                }
+            }
+        }
+    ]
+    # --- MOCK DATA END ---
+
+    return render(request, 'invitations/band_sent_invites.html', {
+        'invitations': mock_invitations
+    })
