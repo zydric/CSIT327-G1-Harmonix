@@ -91,6 +91,21 @@
                         {% endif %}
                     </div>
 
+                    <!-- Location Field -->
+                    <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                        <label for="{{ form.location.id_for_label }}" class="block text-base font-semibold text-gray-900 mb-3">
+                            Location *
+                        </label>
+                        {{ form.location }}
+                        {% if form.location.errors %}
+                            <div class="mt-1">
+                                {% for error in form.location.errors %}
+                                    <p class="text-red-600 text-sm">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
                     <!-- Instruments Needed -->
                     <div class="bg-purple-50 p-6 rounded-lg border-2 border-purple-200">
                         <label class="block text-base font-semibold text-gray-900 mb-2">
