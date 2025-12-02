@@ -4,7 +4,7 @@
 {% block title %}My Applications - Harmonix{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Messages -->
     {% if messages %}
         <div class="mb-6 space-y-3">
@@ -24,6 +24,39 @@
             </p>
         </div>
 
+        <!-- Filter Tabs -->
+        <div class="mb-6">
+            <div class="border-b border-gray-200">
+                <nav class="-mb-px flex space-x-8">
+                    <button onclick="filterApplications('all')" 
+                            class="filter-tab active border-b-2 border-[#4F2FC0] py-4 px-1 text-sm font-medium text-[#4F2FC0]">
+                        All
+                        <span class="ml-2 bg-[#4F2FC0] text-white rounded-full px-2 py-0.5 text-xs" id="count-all">0</span>
+                    </button>
+                    <button onclick="filterApplications('pending')" 
+                            class="filter-tab border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                        Pending
+                        <span class="ml-2 bg-gray-200 text-gray-700 rounded-full px-2 py-0.5 text-xs" id="count-pending">0</span>
+                    </button>
+                    <button onclick="filterApplications('accepted')" 
+                            class="filter-tab border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                        Accepted
+                        <span class="ml-2 bg-gray-200 text-gray-700 rounded-full px-2 py-0.5 text-xs" id="count-accepted">0</span>
+                    </button>
+                    <button onclick="filterApplications('rejected')" 
+                            class="filter-tab border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                        Rejected
+                        <span class="ml-2 bg-gray-200 text-gray-700 rounded-full px-2 py-0.5 text-xs" id="count-rejected">0</span>
+                    </button>
+                    <button onclick="filterApplications('draft')" 
+                            class="filter-tab border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                        Drafts
+                        <span class="ml-2 bg-gray-200 text-gray-700 rounded-full px-2 py-0.5 text-xs" id="count-draft">0</span>
+                    </button>
+                </nav>
+            </div>
+        </div>
+
         <!-- Search Bar -->
         <div class="mb-8">
             <div class="relative">
@@ -38,124 +71,127 @@
         </div>
 
         <!-- Applications List -->
-        <div class="space-y-6">
+        <div class="space-y-6" id="applicationsList">
             {% for application in applications %}
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <!-- Application Header with Avatar -->
-                <div class="flex justify-between items-start mb-4">
-                    <div class="flex items-start gap-3 flex-1">
+            <div class="application-card rounded-lg border overflow-hidden shadow-sm hover:shadow-md transition-shadow
+                {% if application.status == 'draft' %}bg-gray-50 border-gray-300
+                {% elif application.status == 'pending' %}bg-amber-50 border-amber-200
+                {% elif application.status == 'accepted' %}bg-green-50 border-green-200
+                {% else %}bg-red-50 border-red-200{% endif %}" 
+                data-status="{{ application.status }}">
+                
+                <!-- Card Content -->
+                <div class="p-6">
+                    <div class="flex items-start gap-3">
                         <!-- Avatar -->
-                        <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-lg shrink-0" 
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0" 
                              style="background-color: {{ application.listing.band_admin.get_avatar_color }};">
                             {{ application.listing.band_admin.get_avatar_initial }}
                         </div>
                         
                         <!-- Content -->
                         <div class="flex-1 min-w-0">
-                            <h3 class="text-xl font-bold text-gray-900 mb-1">
-                                <a href="{% url 'listings:detail' pk=application.listing.pk %}" 
-                                   class="hover:text-[#4F2FC0] transition-colors">
-                                    {{ application.listing.title }}
-                                </a>
-                            </h3>
-                            <div class="flex items-center space-x-4 text-sm text-gray-600">
-                                <span class="font-medium text-[#4F2FC0]">{{ application.listing.band_name }}</span>
-                                <div class="flex flex-wrap gap-1">
-                                    {% for genre in application.listing.genres_list|slice:":3" %}
-                                    <span class="px-2 py-1 bg-purple-100 text-[#4F2FC0] rounded-full text-xs font-medium">{{ genre }}</span>
-                                    {% endfor %}
-                                    {% if application.listing.genres_list|length > 3 %}
-                                    <span class="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">+{{ application.listing.genres_list|length|add:"-3" }} more</span>
-                                    {% endif %}
+                            <div class="flex items-start justify-between gap-2 mb-1">
+                                <div class="flex-1 min-w-0">
+                                    <a href="{% url 'listings:detail' pk=application.listing.pk %}" class="font-semibold text-gray-900 hover:text-[#4F2FC0] truncate block">
+                                        {{ application.listing.title }}
+                                    </a>
+                                    <p class="text-sm text-gray-600 truncate">{{ application.listing.band_name }}</p>
                                 </div>
+                                <span class="text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap
+                                    {% if application.status == 'draft' %}bg-gray-200 text-gray-800
+                                    {% elif application.status == 'pending' %}bg-amber-200 text-amber-900
+                                    {% elif application.status == 'accepted' %}bg-green-200 text-green-900
+                                    {% else %}bg-red-200 text-red-900{% endif %}">
+                                    {{ application.get_status_display }}
+                                </span>
+                            </div>
+                            
+                            <!-- Instruments needed (max 2 visible) -->
+                            {% if application.listing.instruments_list %}
+                            <div class="flex flex-wrap gap-1 mt-2">
+                                {% for instrument in application.listing.instruments_list|slice:":2" %}
+                                <span class="inline-block bg-white text-gray-700 px-2 py-0.5 rounded text-xs border border-gray-200">{{ instrument }}</span>
+                                {% endfor %}
+                                {% if application.listing.instruments_list|length > 2 %}
+                                <span class="inline-block bg-white text-gray-700 px-2 py-0.5 rounded text-xs border border-gray-200">+{{ application.listing.instruments_list|length|add:"-2" }}</span>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Message preview -->
+                            {% if application.message %}
+                            <p class="text-sm text-gray-700 mt-2 line-clamp-2">{{ application.message }}</p>
+                            {% endif %}
+                            
+                            <!-- Date -->
+                            <div class="flex items-center gap-1 mt-2 text-xs text-gray-600">
+                                <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                {% if application.status == 'draft' %}
+                                    Draft created {{ application.created_at|date:"M d, Y" }}
+                                {% else %}
+                                    Applied {{ application.created_at|date:"M d, Y" }}
+                                {% endif %}
                             </div>
                         </div>
                     </div>
+                </div>
+                
+                <!-- Action Bar -->
+                {% if application.status == 'draft' or application.status == 'pending' %}
+                <div class="border-t bg-white px-6 py-3 flex items-center justify-between
+                    {% if application.status == 'draft' %}border-gray-200
+                    {% else %}border-amber-200{% endif %}">
+                    <a href="{% url 'listings:detail' pk=application.listing.pk %}" 
+                       class="inline-flex items-center text-sm text-gray-600 hover:text-[#4F2FC0] font-medium transition-colors">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                        </svg>
+                        View Listing
+                    </a>
                     
-                    <!-- Status Badge & Actions -->
-                    <div class="flex items-center space-x-3">
-                        <span class="px-3 py-1 text-sm font-medium rounded-full 
-                            {% if application.status == 'draft' %}bg-gray-100 text-gray-800
-                            {% elif application.status == 'pending' %}bg-yellow-100 text-yellow-800
-                            {% elif application.status == 'accepted' %}bg-green-100 text-green-800
-                            {% else %}bg-red-100 text-red-800{% endif %}">
-                            {{ application.get_status_display }}
-                        </span>
-                        
-                        <!-- Draft Actions -->
+                    <div class="flex items-center gap-2">
                         {% if application.status == 'draft' %}
-                        <button onclick="openDraftModal({{ application.pk }}, '{{ application.listing.title|escapejs }}', {{ application.listing.pk }}, `{{ application.message|escapejs }}`)" 
-                           class="text-sm text-[#4F2FC0] hover:text-purple-700 font-medium transition-colors">
-                            View Draft
-                        </button>
-                        <button onclick="confirmWithdraw({{ application.pk }}, '{{ application.listing.title|escapejs }}')" 
-                                class="text-sm text-red-600 hover:text-red-800 font-medium transition-colors">
-                            Delete Draft
-                        </button>
-                        
-                        <!-- Withdraw Button (only for pending applications) -->
+                            <button onclick="openDraftModal({{ application.pk }}, '{{ application.listing.title|escapejs }}', '{{ application.listing.band_name|escapejs }}', {{ application.listing.pk }}, `{{ application.message|escapejs }}`)" 
+                               class="inline-flex items-center px-3 py-1.5 text-sm bg-[#4F2FC0] text-white rounded-md hover:bg-[#3f24a0] font-medium transition-colors">
+                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                                Continue Application
+                            </button>
+                            <button onclick="confirmWithdraw({{ application.pk }}, '{{ application.listing.title|escapejs }}')" 
+                                    class="inline-flex items-center px-3 py-1.5 text-sm text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md font-medium transition-colors">
+                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                                Delete
+                            </button>
                         {% elif application.status == 'pending' %}
-                        <button onclick="confirmWithdraw({{ application.pk }}, '{{ application.listing.title|escapejs }}')" 
-                                class="text-sm text-red-600 hover:text-red-800 font-medium transition-colors">
-                            Withdraw
-                        </button>
+                            <button onclick="confirmWithdraw({{ application.pk }}, '{{ application.listing.title|escapejs }}')" 
+                                    class="inline-flex items-center px-3 py-1.5 text-sm text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md font-medium transition-colors">
+                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                                Withdraw Application
+                            </button>
                         {% endif %}
                     </div>
-                </div>
-
-                <!-- Application Message -->
-                {% if application.message %}
-                <div class="mb-4">
-                    <h4 class="text-sm font-medium text-gray-700 mb-2">Your Message:</h4>
-                    <p class="text-gray-700 bg-gray-50 p-3 rounded-md">{{ application.message }}</p>
                 </div>
                 {% endif %}
-
-                <!-- Application Metadata -->
-                <div class="flex items-center space-x-6 text-sm text-gray-500 border-t border-gray-200 pt-4">
-                    <!-- Application Date -->
-                    <div class="flex items-center">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                        </svg>
-                        {% if application.status == 'draft' %}
-                            Draft created {{ application.created_at|date:"M d, Y" }}
-                        {% else %}
-                            {{ application.application_date_display }}
-                        {% endif %}
-                    </div>
-
-                    <!-- Instruments Needed -->
-                    <div class="flex items-center">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
-                        </svg>
-                        {% for instrument in application.listing.instruments_list %}
-                            {{ instrument }}{% if not forloop.last %}, {% endif %}
-                        {% endfor %}
-                    </div>
-
-                    <!-- View Listing Link -->
-                    <a href="{% url 'listings:detail' pk=application.listing.pk %}" 
-                       class="text-[#4F2FC0] hover:text-purple-700 font-medium">
-                        View Listing →
-                    </a>
-                </div>
             </div>
             {% empty %}
             <!-- Empty State -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+            <div class="bg-white rounded-lg border border-gray-200 p-12 text-center">
                 <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">No Applications Yet</h3>
-                <p class="text-gray-500 mb-4">
-                    You haven't applied to any band opportunities yet. Browse available listings to find your next musical collaboration.
+                <h3 class="text-lg font-medium text-gray-900 mb-2">No applications yet</h3>
+                <p class="text-gray-500">
+                    You haven't applied to any band opportunities yet.
                 </p>
-                <a href="{% url 'listings:feed' %}" 
-                   class="inline-flex items-center px-4 py-2 bg-[#4F2FC0] text-white rounded-md hover:bg-[#3f24a0] transition-colors">
-                    Browse Opportunities
-                </a>
             </div>
             {% endfor %}
         </div>
@@ -167,83 +203,82 @@
     {% csrf_token %}
 </form>
 
-<!-- Draft Application Modal -->
-<div id="draftModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-    <div class="relative top-20 mx-auto p-5 border-2 border-gray-300 w-96 shadow-lg rounded-lg bg-white">
-        <div class="mt-3">
-            <h3 id="draftModalTitle" class="text-xl font-bold text-gray-900 mb-4">Edit Draft Application</h3>
-            
-            <form method="post" action="" id="draftForm">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="submit" id="draftActionInput">
-                <input type="hidden" name="application_id" value="" id="draftApplicationId">
-                <input type="hidden" name="redirect_to" value="my_applications">
-                <div class="mb-4">
-                    <label for="draftMessage" class="block text-base font-semibold text-gray-900 mb-3">
-                        Cover Message (Optional)
-                    </label>
-                    <textarea id="draftMessage" name="message" rows="4" 
-                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                              placeholder="Tell the band why you're interested and what you can bring to the project..."></textarea>
+<!-- Draft Edit Modal (Matches Apply Modal Design) -->
+<div id="draftModal" class="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="flex items-center justify-center min-h-screen px-4 py-8">
+        <div class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl">
+        <!-- Modal Header -->
+        <div class="px-6 py-5 border-b border-gray-200">
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-1">Continue Application</h2>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-1" id="draftModalTitle"></h3>
+                    <p class="text-sm text-gray-600" id="draftModalBandName"></p>
                 </div>
-                
-                <div class="flex justify-end space-x-3">
-                    <button type="button" onclick="hideDraftModal()" 
-                            class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
-                        Cancel
-                    </button>
-                    <button type="button" onclick="saveDraftFromModal()" 
-                            class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
-                        Save as Draft
-                    </button>
-                    <button type="submit" 
-                            class="px-4 py-2 bg-[#4F2FC0] text-white rounded-md hover:bg-[#3f24a0] transition-colors">
-                        Submit Application
-                    </button>
-                </div>
-            </form>
+                <button type="button" onclick="hideDraftModal()" class="text-gray-400 hover:text-gray-600 transition-colors ml-4">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
         </div>
-    </div>
-</div>
-
-<!-- Draft Edit Modal -->
-<div id="draftModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-    <div class="relative top-20 mx-auto p-5 border-2 border-gray-300 w-96 shadow-lg rounded-lg bg-white">
-        <div class="mt-3">
-            <h3 class="text-xl font-bold text-gray-900 mb-4" id="draftModalTitle">Edit Draft Application</h3>
+        
+        <!-- Modal Body -->
+        <form method="post" id="draftForm">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="submit" id="draftActionInput">
+            <input type="hidden" name="redirect_to" value="my_applications">
             
-            <form method="post" id="draftForm">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="submit" id="draftActionInput">
-                <div class="mb-4">
-                    <label for="draftMessage" class="block text-base font-semibold text-gray-900 mb-3">
-                        Cover Message (Optional)
-                    </label>
-                    <textarea id="draftMessage" name="message" rows="4" 
-                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                              placeholder="Tell the band why you're interested and what you can bring to the project..."></textarea>
+            <div class="px-6 py-5">
+                <label for="draftMessage" class="block text-sm font-medium text-gray-900 mb-2">
+                    Application Message <span class="text-gray-500 font-normal">(optional)</span>
+                </label>
+                <div class="relative">
+                    <textarea id="draftMessage" name="message" rows="6" maxlength="1000"
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F2FC0] focus:border-transparent resize-none text-sm"
+                              placeholder="Tell the band why you'd be a great fit..."
+                              oninput="updateDraftCharCount()"></textarea>
+                    <div class="absolute bottom-3 right-3 text-xs text-gray-400" id="draftCharCount">0/1000</div>
                 </div>
-                
-                <div class="flex justify-end space-x-3">
-                    <button type="button" onclick="hideDraftModal()" 
-                            class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
-                        Cancel
-                    </button>
-                    <button type="button" onclick="saveDraftAsDraft()" 
-                            class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
-                        Save as Draft
-                    </button>
-                    <button type="submit" 
-                            class="px-4 py-2 bg-[#4F2FC0] text-white rounded-md hover:bg-[#3f24a0] transition-colors">
-                        Submit Application
-                    </button>
-                </div>
-            </form>
+            </div>
+            
+            <!-- Modal Footer -->
+            <div class="px-6 py-4 bg-gray-50 rounded-b-2xl flex items-center justify-between">
+                <button type="button" onclick="saveDraftAsDraft()" 
+                        class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+                    </svg>
+                    Save Draft
+                </button>
+                <button type="submit" 
+                        class="inline-flex items-center px-6 py-2.5 text-sm font-medium text-white bg-[#4F2FC0] rounded-lg hover:bg-[#3f24a0] transition-colors shadow-sm">
+                    Submit Application
+                </button>
+            </div>
+        </form>
         </div>
     </div>
 </div>
 
 <script>
+// Character counter for draft modal
+function updateDraftCharCount() {
+    const textarea = document.getElementById('draftMessage');
+    const charCount = document.getElementById('draftCharCount');
+    const currentLength = textarea.value.length;
+    charCount.textContent = `${currentLength}/1000`;
+    
+    // Change color when approaching limit
+    if (currentLength > 900) {
+        charCount.classList.add('text-red-500');
+        charCount.classList.remove('text-gray-400');
+    } else {
+        charCount.classList.add('text-gray-400');
+        charCount.classList.remove('text-red-500');
+    }
+}
+
 function confirmWithdraw(applicationId, listingTitle) {
     // Check if this is likely a draft based on the button text (simple approach)
     const isDraft = event.target.textContent.includes('Delete');
@@ -257,19 +292,26 @@ function confirmWithdraw(applicationId, listingTitle) {
     }
 }
 
-function openDraftModal(applicationId, listingTitle, listingId, currentMessage) {
-    document.getElementById('draftModalTitle').textContent = `Edit Draft - ${listingTitle}`;
+function openDraftModal(applicationId, listingTitle, bandName, listingId, currentMessage) {
+    const modal = document.getElementById('draftModal');
+    document.getElementById('draftModalTitle').textContent = listingTitle;
+    document.getElementById('draftModalBandName').textContent = bandName;
     document.getElementById('draftMessage').value = currentMessage;
     document.getElementById('draftForm').action = `/applications/apply/${listingId}/`;
-    document.getElementById('draftModal').classList.remove('hidden');
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    updateDraftCharCount();
 }
 
 function hideDraftModal() {
-    document.getElementById('draftModal').classList.add('hidden');
+    const modal = document.getElementById('draftModal');
+    modal.classList.add('hidden');
+    document.body.style.overflow = 'auto'; // Restore scrolling
     document.getElementById('draftMessage').value = '';
+    updateDraftCharCount();
 }
 
-function saveDraftFromModal() {
+function saveDraftAsDraft() {
     document.getElementById('draftActionInput').value = 'draft';
     document.getElementById('draftForm').submit();
 }
@@ -281,19 +323,110 @@ document.getElementById('draftModal')?.addEventListener('click', function(e) {
     }
 });
 
-// Real-time search for applications
-document.getElementById('searchMyApplications')?.addEventListener('input', function() {
-    const searchTerm = this.value.toLowerCase();
-    const applications = document.querySelectorAll('.space-y-6 > div');
+// Close draft modal when clicking outside
+document.getElementById('draftModal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        hideDraftModal();
+    }
+});
+
+// Filter state
+let currentFilter = 'all';
+
+// Filter applications by status
+function filterApplications(status) {
+    currentFilter = status;
+    const applications = document.querySelectorAll('.application-card');
     
-    applications.forEach(application => {
-        const text = application.textContent.toLowerCase();
-        if (searchTerm === '' || text.includes(searchTerm)) {
-            application.style.display = 'block';
+    // Update tab styling
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.classList.remove('active', 'border-[#4F2FC0]', 'text-[#4F2FC0]');
+        tab.classList.add('border-transparent', 'text-gray-500');
+        // Update badge colors
+        const badge = tab.querySelector('span');
+        badge.classList.remove('bg-[#4F2FC0]', 'text-white');
+        badge.classList.add('bg-gray-200', 'text-gray-700');
+    });
+    
+    // Highlight active tab
+    event.target.closest('.filter-tab').classList.add('active', 'border-[#4F2FC0]', 'text-[#4F2FC0]');
+    event.target.closest('.filter-tab').classList.remove('border-transparent', 'text-gray-500');
+    const activeBadge = event.target.closest('.filter-tab').querySelector('span');
+    activeBadge.classList.remove('bg-gray-200', 'text-gray-700');
+    activeBadge.classList.add('bg-[#4F2FC0]', 'text-white');
+    
+    // Filter applications
+    applications.forEach(app => {
+        const appStatus = app.dataset.status;
+        if (status === 'all' || appStatus === status) {
+            app.style.display = 'block';
         } else {
-            application.style.display = 'none';
+            app.style.display = 'none';
         }
     });
+    
+    // Check if search is active and reapply
+    const searchTerm = document.getElementById('searchMyApplications').value;
+    if (searchTerm) {
+        applySearch(searchTerm);
+    }
+}
+
+// Apply search with current filter
+function applySearch(searchTerm) {
+    const applications = document.querySelectorAll('.application-card');
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    
+    applications.forEach(app => {
+        const appStatus = app.dataset.status;
+        const text = app.textContent.toLowerCase();
+        const matchesFilter = currentFilter === 'all' || appStatus === currentFilter;
+        const matchesSearch = searchTerm === '' || text.includes(lowerSearchTerm);
+        
+        if (matchesFilter && matchesSearch) {
+            app.style.display = 'block';
+        } else {
+            app.style.display = 'none';
+        }
+    });
+}
+
+// Calculate and update counts
+function updateCounts() {
+    const applications = document.querySelectorAll('.application-card');
+    const counts = {
+        all: 0,
+        pending: 0,
+        accepted: 0,
+        rejected: 0,
+        draft: 0
+    };
+    
+    applications.forEach(app => {
+        const status = app.dataset.status;
+        counts.all++;
+        if (counts[status] !== undefined) {
+            counts[status]++;
+        }
+    });
+    
+    // Update badge counts
+    Object.keys(counts).forEach(status => {
+        const badge = document.getElementById(`count-${status}`);
+        if (badge) {
+            badge.textContent = counts[status];
+        }
+    });
+}
+
+// Real-time search for applications
+document.getElementById('searchMyApplications')?.addEventListener('input', function() {
+    applySearch(this.value);
+});
+
+// Initialize counts on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updateCounts();
 });
 </script>
 {% endblock %}

@@ -75,7 +75,7 @@
             {% if recent_applications %}
                 <div class="space-y-3">
                     {% for application in recent_applications %}
-                        <a href="{% url 'listings:detail' pk=application.listing.pk %}" class="block border border-gray-200 rounded-lg p-4 hover:border-[#4F2FC0] hover:shadow-sm transition-all">
+                        <a href="{% url 'listings:detail' pk=application.listing.pk %}?from=musician_dashboard" class="block border border-gray-200 rounded-lg p-4 hover:border-[#4F2FC0] hover:shadow-sm transition-all">
                             <div class="flex items-start gap-3">
                                 <!-- Avatar -->
                                 <div class="flex-shrink-0">
@@ -143,7 +143,7 @@
             {% if recent_invitations %}
                 <div class="space-y-3">
                     {% for invitation in recent_invitations %}
-                        <a href="{% url 'listings:detail' pk=invitation.listing.pk %}" class="block border border-gray-200 rounded-lg p-4 hover:border-[#4F2FC0] hover:shadow-sm transition-all">
+                        <a href="{% url 'listings:detail' pk=invitation.listing.pk %}?from=musician_dashboard" class="block border border-gray-200 rounded-lg p-4 hover:border-[#4F2FC0] hover:shadow-sm transition-all">
                             <div class="flex items-start gap-3">
                                 <!-- Avatar -->
                                 <div class="flex-shrink-0">

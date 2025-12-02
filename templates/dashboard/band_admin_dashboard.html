@@ -71,7 +71,7 @@
                 <div class="space-y-3">
                     {% for listing in recent_listings %}
                         <div class="border border-gray-200 rounded-lg p-4">
-                            <a href="{% url 'listings:detail' pk=listing.pk %}" class="font-semibold text-gray-900 hover:text-[#4F2FC0] block truncate">{{ listing.title }}</a>
+                            <a href="{% url 'listings:detail' pk=listing.pk %}?from=band_admin_dashboard" class="font-semibold text-gray-900 hover:text-[#4F2FC0] block truncate">{{ listing.title }}</a>
                             <p class="text-sm text-gray-500 mt-1 line-clamp-2">{{ listing.description|truncatechars:50 }}</p>
                             <div class="flex items-center gap-2 mt-3 flex-wrap">
                                 {% for genre in listing.genres_list %}
