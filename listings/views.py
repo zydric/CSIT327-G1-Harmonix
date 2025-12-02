@@ -165,6 +165,7 @@ def listing_detail(request, pk):
             back_label = "Back to Dashboard"
     
     # Check if current user has already applied (for musicians)
+    # Note: Draft applications don't count as "applied"
     user_has_applied = False
     user_application = None
     
@@ -172,16 +173,18 @@ def listing_detail(request, pk):
         try:
             user_application = Application.objects.get(
                 musician=request.user, 
-                listing=listing
+                listing=listing,
+                status__in=['pending', 'accepted', 'rejected']  # Exclude drafts
             )
             user_has_applied = True
         except Application.DoesNotExist:
             pass
     
     # Get all applications for this listing (for band admin who owns it)
+    # Exclude draft applications from the list
     applications = None
     if request.user == listing.band_admin:
-        applications = listing.applications.all().order_by('-created_at')
+        applications = listing.applications.exclude(status='draft').order_by('-created_at')
     
     context = {
         'listing': listing,

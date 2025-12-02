@@ -4,7 +4,7 @@
 {% block title %}Listing Details - Harmonix{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Back Button -->
         <div class="mb-6">
             <a href="{% if back_url and back_url != 'listings:feed' %}{% url back_url %}{% else %}{% url 'listings:feed' %}{% endif %}" class="flex items-center text-gray-500 hover:text-[#4F2FC0] transition-colors whitespace-nowrap">
@@ -19,23 +19,16 @@
         <div class="bg-white rounded-lg shadow-sm border-2 border-gray-200 overflow-hidden">
             <!-- Header -->
             <div class="p-8 border-b-2 border-gray-200 bg-gradient-to-br from-purple-50 to-indigo-50">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="flex-1">
-                        <h1 class="text-4xl font-bold text-gray-900 mb-3">{{ listing.title }}</h1>
-                        <div class="flex items-center space-x-4 mb-4">
-                            <span class="text-2xl font-semibold text-[#4F2FC0]">{{ listing.band_name }}</span>
+                <div class="flex justify-between items-start gap-6 mb-4">
+                    <div class="flex-1 min-w-0 max-w-2xl">
+                        <h1 class="text-3xl font-bold text-gray-900 mb-3 break-words" style="word-wrap: break-word; overflow-wrap: break-word;">{{ listing.title }}</h1>
+                        <div class="flex items-center space-x-4">
+                            <span class="text-2xl font-semibold text-[#4F2FC0] break-words">{{ listing.band_name }}</span>
                             {% if not listing.is_active %}
                                 <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm font-medium">
                                     Inactive
                                 </span>
                             {% endif %}
-                        </div>
-                        
-                        <!-- Genres -->
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            {% for genre in listing.genres_list %}
-                                <span class="px-3 py-1 bg-purple-100 text-[#4F2FC0] rounded-full text-sm font-medium">{{ genre }}</span>
-                            {% endfor %}
                         </div>
                     </div>
                     
@@ -66,20 +59,8 @@
                             </button>
                         {% elif user_has_applied %}
                             <!-- Already Applied -->
-                            <div class="flex items-center gap-3">
-                                <div class="px-6 py-2 bg-green-100 text-green-800 rounded-md font-medium">
-                                    {{ user_application.application_date_display }}
-                                </div>
-                                {% if user_application.status == 'pending' %}
-                                <form method="post" action="{% url 'applications:withdraw' pk=user_application.pk %}" class="inline">
-                                    {% csrf_token %}
-                                    <button type="submit" 
-                                            onclick="return confirm('Are you sure you want to withdraw your application?')"
-                                            class="px-4 py-2 text-red-600 hover:text-red-800 font-medium transition-colors">
-                                        Withdraw
-                                    </button>
-                                </form>
-                                {% endif %}
+                            <div class="px-6 py-2 bg-green-100 text-green-800 rounded-md font-medium">
+                                {{ user_application.application_date_display }}
                             </div>
                         {% elif not listing.is_active %}
                             <!-- Inactive Listing -->
@@ -91,27 +72,40 @@
                 </div>
                 
                 <!-- Metadata -->
-                <div class="flex items-center space-x-6 text-sm text-gray-500">
-                    <div class="flex items-center">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                        </svg>
-                        {{ listing.posted_date_display }}
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-6 text-sm text-gray-500">
+                        <div class="flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            {{ listing.posted_date_display }}
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            </svg>
+                            {{ listing.application_count }} application{{ listing.application_count|pluralize }}
+                        </div>
                     </div>
                     
-                    <div class="flex items-center">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    <!-- Withdraw Button (if user has applied) -->
+                    {% if user_has_applied and user_application.status == 'pending' %}
+                    <button onclick="confirmWithdrawApplication()" 
+                            class="inline-flex items-center px-3 py-1.5 text-sm text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md font-medium transition-colors ml-auto">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
-                        {{ listing.application_count }} application{{ listing.application_count|pluralize }}
-                    </div>
+                        Withdraw Application
+                    </button>
+                    {% endif %}
                 </div>
             </div>
 
             <!-- Description -->
             <div class="p-8 border-b-2 border-gray-200 bg-gray-50">
                 <h2 class="text-xl font-bold text-gray-900 mb-4">About This Opportunity</h2>
-                <div class="prose max-w-full text-gray-700 leading-relaxed break-words" style="overflow-wrap: break-word; word-break: break-word;">
+                <div class="prose max-w-full text-gray-700 leading-relaxed" style="overflow-wrap: anywhere; word-break: break-word;">
                     {{ listing.description|linebreaks }}
                 </div>
             </div>
@@ -120,7 +114,7 @@
             <div class="p-8">
                 <h2 class="text-xl font-bold text-gray-900 mb-6">What We're Looking For</h2>
                 
-                <div class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Instruments -->
                     <div class="bg-purple-50 p-6 rounded-lg border border-purple-100">
                         <h3 class="text-base font-semibold text-gray-900 mb-3">Open Positions</h3>
@@ -370,6 +364,24 @@ function loadDraft() {
             }
         })
         .catch(error => console.error('Error loading draft:', error));
+}
+
+// Withdraw Application Confirmation
+function confirmWithdrawApplication() {
+    if (confirm('Are you sure you want to withdraw your application to "{{ listing.title }}"?\n\nThis action cannot be undone.')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{% url "applications:withdraw" pk=user_application.pk %}';
+        
+        const csrfToken = document.createElement('input');
+        csrfToken.type = 'hidden';
+        csrfToken.name = 'csrfmiddlewaretoken';
+        csrfToken.value = '{{ csrf_token }}';
+        
+        form.appendChild(csrfToken);
+        document.body.appendChild(form);
+        form.submit();
+    }
 }
 
 // Delete Confirmation

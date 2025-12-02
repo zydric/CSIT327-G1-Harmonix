@@ -73,15 +73,13 @@
         <!-- Applications List -->
         <div class="space-y-6" id="applicationsList">
             {% for application in applications %}
-            <div class="application-card rounded-lg border overflow-hidden shadow-sm hover:shadow-md transition-shadow
-                {% if application.status == 'draft' %}bg-gray-50 border-gray-300
-                {% elif application.status == 'pending' %}bg-amber-50 border-amber-200
-                {% elif application.status == 'accepted' %}bg-green-50 border-green-200
-                {% else %}bg-red-50 border-red-200{% endif %}" 
+            <div class="application-card rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200
+                {% if application.status == 'draft' %}bg-gray-50
+                {% else %}bg-white{% endif %}" 
                 data-status="{{ application.status }}">
                 
                 <!-- Card Content -->
-                <div class="p-6">
+                <div class="p-6 {% if application.status == 'pending' %}border-t-[6px] border-t-amber-500 rounded-t-lg{% elif application.status == 'accepted' %}border-t-[6px] border-t-green-500 rounded-t-lg{% elif application.status == 'rejected' %}border-t-[6px] border-t-red-500 rounded-t-lg{% endif %}">
                     <div class="flex items-start gap-3">
                         <!-- Avatar -->
                         <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0" 
@@ -141,9 +139,7 @@
                 
                 <!-- Action Bar -->
                 {% if application.status == 'draft' or application.status == 'pending' %}
-                <div class="border-t bg-white px-6 py-3 flex items-center justify-between
-                    {% if application.status == 'draft' %}border-gray-200
-                    {% else %}border-amber-200{% endif %}">
+                <div class="border-t rounded-lg border-gray-200 bg-white px-6 py-3 flex items-center justify-between">
                     <a href="{% url 'listings:detail' pk=application.listing.pk %}" 
                        class="inline-flex items-center text-sm text-gray-600 hover:text-[#4F2FC0] font-medium transition-colors">
                         <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

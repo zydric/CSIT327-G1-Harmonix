@@ -41,18 +41,6 @@
                 </a>
                 
                 {% if user.is_authenticated %}
-                    {% if user.is_musician %}
-                        <a href="{% url 'accounts:musician_profile' %}" 
-                           class="{% if 'profile' in request.path %}text-[#4F2FC0] border-b-2 border-[#4F2FC0]{% else %}hover:text-[#4F2FC0]{% endif %} transition-colors pb-4 -mb-px">
-                            Profile
-                        </a>
-                    {% elif user.is_band_admin %}
-                        <a href="{% url 'accounts:band_profile' %}" 
-                           class="{% if 'profile' in request.path %}text-[#4F2FC0] border-b-2 border-[#4F2FC0]{% else %}hover:text-[#4F2FC0]{% endif %} transition-colors pb-4 -mb-px">
-                            Profile
-                        </a>
-                    {% endif %}
-                    
                     {% if user.is_band_admin %}
                         <a href="{% url 'invitations:band_admin_invite' %}" 
                            class="{% if 'invitations/invite' in request.path %}text-[#4F2FC0] border-b-2 border-[#4F2FC0]{% else %}hover:text-[#4F2FC0]{% endif %} transition-colors pb-4 -mb-px">
@@ -76,6 +64,18 @@
                        class="{% if 'applications' in request.path %}text-[#4F2FC0] border-b-2 border-[#4F2FC0]{% else %}hover:text-[#4F2FC0]{% endif %} transition-colors pb-4 -mb-px">
                         Applications
                     </a>
+                    
+                    {% if user.is_musician %}
+                        <a href="{% url 'accounts:musician_profile' %}" 
+                           class="{% if 'profile' in request.path %}text-[#4F2FC0] border-b-2 border-[#4F2FC0]{% else %}hover:text-[#4F2FC0]{% endif %} transition-colors pb-4 -mb-px">
+                            Profile
+                        </a>
+                    {% elif user.is_band_admin %}
+                        <a href="{% url 'accounts:band_profile' %}" 
+                           class="{% if 'profile' in request.path %}text-[#4F2FC0] border-b-2 border-[#4F2FC0]{% else %}hover:text-[#4F2FC0]{% endif %} transition-colors pb-4 -mb-px">
+                            Profile
+                        </a>
+                    {% endif %}
                     
                     <a href="{% url 'accounts:logout' %}" 
                        class="hover:text-[#4F2FC0] transition-colors pb-4 -mb-px">
