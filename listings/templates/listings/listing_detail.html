@@ -476,8 +476,14 @@ function confirmAcceptApplication(applicationId) {
             statusInput.name = 'status';
             statusInput.value = 'accepted';
             
+            const nextInput = document.createElement('input');
+            nextInput.type = 'hidden';
+            nextInput.name = 'next';
+            nextInput.value = window.location.pathname;
+            
             form.appendChild(csrfToken);
             form.appendChild(statusInput);
+            form.appendChild(nextInput);
             document.body.appendChild(form);
             form.submit();
         }
@@ -505,8 +511,14 @@ function confirmRejectApplication(applicationId) {
             statusInput.name = 'status';
             statusInput.value = 'rejected';
             
+            const nextInput = document.createElement('input');
+            nextInput.type = 'hidden';
+            nextInput.name = 'next';
+            nextInput.value = window.location.pathname;
+            
             form.appendChild(csrfToken);
             form.appendChild(statusInput);
+            form.appendChild(nextInput);
             document.body.appendChild(form);
             form.submit();
         }

@@ -111,6 +111,10 @@ def update_application_status(request, pk):
         else:
             messages.error(request, "Invalid status provided.")
     
+    # Redirect to 'next' parameter if provided, otherwise to my_applications
+    next_url = request.POST.get('next') or request.GET.get('next')
+    if next_url:
+        return redirect(next_url)
     return redirect('applications:my_applications')
 
 
