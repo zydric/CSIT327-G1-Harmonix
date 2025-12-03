@@ -690,10 +690,16 @@
             : 'px-4 py-2 text-sm font-medium rounded-lg border transition-colors bg-white text-gray-700 border-gray-300 hover:bg-gray-50';
     }
 
-    // Real-time search and filters
-    document.getElementById('searchMusicians')?.addEventListener('input', applyMusicianFilters);
-    document.getElementById('filterInstrument')?.addEventListener('change', applyMusicianFilters);
-    document.getElementById('filterGenre')?.addEventListener('change', applyMusicianFilters);
-    document.getElementById('filterLocation')?.addEventListener('change', applyMusicianFilters);
+    // Apply filters on Enter key in search and location fields
+    document.getElementById('searchMusicians')?.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            applyMusicianFilters();
+        }
+    });
+    document.getElementById('filterLocation')?.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            applyMusicianFilters();
+        }
+    });
 </script>
 {% endblock %}

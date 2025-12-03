@@ -29,21 +29,6 @@
                                 {{ profile_user.get_role_display }}
                             </span>
                             
-                            {% if profile_user.is_musician %}
-                                {% if profile_user.availability %}
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 8 8">
-                                        <circle cx="4" cy="4" r="3" />
-                                    </svg>
-                                    Available
-                                </span>
-                                {% else %}
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">
-                                    Not Available
-                                </span>
-                                {% endif %}
-                            {% endif %}
-                            
                             {% if profile_user.location %}
                             <div class="flex items-center text-gray-600 text-sm">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" viewBox="0 0 20 20" fill="currentColor">

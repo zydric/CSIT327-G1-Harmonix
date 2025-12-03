@@ -19,8 +19,8 @@ def band_admin_invite_musicians(request):
         messages.error(request, "Access denied. Only band admins can invite musicians.")
         return redirect('listings:feed')
     
-    # Get all musicians - prioritize available musicians
-    musicians = User.objects.filter(role='musician').order_by('-availability', 'username')
+    # Get only available musicians
+    musicians = User.objects.filter(role='musician', availability=True).order_by('-created_at')
     
     # Get band admin's active listings for the dropdown
     active_listings = Listing.objects.filter(band_admin=request.user, is_active=True)

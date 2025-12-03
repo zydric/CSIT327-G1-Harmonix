@@ -188,16 +188,31 @@
             <div class="divide-y divide-gray-200">
                 {% for application in applications %}
                 <div class="p-6">
-                    <div class="flex justify-between items-start">
-                        <div class="flex-1">
-                            <div class="flex items-center space-x-3 mb-2">
-                                <h3 class="font-medium text-gray-900">{{ application.musician.username }}</h3>
-                                <span class="px-2 py-1 text-xs font-medium rounded-full 
-                                    {% if application.status == 'pending' %}bg-yellow-100 text-yellow-800
-                                    {% elif application.status == 'accepted' %}bg-green-100 text-green-800
-                                    {% else %}bg-red-100 text-red-800{% endif %}">
-                                    {{ application.get_status_display }}
-                                </span>
+                    <div class="flex justify-between items-start gap-4">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center gap-3">
+                                    <h3 class="font-medium text-gray-900">{{ application.musician.username }}</h3>
+                                    <span class="px-2 py-1 text-xs font-medium rounded-full 
+                                        {% if application.status == 'pending' %}bg-yellow-100 text-yellow-800
+                                        {% elif application.status == 'accepted' %}bg-green-100 text-green-800
+                                        {% else %}bg-red-100 text-red-800{% endif %}">
+                                        {{ application.get_status_display }}
+                                    </span>
+                                </div>
+                                {% if application.status == 'pending' %}
+                                <div class="flex items-center gap-2">
+                                    <button onclick="confirmAcceptApplication({{ application.pk }})" 
+                                            class="px-4 py-1.5 bg-[#4F2FC0] text-white text-sm rounded hover:bg-[#3f24a0] transition-colors whitespace-nowrap">
+                                        Accept
+                                    </button>
+                                    <button onclick="confirmRejectApplication({{ application.pk }})" 
+                                            style="background-color: rgb(252 165 165); color: rgb(127 29 29);" 
+                                            class="px-4 py-1.5 text-sm rounded hover:bg-red-400 transition-colors whitespace-nowrap">
+                                        Reject
+                                    </button>
+                                </div>
+                                {% endif %}
                             </div>
                             
                             {% if application.musician.instruments %}
@@ -209,32 +224,19 @@
                             {% endif %}
                             
                             {% if application.message %}
-                            <p class="text-gray-700 text-sm">{{ application.message }}</p>
+                            <p class="text-gray-700 text-sm mb-2">{{ application.message }}</p>
                             {% endif %}
                             
-                            <p class="text-xs text-gray-500 mt-2">{{ application.application_date_display }}</p>
+                            <div class="flex items-center justify-between">
+                                <p class="text-xs text-gray-500">{{ application.application_date_display }}</p>
+                                <a href="{% url 'accounts:view_profile' username=application.musician.username %}" 
+                                   class="text-xs text-[#4F2FC0] hover:text-[#3f24a0] font-medium hover:underline whitespace-nowrap">
+                                    View Profile →
+                                </a>
+                            </div>
                         </div>
                         
-                        {% if application.status == 'pending' %}
-                        <div class="flex space-x-2 ml-4">
-                            <form method="post" action="{% url 'applications:update_status' pk=application.pk %}" class="inline">
-                                {% csrf_token %}
-                                <input type="hidden" name="status" value="accepted">
-                                <button type="submit" 
-                                        class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors">
-                                    Accept
-                                </button>
-                            </form>
-                            <form method="post" action="{% url 'applications:update_status' pk=application.pk %}" class="inline">
-                                {% csrf_token %}
-                                <input type="hidden" name="status" value="rejected">
-                                <button type="submit" 
-                                        class="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition-colors">
-                                    Reject
-                                </button>
-                            </form>
-                        </div>
-                        {% endif %}
+                        
                     </div>
                 </div>
                 {% empty %}
@@ -446,6 +448,67 @@ function respondToInvitation(invitationId, response) {
                 console.error('Error:', error);
                 alert('An error occurred. Please try again.');
             });
+        }
+    });
+}
+{% endif %}
+
+// Accept Application Confirmation
+{% if is_owner %}
+function confirmAcceptApplication(applicationId) {
+    showConfirmModal({
+        title: 'Accept Application',
+        message: 'Are you sure you want to accept this application? The musician will be notified.',
+        confirmText: 'Accept',
+        type: 'success',
+        onConfirm: function() {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/applications/status/${applicationId}/`;
+            
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = 'csrfmiddlewaretoken';
+            csrfToken.value = '{{ csrf_token }}';
+            
+            const statusInput = document.createElement('input');
+            statusInput.type = 'hidden';
+            statusInput.name = 'status';
+            statusInput.value = 'accepted';
+            
+            form.appendChild(csrfToken);
+            form.appendChild(statusInput);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    });
+}
+
+function confirmRejectApplication(applicationId) {
+    showConfirmModal({
+        title: 'Reject Application',
+        message: 'Are you sure you want to reject this application? This action cannot be undone.',
+        confirmText: 'Reject',
+        type: 'warning',
+        onConfirm: function() {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/applications/status/${applicationId}/`;
+            
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = 'csrfmiddlewaretoken';
+            csrfToken.value = '{{ csrf_token }}';
+            
+            const statusInput = document.createElement('input');
+            statusInput.type = 'hidden';
+            statusInput.name = 'status';
+            statusInput.value = 'rejected';
+            
+            form.appendChild(csrfToken);
+            form.appendChild(statusInput);
+            document.body.appendChild(form);
+            form.submit();
         }
     });
 }
